@@ -1,0 +1,2475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Energy Index — Data Visualization Lab</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'PP NeueBit'; src: url('PPNeueBit-Bold.otf') format('opentype'); font-weight: bold; }
+  @font-face { font-family: 'Melodrame';  src: url('melodrame.ttf') format('truetype'); }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  :root {
+    --bg: #111512;
+    --bg-surface: #141714;
+    --bg-card: #151916;
+    --mint: #1bff7e;
+    --mint-dim: rgba(27,255,126,0.12);
+    --mint-border: rgba(27,255,126,0.25);
+    --text: #e8f0ea;
+    --text-muted: #7a9982;
+    --text-faint: #3d5443;
+    --border: rgba(27,255,126,0.1);
+    --danger: #ff5f5f;
+    --amber: #ffb340;
+    --sky: #40c4ff;
+    --pad-h: clamp(24px, 5vw, 80px);
+    --pad-v: clamp(48px, 6vw, 96px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("https://www.figma.com/api/mcp/asset/beb62ef6-08d1-4692-9ea5-67d43ca2bf8a");
+    background-size: cover;
+    mix-blend-mode: exclusion;
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px var(--pad-h);
+    border-bottom: 1px solid var(--border);
+    background: rgba(17,21,18,0.92);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: 'PP NeueBit', monospace;
+    font-weight: bold;
+    font-size: 20px;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: var(--mint);
+  }
+  .nav-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* HERO */
+  .hero {
+    padding: var(--pad-v) var(--pad-h) 60px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(27,255,126,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mint);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--mint);
+  }
+  h1 {
+    font-family: 'PP NeueBit', monospace;
+    font-size: clamp(36px, 5vw, 68px);
+    font-weight: bold;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    max-width: 900px;
+    margin-bottom: 24px;
+  }
+  h1 em {
+    color: var(--mint);
+    font-style: normal;
+  }
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-muted);
+    max-width: 620px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .meta-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+
+  /* SECTION */
+  section {
+    padding: var(--pad-v) var(--pad-h);
+    border-bottom: 1px solid var(--border);
+  }
+  section:last-of-type { border-bottom: none; }
+
+  h2 {
+    font-family: 'PP NeueBit', monospace;
+    font-size: clamp(32px, 3.5vw, 52px);
+    font-weight: bold;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  h3 {
+    font-family: 'PP NeueBit', monospace;
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  p { color: var(--text-muted); line-height: 1.75; }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+  .section-header-left { flex: 1; min-width: 260px; }
+  .section-header-right { max-width: 420px; }
+  .source-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+    margin-top: 12px;
+  }
+
+  /* DATA TABLE */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 56px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead {
+    background: var(--bg-card);
+  }
+  th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mint);
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--mint-border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 13px 18px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+  td:first-child {
+    color: var(--text);
+    font-weight: 500;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--mint-dim); }
+  .val-mint { color: var(--mint); font-family: 'Space Mono', monospace; }
+  .val-danger { color: var(--danger); font-family: 'Space Mono', monospace; }
+  .val-amber { color: var(--amber); font-family: 'Space Mono', monospace; }
+  .val-sky { color: var(--sky); font-family: 'Space Mono', monospace; }
+
+  /* VIZ CONTAINERS */
+  .viz-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 40px 40px 32px;
+    margin-bottom: 24px;
+  }
+  .viz-title {
+    font-family: 'PP NeueBit', monospace;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .viz-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+  svg text { font-family: 'Space Grotesk', sans-serif; }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 24px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .legend-rect {
+    width: 24px; height: 10px;
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+
+  /* INSIGHT CALLOUT */
+  .insight {
+    border-left: 2px solid var(--mint);
+    padding: 16px 24px;
+    background: var(--mint-dim);
+    border-radius: 0 4px 4px 0;
+    margin-top: 32px;
+  }
+  .insight-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mint);
+    margin-bottom: 6px;
+  }
+  .insight p { font-size: 14px; color: var(--text-muted); }
+
+  /* FOOTER */
+  footer {
+    padding: 40px var(--pad-h);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  footer .nav-logo { color: var(--text-faint); }
+  footer p { font-size: 12px; color: var(--text-faint); }
+
+
+  /* D3 TOOLTIP */
+  .tooltip {
+    position: absolute;
+    background: var(--bg-card);
+    border: 1px solid var(--mint-border);
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 50;
+    font-family: 'Space Mono', monospace;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 680px) {
+    .section-header { flex-direction: column; }
+    .viz-card { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">The Energy Index</span>
+  <div style="display:flex;align-items:center;gap:28px;">
+    <span class="nav-label">Data Visualization Lab · Milestone 2</span>
+    <a href="index.html" style="font-family:'PP NeueBit',monospace;font-size:15px;font-weight:bold;color:rgba(27,255,126,0.6);text-decoration:none;letter-spacing:0.04em;transition:color 0.15s;" onmouseover="this.style.color='#1bff7e'" onmouseout="this.style.color='rgba(27,255,126,0.6)'">← Back to Overview</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero reveal">
+  <div class="section-label">Lab 02 — Visualization</div>
+  <h1>Power, Pixels,<br>and <em>Proportions</em></h1>
+  <p class="hero-sub">
+    Two data visualizations exploring GPU hardware efficiency and U.S. data center electricity consumption — drawn from real datasets including LBNL 2024, the IEA Energy & AI report, and the MDPI Kappa-Energy Index paper.
+  </p>
+  <div class="meta-row">
+    <span class="meta-pill">LBNL 2024 U.S. Data Center Report</span>
+    <span class="meta-pill">IEA Energy & AI Dataset</span>
+    <span class="meta-pill">MDPI Kappa-Energy Index (2025)</span>
+    <span class="meta-pill">Kaggle GPU Benchmarks</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     VISUALIZATION 1: Slope / Connected Dot Chart
+     GPU Architecture Efficiency: Performance vs. Energy Cost
+     Data: MDPI Kappa-Energy Index paper, Table 3 & 4
+     ═══════════════════════════════════════════════════════════ -->
+<section>
+  <div class="section-header reveal">
+    <div class="section-header-left">
+      <div class="section-label">Visualization 01</div>
+      <h2>GPU Architecture:<br>Performance vs. Energy Cost</h2>
+    </div>
+    <div class="section-header-right">
+      <p>Six deep learning architectures benchmarked on two NVIDIA GPUs. Each row shows how training energy and top-1 accuracy interact — the ideal model sits at <em style="color:var(--mint)">low energy, high accuracy</em>. Data from the MDPI Kappa-Energy Index study (2025), Tables 3–7.</p>
+      <div class="source-tag">SOURCE — MDPI Sensors 25(3):846 · DOI:10.3390/s25030846</div>
+    </div>
+  </div>
+
+  <!-- DATA TABLE 1 -->
+  <div class="table-wrap reveal">
+    <table>
+      <thead>
+        <tr>
+          <th>Architecture</th>
+          <th>Params (M)</th>
+          <th>TITAN Xp Energy (Wh)</th>
+          <th>GTX 1080 Ti Energy (Wh)</th>
+          <th>Top-1 Accuracy (%)</th>
+          <th>Kappa-Energy Index</th>
+          <th>Efficiency Tier</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AlexNet</td>
+          <td>61.1</td>
+          <td class="val-mint">14.2</td>
+          <td class="val-mint">16.8</td>
+          <td>56.5</td>
+          <td class="val-amber">3.98</td>
+          <td>Low</td>
+        </tr>
+        <tr>
+          <td>VGG-16</td>
+          <td>138.4</td>
+          <td class="val-danger">210.5</td>
+          <td class="val-danger">248.3</td>
+          <td>71.6</td>
+          <td class="val-amber">0.34</td>
+          <td>Very Low</td>
+        </tr>
+        <tr>
+          <td>ResNet-18</td>
+          <td>11.7</td>
+          <td class="val-mint">28.7</td>
+          <td class="val-mint">33.4</td>
+          <td>69.8</td>
+          <td class="val-mint">2.43</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>EfficientNet-B3</td>
+          <td>12.2</td>
+          <td class="val-mint">41.3</td>
+          <td class="val-mint">49.6</td>
+          <td>82.1</td>
+          <td class="val-mint">1.99</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>ConvNeXt-T</td>
+          <td>28.6</td>
+          <td class="val-amber">67.9</td>
+          <td class="val-amber">79.2</td>
+          <td>82.1</td>
+          <td class="val-sky">1.21</td>
+          <td>Medium</td>
+        </tr>
+        <tr>
+          <td>Swin Transformer</td>
+          <td>28.3</td>
+          <td class="val-amber">89.4</td>
+          <td class="val-amber">104.8</td>
+          <td>81.3</td>
+          <td class="val-sky">0.91</td>
+          <td>Medium-Low</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- VIZ 1: Bubble Scatter -->
+  <div class="viz-card reveal">
+    <div class="viz-title">Energy-Accuracy Trade-off Map</div>
+    <div class="viz-sub">Training energy consumption (Wh, TITAN Xp) vs. ImageNet Top-1 Accuracy. Bubble size = parameter count. Ideal quadrant: bottom-right (low energy, high accuracy).</div>
+    <div id="scatter-chart"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--mint)"></div> Highly efficient</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Moderate trade-off</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div> Energy-intensive</div>
+      <div class="legend-item" style="margin-left:auto; color: var(--text-faint); font-size:11px;">Bubble area ∝ parameter count</div>
+    </div>
+    <div class="insight">
+      <div class="insight-label">Key Insight</div>
+      <p>ResNet-18 and EfficientNet-B3 dominate the efficiency frontier — EfficientNet achieves the highest accuracy (82.1%) at just 41 Wh, roughly 5× less energy than VGG-16 with 12% better accuracy. VGG-16 sits alone in the "energy trap" quadrant: the worst energy-per-accuracy ratio of all tested architectures.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     VISUALIZATION 2: Stacked Area Chart
+     U.S. Data Center Electricity Consumption by Type (2000–2023)
+     Data: LBNL 2024 U.S. Data Center Energy Usage Report
+     ═══════════════════════════════════════════════════════════ -->
+<section>
+  <div class="section-header reveal">
+    <div class="section-header-left">
+      <div class="section-label">Visualization 02</div>
+      <h2>U.S. Data Center Electricity<br>Consumption, 2000–2023</h2>
+    </div>
+    <div class="section-header-right">
+      <p>Twenty-three years of tracked electricity demand, disaggregated by facility type: traditional enterprise, colocation, and hyperscale/cloud. The rise of hyperscale is the dominant structural shift — and AI-optimized clusters are accelerating it further. From the LBNL 2024 report, Figure 2.1 & Table 2.1.</p>
+      <div class="source-tag">SOURCE — LBNL 2024 U.S. Data Center Energy Usage Report · eta-publications.lbl.gov</div>
+    </div>
+  </div>
+
+  <!-- DATA TABLE 2 -->
+  <div class="table-wrap reveal">
+    <table>
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Traditional Enterprise (TWh)</th>
+          <th>Colocation (TWh)</th>
+          <th>Hyperscale / Cloud (TWh)</th>
+          <th>Total (TWh)</th>
+          <th>YoY Growth</th>
+          <th>Hyperscale Share</th>
+        </tr>
+      </thead>
+      <tbody id="table-2-body"></tbody>
+    </table>
+  </div>
+
+  <!-- VIZ 2: Stacked Area Chart -->
+  <div class="viz-card reveal">
+    <div class="viz-title">Stacked Area: Electricity by Facility Type</div>
+    <div class="viz-sub">Total U.S. data center electricity (TWh). The green surge from 2015 onward reflects hyperscale build-out driven by cloud and, increasingly, AI workloads.</div>
+    <div id="area-chart"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-rect" style="background:#3d5e47"></div> Traditional Enterprise</div>
+      <div class="legend-item"><div class="legend-rect" style="background:#1baa55"></div> Colocation</div>
+      <div class="legend-item"><div class="legend-rect" style="background:var(--mint)"></div> Hyperscale / Cloud</div>
+    </div>
+    <div class="insight">
+      <div class="insight-label">Key Insight</div>
+      <p>U.S. data center electricity demand grew from ~61 TWh in 2000 to ~176 TWh in 2023 — a ~190% increase. But the composition shifted dramatically: hyperscale now accounts for ~55% of total consumption, up from near-zero in 2010. Critically, even as total demand surged, efficiency improvements (better PUE, server consolidation) prevented consumption from growing proportionally with compute capacity.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer>
+  <span class="nav-logo">The Energy Index</span>
+  <p>Data Visualization Lab — Milestone 2 · All data sourced from LBNL 2024, IEA Energy & AI, MDPI Sensors 25(3):846</p>
+</footer>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ═══════════════════════════════════
+
+
+// ═══════════════════════════════════
+// DATA
+// ═══════════════════════════════════
+
+// Viz 1: GPU architectures — MDPI Kappa-Energy Index paper, Tables 3-7
+const gpuData = [
+  { name: 'AlexNet',        energy: 14.2,  accuracy: 56.5, params: 61.1,  color: '#ffb340' },
+  { name: 'VGG-16',         energy: 210.5, accuracy: 71.6, params: 138.4, color: '#ff5f5f' },
+  { name: 'ResNet-18',      energy: 28.7,  accuracy: 69.8, params: 11.7,  color: '#1bff7e' },
+  { name: 'EfficientNet-B3',energy: 41.3,  accuracy: 82.1, params: 12.2,  color: '#1bff7e' },
+  { name: 'ConvNeXt-T',     energy: 67.9,  accuracy: 82.1, params: 28.6,  color: '#40c4ff' },
+  { name: 'Swin Transformer',energy:89.4,  accuracy: 81.3, params: 28.3,  color: '#40c4ff' },
+];
+
+// Viz 2: LBNL 2024 U.S. Data Center Energy — Figure 2.1 / Table 2.1
+// Values in TWh, estimated from LBNL 2024 figure interpolation
+const lbnlData = [
+  { year: 2000, enterprise: 46, colo: 11,  hyper: 4  },
+  { year: 2001, enterprise: 47, colo: 12,  hyper: 4  },
+  { year: 2002, enterprise: 47, colo: 12,  hyper: 5  },
+  { year: 2003, enterprise: 48, colo: 13,  hyper: 5  },
+  { year: 2004, enterprise: 48, colo: 14,  hyper: 6  },
+  { year: 2005, enterprise: 49, colo: 15,  hyper: 7  },
+  { year: 2006, enterprise: 50, colo: 17,  hyper: 8  },
+  { year: 2007, enterprise: 51, colo: 19,  hyper: 10 },
+  { year: 2008, enterprise: 52, colo: 20,  hyper: 11 },
+  { year: 2009, enterprise: 51, colo: 20,  hyper: 11 },
+  { year: 2010, enterprise: 51, colo: 21,  hyper: 13 },
+  { year: 2011, enterprise: 51, colo: 22,  hyper: 15 },
+  { year: 2012, enterprise: 51, colo: 23,  hyper: 18 },
+  { year: 2013, enterprise: 51, colo: 24,  hyper: 22 },
+  { year: 2014, enterprise: 50, colo: 25,  hyper: 27 },
+  { year: 2015, enterprise: 49, colo: 27,  hyper: 35 },
+  { year: 2016, enterprise: 48, colo: 28,  hyper: 43 },
+  { year: 2017, enterprise: 47, colo: 29,  hyper: 52 },
+  { year: 2018, enterprise: 46, colo: 30,  hyper: 62 },
+  { year: 2019, enterprise: 45, colo: 31,  hyper: 70 },
+  { year: 2020, enterprise: 44, colo: 32,  hyper: 80 },
+  { year: 2021, enterprise: 43, colo: 34,  hyper: 91 },
+  { year: 2022, enterprise: 42, colo: 36,  hyper: 98 },
+  { year: 2023, enterprise: 40, colo: 38,  hyper: 98 },
+];
+
+// populate table 2
+(function(){
+  const tbody = document.getElementById('table-2-body');
+  const subset = [2000,2005,2010,2015,2018,2019,2020,2021,2022,2023];
+  lbnlData.filter(d => subset.includes(d.year)).forEach((d,i,arr) => {
+    const total = d.enterprise + d.colo + d.hyper;
+    const prevTotal = i > 0 ? arr[i-1].enterprise + arr[i-1].colo + arr[i-1].hyper : null;
+    const yoy = prevTotal ? (((total - prevTotal)/prevTotal)*100).toFixed(1)+'%' : '—';
+    const share = Math.round(d.hyper/total*100)+'%';
+    tbody.innerHTML += `<tr>
+      <td>${d.year}</td>
+      <td>${d.enterprise}</td>
+      <td>${d.colo}</td>
+      <td class="val-mint">${d.hyper}</td>
+      <td style="color:var(--text); font-weight:600">${total}</td>
+      <td class="${total > (prevTotal||0) ? 'val-mint' : 'val-danger'}">${yoy}</td>
+      <td class="val-mint">${share}</td>
+    </tr>`;
+  });
+})();
+
+
+// ═══════════════════════════════════
+// VIZ 1: BUBBLE SCATTER
+// ═══════════════════════════════════
+(function(){
+  const container = document.getElementById('scatter-chart');
+  const W = container.clientWidth || 800;
+  const H = Math.max(380, W * 0.48);
+  const margin = { top: 30, right: 140, bottom: 60, left: 70 };
+  const iw = W - margin.left - margin.right;
+  const ih = H - margin.top - margin.bottom;
+
+  const svg = d3.select('#scatter-chart')
+    .append('svg')
+    .attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('width', '100%');
+
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+  // Grid
+  const xScale = d3.scaleLog().domain([10, 280]).range([0, iw]);
+  const yScale = d3.scaleLinear().domain([50, 88]).range([ih, 0]);
+  const rScale = d3.scaleSqrt().domain([0, 150]).range([0, 38]);
+
+  // Gridlines
+  g.append('g').attr('class','grid').call(
+    d3.axisLeft(yScale).tickSize(-iw).tickFormat('')
+  ).selectAll('line').style('stroke','rgba(27,255,126,0.06)').style('stroke-dasharray','3,4');
+  g.select('.grid .domain').remove();
+
+  // Ideal zone annotation
+  g.append('rect')
+    .attr('x', 0).attr('y', 0)
+    .attr('width', iw * 0.28).attr('height', ih * 0.36)
+    .attr('fill', 'rgba(27,255,126,0.04)')
+    .attr('stroke', 'rgba(27,255,126,0.15)')
+    .attr('stroke-dasharray','4,3');
+  g.append('text')
+    .attr('x', 8).attr('y', 14)
+    .attr('fill', 'rgba(27,255,126,0.4)')
+    .attr('font-size', '10px')
+    .attr('font-family', 'Space Mono, monospace')
+    .attr('letter-spacing', '0.1em')
+    .text('IDEAL ZONE');
+
+  // Axes
+  g.append('g').attr('transform', `translate(0,${ih})`)
+    .call(d3.axisBottom(xScale).ticks(6, '~s').tickFormat(d => d+' Wh'))
+    .selectAll('text').style('fill','#7a9982').style('font-size','11px').style('font-family','Space Mono,monospace');
+  g.selectAll('.domain, .tick line').style('stroke','rgba(27,255,126,0.15)');
+
+  g.append('g')
+    .call(d3.axisLeft(yScale).ticks(6).tickFormat(d => d+'%'))
+    .selectAll('text').style('fill','#7a9982').style('font-size','11px').style('font-family','Space Mono,monospace');
+
+  // Axis labels
+  g.append('text').attr('x', iw/2).attr('y', ih+48)
+    .attr('text-anchor','middle').attr('fill','#7a9982')
+    .attr('font-size','12px').attr('font-family','Space Grotesk,sans-serif')
+    .attr('letter-spacing','0.06em')
+    .text('Training Energy Consumption (Wh, log scale) — TITAN Xp');
+
+  g.append('text').attr('transform','rotate(-90)')
+    .attr('x', -ih/2).attr('y', -52)
+    .attr('text-anchor','middle').attr('fill','#7a9982')
+    .attr('font-size','12px').attr('font-family','Space Grotesk,sans-serif')
+    .attr('letter-spacing','0.06em')
+    .text('Top-1 Accuracy (%)');
+
+  const tooltip = document.getElementById('tooltip');
+
+  // Bubbles
+  const bubbles = g.selectAll('circle').data(gpuData).enter().append('circle')
+    .attr('cx', d => xScale(d.energy))
+    .attr('cy', d => yScale(d.accuracy))
+    .attr('r', 0)
+    .attr('fill', d => d.color)
+    .attr('fill-opacity', 0.18)
+    .attr('stroke', d => d.color)
+    .attr('stroke-width', 1.5)
+    .style('cursor','pointer')
+    .on('mouseover', function(event, d){
+      d3.select(this).attr('fill-opacity',0.35).attr('stroke-width',2.5);
+      tooltip.style.opacity = 1;
+      tooltip.innerHTML = `<strong style="color:${d.color}">${d.name}</strong><br>Energy: ${d.energy} Wh<br>Accuracy: ${d.accuracy}%<br>Params: ${d.params}M`;
+    })
+    .on('mousemove', function(event){
+      tooltip.style.left = (event.pageX+14)+'px';
+      tooltip.style.top = (event.pageY-40)+'px';
+    })
+    .on('mouseout', function(){
+      d3.select(this).attr('fill-opacity',0.18).attr('stroke-width',1.5);
+      tooltip.style.opacity = 0;
+    });
+
+  bubbles.transition().duration(800).delay((d,i) => i*100)
+    .attr('r', d => rScale(d.params));
+
+  // Labels
+  const labelOffsets = {
+    'AlexNet':         [10, -14],
+    'VGG-16':          [10, -12],
+    'ResNet-18':       [10, -14],
+    'EfficientNet-B3': [10, 18],
+    'ConvNeXt-T':      [10, -14],
+    'Swin Transformer':[-60, 20],
+  };
+  g.selectAll('.label').data(gpuData).enter().append('text')
+    .attr('x', d => xScale(d.energy) + (labelOffsets[d.name]||[10,0])[0])
+    .attr('y', d => yScale(d.accuracy) + (labelOffsets[d.name]||[10,0])[1])
+    .attr('fill', d => d.color)
+    .attr('font-size', '11px')
+    .attr('font-family', 'Space Grotesk,sans-serif')
+    .attr('font-weight', '500')
+    .text(d => d.name)
+    .attr('opacity',0)
+    .transition().delay((d,i)=>i*100+400).duration(500)
+    .attr('opacity',1);
+
+})();
+
+
+// ═══════════════════════════════════
+// VIZ 2: STACKED AREA
+// ═══════════════════════════════════
+(function(){
+  const container = document.getElementById('area-chart');
+  const W = container.clientWidth || 800;
+  const H = Math.max(360, W * 0.44);
+  const margin = { top: 30, right: 30, bottom: 56, left: 65 };
+  const iw = W - margin.left - margin.right;
+  const ih = H - margin.top - margin.bottom;
+
+  const svg = d3.select('#area-chart')
+    .append('svg').attr('viewBox',`0 0 ${W} ${H}`).attr('width','100%');
+
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const keys = ['enterprise','colo','hyper'];
+  const colors = { enterprise: '#3d5e47', colo: '#1baa55', hyper: '#1bff7e' };
+
+  const stack = d3.stack().keys(keys)(lbnlData);
+
+  const xScale = d3.scaleLinear().domain([2000,2023]).range([0,iw]);
+  const yScale = d3.scaleLinear().domain([0, 200]).range([ih,0]);
+
+  // Gridlines
+  g.append('g').call(
+    d3.axisLeft(yScale).tickSize(-iw).tickFormat('')
+  ).selectAll('line').style('stroke','rgba(27,255,126,0.06)').style('stroke-dasharray','3,4');
+  g.selectAll('.domain').remove();
+
+  const area = d3.area()
+    .x(d => xScale(d.data.year))
+    .y0(d => yScale(d[0]))
+    .y1(d => yScale(d[1]))
+    .curve(d3.curveMonotoneX);
+
+  const tooltip = document.getElementById('tooltip');
+
+  // Draw areas
+  g.selectAll('.layer').data(stack).enter().append('path')
+    .attr('class','layer')
+    .attr('d', area)
+    .attr('fill', d => colors[d.key])
+    .attr('fill-opacity', d => d.key === 'hyper' ? 0.85 : d.key === 'colo' ? 0.7 : 0.55)
+    .attr('stroke', d => colors[d.key])
+    .attr('stroke-width', 0.5)
+    .attr('stroke-opacity', 0.4);
+
+  // Milestone annotation: 2015 hyperscale takeoff
+  const x2015 = xScale(2015);
+  g.append('line')
+    .attr('x1', x2015).attr('x2', x2015)
+    .attr('y1', 0).attr('y2', ih)
+    .attr('stroke', 'rgba(27,255,126,0.3)')
+    .attr('stroke-dasharray','5,4')
+    .attr('stroke-width', 1);
+  g.append('text')
+    .attr('x', x2015 + 6).attr('y', 14)
+    .attr('fill','rgba(27,255,126,0.5)')
+    .attr('font-size','10px')
+    .attr('font-family','Space Mono,monospace')
+    .text('Hyperscale surge →');
+
+  // AI annotation 2020+
+  const x2020 = xScale(2020);
+  g.append('line')
+    .attr('x1', x2020).attr('x2', x2020)
+    .attr('y1', 0).attr('y2', ih)
+    .attr('stroke','rgba(255,179,64,0.35)')
+    .attr('stroke-dasharray','5,4')
+    .attr('stroke-width', 1);
+  g.append('text')
+    .attr('x', x2020 + 6).attr('y', 14)
+    .attr('fill','rgba(255,179,64,0.6)')
+    .attr('font-size','10px')
+    .attr('font-family','Space Mono,monospace')
+    .text('AI/cloud boom →');
+
+  // Axes
+  g.append('g').attr('transform',`translate(0,${ih})`)
+    .call(d3.axisBottom(xScale).tickFormat(d3.format('d')).ticks(8))
+    .selectAll('text').style('fill','#7a9982').style('font-size','11px').style('font-family','Space Mono,monospace');
+
+  g.append('g')
+    .call(d3.axisLeft(yScale).ticks(6).tickFormat(d=>d+' TWh'))
+    .selectAll('text').style('fill','#7a9982').style('font-size','11px').style('font-family','Space Mono,monospace');
+
+  // Total line
+  const totalLine = d3.line()
+    .x(d => xScale(d.year))
+    .y(d => yScale(d.enterprise + d.colo + d.hyper))
+    .curve(d3.curveMonotoneX);
+
+  g.append('path').datum(lbnlData)
+    .attr('d', totalLine)
+    .attr('fill','none')
+    .attr('stroke','rgba(255,255,255,0.2)')
+    .attr('stroke-width',1.5)
+    .attr('stroke-dasharray','4,3');
+
+  // Hover overlay
+  const bisect = d3.bisector(d=>d.year).left;
+  g.append('rect')
+    .attr('width', iw).attr('height', ih)
+    .attr('fill','transparent')
+    .on('mousemove', function(event){
+      const [mx] = d3.pointer(event);
+      const year = Math.round(xScale.invert(mx));
+      const idx = bisect(lbnlData, year, 0);
+      const d = lbnlData[Math.min(idx, lbnlData.length-1)];
+      if (!d) return;
+      tooltip.style.opacity = 1;
+      tooltip.style.left = (event.pageX+14)+'px';
+      tooltip.style.top = (event.pageY-60)+'px';
+      tooltip.innerHTML = `<strong style="color:#1bff7e">${d.year}</strong><br>Enterprise: ${d.enterprise} TWh<br>Colocation: ${d.colo} TWh<br><span style="color:#1bff7e">Hyperscale: ${d.hyper} TWh</span><br>Total: ${d.enterprise+d.colo+d.hyper} TWh`;
+    })
+    .on('mouseout', () => { tooltip.style.opacity = 0; });
+
+  // Axis label
+  g.append('text').attr('x',iw/2).attr('y',ih+48)
+    .attr('text-anchor','middle').attr('fill','#7a9982')
+    .attr('font-size','12px').attr('font-family','Space Grotesk,sans-serif')
+    .attr('letter-spacing','0.06em')
+    .text('Year');
+
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════
+     GPU SPECS DASHBOARD  (Visualization 03)
+     Data: wthoman.webdev.iyaserver.com
+════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<style>
+  /* ── GPU section scoped styles ── */
+  .gpu-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin: 32px 0 24px;
+  }
+  .gpu-stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 20px 20px 16px;
+  }
+  .gpu-stat-card .s-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .gpu-stat-card .s-value {
+    font-family: 'PP NeueBit', monospace;
+    font-size: 38px;
+    font-weight: bold;
+    line-height: 1;
+    color: var(--mint);
+  }
+  .gpu-stat-card .s-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  .gpu-toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .gpu-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border);
+    background: rgba(21,25,22,0.7);
+    border-radius: 999px;
+    padding: 9px 16px;
+  }
+  .gpu-control label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .gpu-control select {
+    appearance: none;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    min-width: 130px;
+    cursor: pointer;
+  }
+  .gpu-control select option { background: #151916; }
+
+  .gpu-charts-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  .gpu-chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 24px 24px 20px;
+  }
+  .gpu-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .gpu-chart-header h3 {
+    margin: 0 0 4px;
+    font-size: 20px;
+    line-height: 1.2;
+  }
+  .gpu-chart-header .chart-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .gpu-chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 500px;
+  }
+  .gpu-legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 2px;
+  }
+  .gpu-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .gpu-dot {
+    width: 9px; height: 9px;
+    border-radius: 999px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .gpu-table-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 24px 24px 20px;
+    margin-top: 18px;
+  }
+  .gpu-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 14px;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .gpu-table-header h3 { margin: 0; font-size: 20px; }
+  .gpu-row-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+  .gpu-table-scroll {
+    max-height: 380px;
+    overflow: auto;
+    margin-top: 0;
+  }
+  .gpu-table-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+  .gpu-table-scroll::-webkit-scrollbar-track { background: transparent; }
+  .gpu-table-scroll::-webkit-scrollbar-thumb { background: rgba(27,255,126,0.2); border-radius: 4px; }
+
+  .gpu-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .gpu-table thead th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mint);
+    padding: 13px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--mint-border);
+    background: var(--bg-card);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    white-space: nowrap;
+  }
+  .gpu-table tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .gpu-table tbody td:first-child { color: var(--text); font-weight: 500; }
+  .gpu-table tbody td:nth-child(2) { color: var(--text); }
+  .gpu-table tbody tr:hover td { background: var(--mint-dim); }
+  .gpu-table .val-mint { color: var(--mint); font-family: 'Space Mono', monospace; }
+
+  .gpu-status-bar {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .gpu-status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--mint);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 1000px) {
+    .gpu-stats { grid-template-columns: repeat(2, 1fr); }
+    .gpu-charts-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<section style="padding: var(--pad-v) var(--pad-h); border-top: 1px solid var(--border);">
+  <div class="section-header">
+    <div class="section-header-left">
+      <div class="section-label">Visualization 03</div>
+      <h2>GPU Specs Dashboard</h2>
+    </div>
+    <div class="section-header-right">
+      <p>Interactive analytics across GPU hardware generations — compute density, memory bandwidth proxies, and clock relationships. Filter by manufacturer, release year, and sort metric.</p>
+      <p class="source-tag">SOURCE — Kaggle GPU Benchmarks · wthoman API</p>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="gpu-status-bar">
+    <span class="gpu-status-dot" id="gpuStatusDot" style="background: var(--text-faint);"></span>
+    <span id="gpuStatusText">Connecting to data source…</span>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="gpu-stats">
+    <div class="gpu-stat-card">
+      <div class="s-label">GPU Models</div>
+      <div class="s-value" id="gpuStatModels">—</div>
+      <div class="s-sub">Total records loaded</div>
+    </div>
+    <div class="gpu-stat-card">
+      <div class="s-label">Avg Unified Shaders</div>
+      <div class="s-value" id="gpuStatShaders">—</div>
+      <div class="s-sub">Compute-heavy filtered set</div>
+    </div>
+    <div class="gpu-stat-card">
+      <div class="s-label">Median Memory</div>
+      <div class="s-value" id="gpuStatMem">—</div>
+      <div class="s-sub">Useful for tier clustering</div>
+    </div>
+    <div class="gpu-stat-card">
+      <div class="s-label">Top GPU Clock</div>
+      <div class="s-value" id="gpuStatClock">—</div>
+      <div class="s-sub" id="gpuStatClockName">—</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="gpu-toolbar">
+    <div class="gpu-control">
+      <label>Manufacturer</label>
+      <select id="gpuMfr"><option value="all">All</option></select>
+    </div>
+    <div class="gpu-control">
+      <label>Year</label>
+      <select id="gpuYear"><option value="all">All</option></select>
+    </div>
+    <div class="gpu-control">
+      <label>Sort by</label>
+      <select id="gpuSort">
+        <option value="unifiedShader_desc">Shaders — high to low</option>
+        <option value="gpuClock_desc">GPU clock — high to low</option>
+        <option value="memSize_desc">Memory — high to low</option>
+        <option value="releaseYear_desc">Year — newest first</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="gpu-charts-grid">
+    <div class="gpu-chart-card">
+      <div class="gpu-chart-header">
+        <div>
+          <h3>Memory vs. Unified Shaders</h3>
+          <p class="chart-sub">Bubble size = memory bus width. Ideal: high shaders, large memory.</p>
+        </div>
+        <div class="gpu-legend">
+          <div class="gpu-legend-item"><span class="gpu-dot" style="background:#60a5fa"></span>NVIDIA</div>
+          <div class="gpu-legend-item"><span class="gpu-dot" style="background:#1bff7e"></span>Intel</div>
+          <div class="gpu-legend-item"><span class="gpu-dot" style="background:#ff6b6b"></span>AMD</div>
+        </div>
+      </div>
+      <div class="gpu-chart-wrap"><canvas id="gpuBubbleChart"></canvas></div>
+    </div>
+
+    <div class="gpu-chart-card">
+      <div class="gpu-chart-header">
+        <div>
+          <h3>GPU Clock vs. Memory Clock</h3>
+          <p class="chart-sub">Horizontal bars sorted by GPU clock (MHz).</p>
+        </div>
+        <div class="gpu-legend">
+          <div class="gpu-legend-item"><span class="gpu-dot" style="background:#60a5fa; border-radius:2px;"></span>GPU clock</div>
+          <div class="gpu-legend-item"><span class="gpu-dot" style="background:#f5a623; border-radius:2px;"></span>Mem clock</div>
+        </div>
+      </div>
+      <div class="gpu-chart-wrap"><canvas id="gpuBarChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="gpu-table-card">
+    <div class="gpu-table-header">
+      <h3>Filtered Records</h3>
+      <span class="gpu-row-count" id="gpuRowCount">—</span>
+    </div>
+    <div class="gpu-table-scroll">
+      <table class="gpu-table">
+        <thead>
+          <tr>
+            <th>Manufacturer</th><th>Product</th><th>Year</th>
+            <th>Mem (GB)</th><th>Bus Width</th><th>GPU Clock</th>
+            <th>Mem Clock</th><th>Shaders</th><th>Chip</th>
+          </tr>
+        </thead>
+        <tbody id="gpuTableBody">
+          <tr><td colspan="9" style="padding:20px 14px; color:var(--text-muted);">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  Chart.register(ChartDataLabels);
+
+  const fmt = new Intl.NumberFormat('en-US');
+  const TOOLTIP_BG = 'rgba(12,16,13,0.97)';
+  const GRID_COLOR = 'rgba(27,255,126,0.07)';
+  const TICK_COLOR = '#7a9982';
+  const AXIS_TITLE_COLOR = '#e8f0ea';
+
+  const brandColors = { NVIDIA: '#60a5fa', Intel: '#1bff7e', AMD: '#ff6b6b' };
+
+  let rawData = [], gpuBubble, gpuBar;
+
+  const $ = id => document.getElementById(id);
+
+  function num(v) { const n = Number(v); return Number.isFinite(n) ? n : null; }
+  function avg(arr) { const ns = arr.filter(Number.isFinite); return ns.length ? ns.reduce((a,b)=>a+b,0)/ns.length : null; }
+  function median(arr) {
+    const ns = arr.filter(Number.isFinite).sort((a,b)=>a-b);
+    if (!ns.length) return null;
+    const m = Math.floor(ns.length/2);
+    return ns.length%2 ? ns[m] : (ns[m-1]+ns[m])/2;
+  }
+
+  function buildFilters(data) {
+    [...new Set(data.map(d=>d.manufacturer).filter(Boolean))].sort().forEach(m => {
+      const o = document.createElement('option'); o.value = o.textContent = m;
+      $('gpuMfr').appendChild(o);
+    });
+    [...new Set(data.map(d=>d.releaseYear).filter(Boolean))].sort((a,b)=>b-a).forEach(y => {
+      const o = document.createElement('option'); o.value = o.textContent = y;
+      $('gpuYear').appendChild(o);
+    });
+  }
+
+  function filtered() {
+    const mfr = $('gpuMfr').value, yr = $('gpuYear').value;
+    let d = [...rawData];
+    if (mfr !== 'all') d = d.filter(r => r.manufacturer === mfr);
+    if (yr  !== 'all') d = d.filter(r => String(r.releaseYear) === String(yr));
+    const [field, dir] = $('gpuSort').value.split('_');
+    d.sort((a,b) => { const av=num(a[field])??-Infinity, bv=num(b[field])??-Infinity; return dir==='desc'?bv-av:av-bv; });
+    return d;
+  }
+
+  function refreshStats(d) {
+    $('gpuStatModels').textContent  = fmt.format(d.length);
+    $('gpuStatShaders').textContent = fmt.format(Math.round(avg(d.map(r=>num(r.unifiedShader)))||0));
+    $('gpuStatMem').textContent     = `${fmt.format(Math.round(median(d.map(r=>num(r.memSize)))||0))} GB`;
+    const top = d.reduce((b,r) => { const c=num(r.gpuClock)||0; return !b||c>b.c?{c,r}:b; }, null);
+    if (top) { $('gpuStatClock').textContent = `${fmt.format(top.c)}`; $('gpuStatClockName').textContent = top.r.productName; }
+  }
+
+  function refreshTable(d) {
+    $('gpuRowCount').textContent = `${fmt.format(d.length)} rows`;
+    $('gpuTableBody').innerHTML = d.map(r => `
+      <tr>
+        <td>${r.manufacturer??''}</td>
+        <td>${r.productName??''}</td>
+        <td>${r.releaseYear??''}</td>
+        <td class="val-mint">${r.memSize??''}</td>
+        <td>${r.memBusWidth??''}</td>
+        <td class="val-mint">${r.gpuClock??''}</td>
+        <td>${r.memClock??''}</td>
+        <td>${r.unifiedShader??''}</td>
+        <td>${r.gpuChip??''}</td>
+      </tr>`).join('');
+  }
+
+  function buildBubble(d) {
+    const pts = d.map(r => ({
+      x: num(r.memSize), y: num(r.unifiedShader),
+      r: Math.max(5, Math.min(22, (num(r.memBusWidth)||0)/12)),
+      manufacturer: r.manufacturer, productName: r.productName,
+      memBusWidth: r.memBusWidth, gpuClock: r.gpuClock,
+      memClock: r.memClock, releaseYear: r.releaseYear, gpuChip: r.gpuChip
+    })).filter(p => p.x!==null && p.y!==null);
+
+    if (gpuBubble) gpuBubble.destroy();
+    gpuBubble = new Chart($('gpuBubbleChart'), {
+      type: 'bubble',
+      data: {
+        datasets: ['NVIDIA','Intel','AMD'].map(brand => ({
+          label: brand,
+          data: pts.filter(p => p.manufacturer===brand),
+          backgroundColor: brandColors[brand]+'99',
+          borderColor: brandColors[brand],
+          borderWidth: 1,
+          hoverBackgroundColor: brandColors[brand]+'ee'
+        }))
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          datalabels: {
+            color: '#e8f0ea',
+            formatter: (v,ctx) => ctx.dataset.data.length <= 6 ? ctx.raw.productName : '',
+            anchor: 'end', align: 'top', offset: 4,
+            font: { size: 10, family: 'Space Grotesk, sans-serif' }
+          },
+          tooltip: {
+            backgroundColor: TOOLTIP_BG, titleColor: '#fff', bodyColor: '#c8d8cc',
+            borderColor: 'rgba(27,255,126,0.2)', borderWidth: 1, padding: 14,
+            callbacks: {
+              title: items => items[0].raw.productName,
+              label: ctx => {
+                const r = ctx.raw;
+                return [`${r.manufacturer}`, `Memory: ${r.x} GB`, `Shaders: ${fmt.format(r.y)}`,
+                        `Bus width: ${r.memBusWidth} bit`, `GPU clock: ${fmt.format(r.gpuClock)} MHz`,
+                        `Mem clock: ${fmt.format(r.memClock)} MHz`, `Year: ${r.releaseYear}`];
+              }
+            }
+          }
+        },
+        scales: {
+          x: { title: { display:true, text:'Memory (GB)', color: AXIS_TITLE_COLOR, font:{weight:'600'} },
+               ticks:{color:TICK_COLOR}, grid:{color:GRID_COLOR} },
+          y: { title: { display:true, text:'Unified Shaders', color: AXIS_TITLE_COLOR, font:{weight:'600'} },
+               ticks:{color:TICK_COLOR, callback:v=>fmt.format(v)}, grid:{color:GRID_COLOR} }
+        }
+      }
+    });
+  }
+
+  function buildBar(d) {
+    const sorted = [...d].sort((a,b)=>(num(b.gpuClock)||0)-(num(a.gpuClock)||0));
+    if (gpuBar) gpuBar.destroy();
+    gpuBar = new Chart($('gpuBarChart'), {
+      type: 'bar',
+      data: {
+        labels: sorted.map(r=>r.productName),
+        datasets: [
+          { label:'GPU clock (MHz)', data:sorted.map(r=>num(r.gpuClock)),
+            backgroundColor:'rgba(96,165,250,0.88)', borderColor:'#60a5fa',
+            borderWidth:1, borderRadius:6, barThickness:11 },
+          { label:'Memory clock (MHz)', data:sorted.map(r=>num(r.memClock)),
+            backgroundColor:'rgba(245,166,35,0.88)', borderColor:'#f5a623',
+            borderWidth:1, borderRadius:6, barThickness:11 }
+        ]
+      },
+      options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          datalabels: { display: false },
+          tooltip: {
+            backgroundColor: TOOLTIP_BG, titleColor:'#fff', bodyColor:'#c8d8cc',
+            borderColor:'rgba(27,255,126,0.2)', borderWidth:1, padding:14,
+            callbacks: { label: ctx=>`${ctx.dataset.label}: ${fmt.format(ctx.raw)} MHz` }
+          }
+        },
+        scales: {
+          x: { beginAtZero:true, ticks:{color:TICK_COLOR, callback:v=>fmt.format(v)}, grid:{color:GRID_COLOR} },
+          y: { ticks:{color:'#e8f0ea', font:{size:11}}, grid:{display:false} }
+        }
+      }
+    });
+  }
+
+  function refresh() {
+    const d = filtered();
+    refreshStats(d); refreshTable(d); buildBubble(d); buildBar(d);
+  }
+
+  async function init() {
+    try {
+      const res = await fetch('https://wthoman.webdev.iyaserver.com/acad274/data_center/gpu_data.php', { cache:'no-store' });
+      const json = await res.json();
+      if (!res.ok || json.error) throw new Error(json.error || `HTTP ${res.status}`);
+
+      rawData = json.map(r => ({
+        ...r,
+        releaseYear:   num(r.releaseYear),
+        memSize:       num(r.memSize),
+        memBusWidth:   num(r.memBusWidth),
+        gpuClock:      num(r.gpuClock),
+        memClock:      num(r.memClock),
+        unifiedShader: num(r.unifiedShader)
+      }));
+
+      buildFilters(rawData);
+      refresh();
+
+      $('gpuStatusDot').style.background = 'var(--mint)';
+      $('gpuStatusText').textContent = `${fmt.format(rawData.length)} GPU records loaded`;
+    } catch (err) {
+      $('gpuStatusDot').style.background = '#ff6b6b';
+      $('gpuStatusText').textContent = `Failed to load — ${err.message}`;
+      $('gpuTableBody').innerHTML = `<tr><td colspan="9" style="padding:20px 14px;color:#ff6b6b;">Could not reach data source.</td></tr>`;
+    }
+  }
+
+  ['gpuMfr','gpuYear','gpuSort'].forEach(id => $(id).addEventListener('change', refresh));
+  init();
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════
+     IEA ENERGY DEMAND  (Visualization 04)
+     Data: jhu30699.webdev.iyaserver.com
+════════════════════════════════════════════ -->
+<style>
+  .iea-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 28px 0;
+  }
+  .iea-stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 22px 20px 18px;
+  }
+  .iea-stat .s-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 8px;
+  }
+  .iea-stat .s-value {
+    font-family: 'PP NeueBit', monospace;
+    font-size: 40px; font-weight: bold;
+    line-height: 1; color: var(--mint);
+  }
+  .iea-stat .s-sub {
+    font-size: 12px; color: var(--text-muted); margin-top: 5px; line-height: 1.4;
+  }
+
+  .iea-region-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 0 0 32px;
+  }
+  .iea-region {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 16px 14px;
+  }
+  .iea-region .r-name {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
+  }
+  .iea-region .r-value {
+    font-family: 'PP NeueBit', monospace;
+    font-size: 28px; font-weight: bold;
+    color: var(--sky); line-height: 1;
+  }
+  .iea-region .r-unit {
+    font-size: 11px; color: var(--text-muted); margin-top: 3px;
+  }
+
+  .iea-charts-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  .iea-chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+  .iea-chart-card h3 { font-size: 20px; margin: 0 0 6px; line-height: 1.2; }
+  .iea-chart-card .chart-sub {
+    font-size: 12px; color: var(--text-muted); margin: 0 0 20px;
+  }
+  .iea-legend {
+    display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px;
+  }
+  .iea-legend-item {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .iea-swatch {
+    width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex-shrink: 0;
+  }
+
+  .iea-table-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 24px 24px 20px;
+    margin-top: 18px;
+  }
+  .iea-table-card h3 { font-size: 20px; margin: 0 0 16px; }
+  .iea-table-scroll { overflow-x: auto; }
+  .iea-table {
+    width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px;
+  }
+  .iea-table thead th {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--mint); padding: 13px 14px; text-align: left;
+    border-bottom: 1px solid var(--mint-border);
+    background: var(--bg-card); position: sticky; top: 0; z-index: 1;
+  }
+  .iea-table tbody td {
+    padding: 11px 14px; border-bottom: 1px solid var(--border);
+    color: var(--text-muted); vertical-align: top;
+  }
+  .iea-table tbody td:first-child { color: var(--text); font-weight: 500; }
+  .iea-table tbody tr:hover td { background: var(--mint-dim); }
+  .iea-table .val-mint { color: var(--mint); font-family: 'Space Mono', monospace; font-size: 12px; }
+
+  @media (max-width: 900px) {
+    .iea-stats { grid-template-columns: 1fr 1fr; }
+    .iea-region-grid { grid-template-columns: repeat(2, 1fr); }
+    .iea-charts-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<section style="padding: var(--pad-v) var(--pad-h); border-top: 1px solid var(--border);">
+  <div class="section-header">
+    <div class="section-header-left">
+      <div class="section-label">Visualization 04</div>
+      <h2>Global Data Center<br>Energy Demand</h2>
+    </div>
+    <div class="section-header-right">
+      <p>IEA <em>Electricity 2024</em> projections — how much electricity data centers consumed in 2022 and where demand is heading by 2026 across regions, plus a breakdown of how that electricity is split inside a typical facility.</p>
+      <p class="source-tag">SOURCE — IEA, Electricity 2024: Analysis and Forecast to 2026 · jhu30699</p>
+    </div>
+  </div>
+
+  <!-- Key stats -->
+  <div class="iea-stats">
+    <div class="iea-stat">
+      <div class="s-label">Global demand, 2022</div>
+      <div class="s-value">460 TWh</div>
+      <div class="s-sub">Actual figure from IEA report</div>
+    </div>
+    <div class="iea-stat">
+      <div class="s-label">IEA base case, 2026</div>
+      <div class="s-value">~800 TWh</div>
+      <div class="s-sub">Range: 620–1,050 TWh</div>
+    </div>
+    <div class="iea-stat">
+      <div class="s-label">Internal energy split</div>
+      <div class="s-value">40/40/20</div>
+      <div class="s-sub">Computing / Cooling / Other IT</div>
+    </div>
+  </div>
+
+  <!-- Regional context -->
+  <div style="font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(27,255,126,0.6); padding-bottom:12px; border-bottom:1px solid rgba(50,205,115,0.15); margin-bottom:16px;">
+    Regional snapshot — 2026 forecast (TWh)
+  </div>
+  <div class="iea-region-grid">
+    <div class="iea-region"><div class="r-name">United States</div><div class="r-value">200–260</div><div class="r-unit">TWh · ~6% of US demand</div></div>
+    <div class="iea-region"><div class="r-name">European Union</div><div class="r-value">&lt;150</div><div class="r-unit">TWh · IEA estimate</div></div>
+    <div class="iea-region"><div class="r-name">China</div><div class="r-value">~300</div><div class="r-unit">TWh forecast 2026</div></div>
+    <div class="iea-region"><div class="r-name">Ireland</div><div class="r-value">5.3</div><div class="r-unit">TWh · up to 32% national</div></div>
+    <div class="iea-region"><div class="r-name">Denmark</div><div class="r-value">6</div><div class="r-unit">TWh · ~20% national</div></div>
+  </div>
+
+  <!-- Charts -->
+  <div class="iea-charts-grid">
+
+    <!-- Bar chart: global demand -->
+    <div class="iea-chart-card">
+      <h3>Global Electricity Demand from Data Centers</h3>
+      <p class="chart-sub">IEA 2022 actual vs 2026 low / base / high scenario (TWh)</p>
+      <svg viewBox="0 0 760 400" role="img" aria-label="Bar chart of global data center electricity demand">
+        <defs>
+          <linearGradient id="ieaGrad1" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#1bff7e" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#40c4ff" stop-opacity="0.75"/>
+          </linearGradient>
+          <linearGradient id="ieaGrad2" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#ffb340" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#ff7e67" stop-opacity="0.8"/>
+          </linearGradient>
+        </defs>
+        <!-- grid lines -->
+        <g stroke="rgba(27,255,126,0.07)" stroke-width="1">
+          <line x1="64" y1="350" x2="720" y2="350"/>
+          <line x1="64" y1="293" x2="720" y2="293"/>
+          <line x1="64" y1="237" x2="720" y2="237"/>
+          <line x1="64" y1="180" x2="720" y2="180"/>
+          <line x1="64" y1="124" x2="720" y2="124"/>
+          <line x1="64" y1="67"  x2="720" y2="67"/>
+        </g>
+        <!-- y-axis -->
+        <g fill="#7a9982" font-size="12" font-family="Space Grotesk,sans-serif" text-anchor="end">
+          <text x="56" y="354">0</text>
+          <text x="56" y="297">200</text>
+          <text x="56" y="241">400</text>
+          <text x="56" y="184">600</text>
+          <text x="56" y="128">800</text>
+          <text x="56" y="71">1,000</text>
+        </g>
+        <line x1="64" y1="350" x2="720" y2="350" stroke="rgba(27,255,126,0.2)" stroke-width="1"/>
+        <!-- 2022: 460 TWh → height = 460/1100*306 ≈ 128 -->
+        <rect x="110" y="222" width="100" height="128" fill="url(#ieaGrad1)" rx="8"/>
+        <text x="160" y="214" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">460</text>
+        <text x="160" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2022 actual</text>
+        <!-- 2026 low: 620 → height ≈ 173 -->
+        <rect x="250" y="177" width="100" height="173" fill="url(#ieaGrad2)" rx="8" opacity="0.85"/>
+        <text x="300" y="169" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">620</text>
+        <text x="300" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2026 low</text>
+        <!-- 2026 base: 805 → height ≈ 224 -->
+        <rect x="390" y="126" width="100" height="224" fill="url(#ieaGrad1)" rx="8"/>
+        <text x="440" y="118" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">~805</text>
+        <text x="440" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2026 base</text>
+        <!-- 2026 high: 1050 → height ≈ 292 -->
+        <rect x="530" y="58" width="100" height="292" fill="url(#ieaGrad2)" rx="8"/>
+        <text x="580" y="50" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">1,050</text>
+        <text x="580" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2026 high</text>
+        <!-- unit label -->
+        <text x="392" y="22" fill="#7a9982" font-size="11" font-family="Space Mono,monospace" text-anchor="middle" letter-spacing="0.1em">TWH / YEAR</text>
+      </svg>
+      <div class="iea-legend">
+        <div class="iea-legend-item"><span class="iea-swatch" style="background:#1bff7e;"></span>Actual / base scenario</div>
+        <div class="iea-legend-item"><span class="iea-swatch" style="background:#ffb340;"></span>Low / high scenario</div>
+      </div>
+    </div>
+
+    <!-- Donut chart: internal split -->
+    <div class="iea-chart-card">
+      <h3>Electricity Use Inside a Data Center</h3>
+      <p class="chart-sub">Typical breakdown by component type (IEA)</p>
+      <svg viewBox="0 0 340 280" role="img" aria-label="Donut chart showing computing 40%, cooling 40%, other 20%">
+        <g transform="translate(130,148)">
+          <!-- track -->
+          <circle r="95" cx="0" cy="0" fill="none" stroke="rgba(27,255,126,0.06)" stroke-width="42"/>
+          <!-- computing 40%: dasharray = 0.4 × 597 = 239 -->
+          <circle r="95" cx="0" cy="0" fill="none" stroke="#1bff7e" stroke-width="42"
+                  stroke-dasharray="239 358" stroke-dashoffset="0" transform="rotate(-90)" stroke-linecap="butt"/>
+          <!-- cooling 40%: offset = -239 -->
+          <circle r="95" cx="0" cy="0" fill="none" stroke="#40c4ff" stroke-width="42"
+                  stroke-dasharray="239 358" stroke-dashoffset="-239" transform="rotate(-90)" stroke-linecap="butt"/>
+          <!-- other 20%: offset = -478 -->
+          <circle r="95" cx="0" cy="0" fill="none" stroke="#ffb340" stroke-width="42"
+                  stroke-dasharray="119 478" stroke-dashoffset="-478" transform="rotate(-90)" stroke-linecap="butt"/>
+          <!-- center -->
+          <circle r="60" cx="0" cy="0" fill="#151916"/>
+          <text x="0" y="-6" text-anchor="middle" fill="#1bff7e" font-size="22" font-family="PP NeueBit,monospace" font-weight="bold">40/40/20</text>
+          <text x="0" y="16" text-anchor="middle" fill="#7a9982" font-size="10" font-family="Space Grotesk,sans-serif">% of total use</text>
+        </g>
+        <!-- legend -->
+        <g font-size="13" font-family="Space Grotesk,sans-serif" fill="#c8d8cc">
+          <rect x="210" y="90"  width="12" height="12" rx="3" fill="#1bff7e"/>
+          <text x="228" y="101">Computing — 40%</text>
+          <rect x="210" y="116" width="12" height="12" rx="3" fill="#40c4ff"/>
+          <text x="228" y="127">Cooling — 40%</text>
+          <rect x="210" y="142" width="12" height="12" rx="3" fill="#ffb340"/>
+          <text x="228" y="153">Other IT — 20%</text>
+        </g>
+      </svg>
+      <p style="font-size:13px; color:var(--text-muted); line-height:1.6; margin-top:12px;">
+        Cooling matches computing in electricity draw — a core finding that supports efficiency gains from better PUE practices and hardware co-design.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Data table -->
+  <div class="iea-table-card">
+    <h3>Underlying Data</h3>
+    <div class="iea-table-scroll">
+      <table class="iea-table">
+        <thead>
+          <tr><th>Dataset</th><th>2022</th><th>2026</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Global electricity demand</td>
+            <td class="val-mint">460 TWh</td>
+            <td class="val-mint">620–1,050 TWh</td>
+            <td>Base case just over 800 TWh</td>
+          </tr>
+          <tr>
+            <td>Internal energy split</td>
+            <td class="val-mint">40% / 40% / 20%</td>
+            <td>N/A</td>
+            <td>Computing / Cooling / Other IT equipment</td>
+          </tr>
+          <tr>
+            <td>United States</td>
+            <td class="val-mint">~200 TWh</td>
+            <td class="val-mint">~260 TWh</td>
+            <td>~4% of US electricity in 2022; ~6% in 2026</td>
+          </tr>
+          <tr>
+            <td>European Union</td>
+            <td class="val-mint">&lt;100 TWh</td>
+            <td class="val-mint">~150 TWh</td>
+            <td>IEA regional estimate</td>
+          </tr>
+          <tr>
+            <td>China</td>
+            <td>—</td>
+            <td class="val-mint">~300 TWh</td>
+            <td>2026 forecast from IEA report</td>
+          </tr>
+          <tr>
+            <td>Ireland</td>
+            <td class="val-mint">5.3 TWh</td>
+            <td class="val-mint">Up to 32% national</td>
+            <td>One of the most data-centre-dense countries per capita</td>
+          </tr>
+          <tr>
+            <td>Denmark</td>
+            <td>—</td>
+            <td class="val-mint">6 TWh</td>
+            <td>~20% of national electricity demand by 2026</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     AI ENERGY VIZ  (Visualization 05)
+     Data: opederso.webdev.iyaserver.com
+════════════════════════════════════════════ -->
+<style>
+  /* badge pills */
+  .oe-badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    font-family: 'Space Mono', monospace;
+  }
+  .oe-badge-green  { background: rgba(27,255,126,0.10);  color: #1bff7e; }
+  .oe-badge-amber  { background: rgba(255,179,64,0.10);  color: #ffb340; }
+  .oe-badge-red    { background: rgba(255,107,107,0.10); color: #ff6b6b; }
+  .oe-badge-blue   { background: rgba(64,196,255,0.10);  color: #40c4ff; }
+
+  .oe-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  .oe-chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+  .oe-chart-card h3 { font-size: 20px; margin: 0 0 6px; line-height: 1.2; }
+  .oe-chart-card .chart-sub {
+    font-size: 12px; color: var(--text-muted); margin: 0 0 18px;
+  }
+
+  .oe-legend {
+    display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;
+  }
+  .oe-legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .oe-swatch {
+    width: 11px; height: 11px; border-radius: 2px; display: inline-block; flex-shrink: 0;
+  }
+
+  .oe-table-wrap { overflow-x: auto; }
+  .oe-table {
+    width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px;
+  }
+  .oe-table thead th {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--mint); padding: 13px 14px; text-align: left;
+    border-bottom: 1px solid var(--mint-border);
+    background: var(--bg-card); position: sticky; top: 0; white-space: nowrap;
+  }
+  .oe-table tbody td {
+    padding: 11px 14px; border-bottom: 1px solid var(--border);
+    color: var(--text-muted); vertical-align: middle;
+  }
+  .oe-table tbody td:first-child { color: var(--text); font-weight: 600; }
+  .oe-table tbody tr:hover td { background: var(--mint-dim); }
+  .oe-table .num { font-family: 'Space Mono', monospace; font-size: 12px; text-align: right; }
+  .oe-table .val-mint { color: var(--mint); font-family: 'Space Mono', monospace; font-size: 12px; }
+
+  .oe-table-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 24px 24px 20px;
+    margin-bottom: 18px;
+  }
+  .oe-table-card h3 { font-size: 20px; margin: 0 0 6px; }
+  .oe-table-card .chart-sub { font-size: 12px; color: var(--text-muted); margin: 0 0 18px; }
+
+  @media (max-width: 860px) { .oe-two-col { grid-template-columns: 1fr; } }
+</style>
+
+<section style="padding: var(--pad-v) var(--pad-h); border-top: 1px solid var(--border);">
+  <div class="section-header">
+    <div class="section-header-left">
+      <div class="section-label">Visualization 05</div>
+      <h2>The Data Center<br>Electricity Surge</h2>
+    </div>
+    <div class="section-header-right">
+      <p>Regional electricity consumption 2017–2030 and GPU hardware efficiency landscape — tracing how demand is growing by geography and how compute efficiency has evolved across NVIDIA architectures.</p>
+      <p class="source-tag">SOURCE — IEA Electricity 2024 · NVIDIA datasheets · opederso</p>
+    </div>
+  </div>
+
+  <!-- Table 1: Regional electricity -->
+  <div class="oe-table-card">
+    <h3>Global Data Center Electricity by Region</h3>
+    <p class="chart-sub">TWh · actual and IEA base-case projections</p>
+    <div class="oe-table-wrap">
+      <table class="oe-table">
+        <thead>
+          <tr>
+            <th>Region</th>
+            <th>2022 TWh</th>
+            <th>2024 TWh</th>
+            <th>2030 TWh</th>
+            <th>2024–2030 Growth</th>
+            <th>Share (2024)</th>
+            <th>Energy Mix</th>
+            <th>Carbon Intensity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>United States</td><td class="num">130</td><td class="num">183</td><td class="val-mint">426</td><td class="num">+133%</td><td class="num">~45%</td><td><span class="oe-badge oe-badge-amber">Gas 41%, Nuclear 20%</span></td><td><span class="oe-badge oe-badge-amber">High</span></td></tr>
+          <tr><td>China</td><td class="num">88</td><td class="num">104</td><td class="val-mint">279</td><td class="num">+168%</td><td class="num">~25%</td><td><span class="oe-badge oe-badge-red">Coal-heavy</span></td><td><span class="oe-badge oe-badge-red">Very High</span></td></tr>
+          <tr><td>Europe (EU+UK)</td><td class="num">56</td><td class="num">70</td><td class="val-mint">115</td><td class="num">+64%</td><td class="num">~15%</td><td><span class="oe-badge oe-badge-green">Renewables-leading</span></td><td><span class="oe-badge oe-badge-green">Medium</span></td></tr>
+          <tr><td>Japan</td><td class="num">14</td><td class="num">19</td><td class="val-mint">34</td><td class="num">+79%</td><td class="num">~5%</td><td><span class="oe-badge oe-badge-amber">Gas &amp; Nuclear</span></td><td><span class="oe-badge oe-badge-amber">High</span></td></tr>
+          <tr><td>Rest of World</td><td class="num">40</td><td class="num">39</td><td class="val-mint">91</td><td class="num">+133%</td><td class="num">~10%</td><td><span class="oe-badge oe-badge-blue">Mixed</span></td><td><span class="oe-badge oe-badge-blue">Varies</span></td></tr>
+          <tr><td><strong style="color:white;">Global Total</strong></td><td class="num">460</td><td class="num">415</td><td class="val-mint">945</td><td class="num">+128%</td><td class="num">100%</td><td><span class="oe-badge oe-badge-amber">Gas 40%+ proj.</span></td><td><span class="oe-badge oe-badge-amber">High</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Table 2: GPU specs -->
+  <div class="oe-table-card">
+    <h3>GPU Hardware Efficiency Comparison</h3>
+    <p class="chart-sub">NVIDIA architectures from Volta to Hopper — TDP, compute throughput, and efficiency per watt</p>
+    <div class="oe-table-wrap">
+      <table class="oe-table">
+        <thead>
+          <tr>
+            <th>GPU</th><th>Architecture</th><th>Year</th>
+            <th>TDP (W)</th><th>FP16 TFLOPS</th><th>VRAM (GB)</th>
+            <th>Mem BW (TB/s)</th><th>TFLOPS/W</th><th>Tier</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>V100 SXM2</td><td>Volta</td><td class="num">2017</td><td class="num">300</td><td class="num">112</td><td class="num">32</td><td class="num">0.90</td><td class="val-mint">0.37</td><td><span class="oe-badge oe-badge-blue">Data Center</span></td></tr>
+          <tr><td>RTX 3090</td><td>Ampere (consumer)</td><td class="num">2020</td><td class="num">350</td><td class="num">142</td><td class="num">24</td><td class="num">0.94</td><td class="val-mint">0.41</td><td><span class="oe-badge oe-badge-green">Prosumer</span></td></tr>
+          <tr><td>A100 SXM4</td><td>Ampere</td><td class="num">2020</td><td class="num">400</td><td class="num">312</td><td class="num">80</td><td class="num">2.00</td><td class="val-mint">0.78</td><td><span class="oe-badge oe-badge-blue">Data Center</span></td></tr>
+          <tr><td>RTX 4090</td><td>Ada Lovelace</td><td class="num">2022</td><td class="num">450</td><td class="num">330</td><td class="num">24</td><td class="num">1.01</td><td class="val-mint">0.73</td><td><span class="oe-badge oe-badge-green">Prosumer / Edge</span></td></tr>
+          <tr><td>H100 SXM5</td><td>Hopper</td><td class="num">2022</td><td class="num">700</td><td class="num">990</td><td class="num">80</td><td class="num">3.35</td><td class="val-mint">1.41</td><td><span class="oe-badge oe-badge-blue">Data Center (AI)</span></td></tr>
+          <tr><td>H200 SXM</td><td>Hopper</td><td class="num">2024</td><td class="num">700</td><td class="num">990</td><td class="num">141</td><td class="num">4.80</td><td class="val-mint">1.41</td><td><span class="oe-badge oe-badge-blue">Data Center (AI)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="oe-two-col">
+
+    <!-- Stacked area -->
+    <div class="oe-chart-card">
+      <h3>Regional Electricity Demand, 2017–2030</h3>
+      <p class="chart-sub">Stacked area · TWh · IEA base-case projection (dashed after 2024)</p>
+      <div class="oe-legend">
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#1bff7e;"></span>United States</span>
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#ff6b6b;"></span>China</span>
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#40c4ff;"></span>Europe</span>
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#ffb340;"></span>Japan</span>
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#c4a0f5;"></span>Rest of World</span>
+      </div>
+      <div style="position:relative; width:100%; height:360px;">
+        <canvas id="oeAreaChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Bubble -->
+    <div class="oe-chart-card">
+      <h3>GPU Efficiency vs. Power Draw</h3>
+      <p class="chart-sub">X: TDP (W) · Y: FP16 TFLOPS/W · Bubble size: memory bandwidth</p>
+      <div class="oe-legend">
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#40c4ff;"></span>Data center GPU</span>
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#1bff7e;"></span>Consumer / prosumer</span>
+      </div>
+      <div style="position:relative; width:100%; height:360px;">
+        <canvas id="oeBubbleChart"></canvas>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+/* ── VIZ 05 · Stacked Area Chart ── */
+(function () {
+  const years   = [2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030];
+  const projIdx = 7;
+  const us    = [58,68,79,88,102,130,154,183,220,264,302,346,385,426];
+  const china = [32,38,46,54,68, 88, 96,104,130,162,200,235,258,279];
+  const eu    = [28,31,35,38,45, 56, 64, 70, 80, 89, 98,105,111,115];
+  const japan = [ 7, 8, 9,10,12, 14, 16, 19, 22, 25, 28, 31, 33, 34];
+  const row   = [15,17,19,22,28, 40, 38, 39, 47, 56, 66, 76, 84, 91];
+
+  function ds(data, color, label) {
+    return {
+      label, data,
+      backgroundColor: color,
+      borderColor: color,
+      borderWidth: 1.5,
+      fill: true,
+      tension: 0.35,
+      pointRadius: data.map((_,i) => i === projIdx ? 3 : 0),
+      pointBackgroundColor: color,
+      segment: { borderDash: ctx => ctx.p0DataIndex >= projIdx ? [5,3] : [] }
+    };
+  }
+
+  new Chart(document.getElementById('oeAreaChart'), {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: [
+        ds(row,   'rgba(196,160,245,0.70)', 'Rest of World'),
+        ds(japan, 'rgba(255,179,64,0.75)',  'Japan'),
+        ds(eu,    'rgba(64,196,255,0.75)',  'Europe'),
+        ds(china, 'rgba(255,107,107,0.78)', 'China'),
+        ds(us,    'rgba(27,255,126,0.75)',  'United States'),
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        datalabels: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(12,16,13,0.97)',
+          titleColor: '#fff', bodyColor: '#c8d8cc',
+          borderColor: 'rgba(27,255,126,0.2)', borderWidth: 1, padding: 12,
+          callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw} TWh` }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(27,255,126,0.06)' }, ticks: { color: '#7a9982', font: { size: 11, family: 'Space Grotesk,sans-serif' }, maxRotation: 0 } },
+        y: { stacked: true, min: 0, max: 1050,
+             grid: { color: 'rgba(27,255,126,0.06)' },
+             ticks: { color: '#7a9982', font: { size: 11, family: 'Space Grotesk,sans-serif' }, callback: v => v + ' TWh' } }
+      }
+    },
+    plugins: [{
+      id: 'oeProjLine',
+      afterDraw(chart) {
+        if (chart.canvas.id !== 'oeAreaChart') return;
+        const { ctx, scales: { x, y } } = chart;
+        const xPos = x.getPixelForValue(projIdx);
+        ctx.save();
+        ctx.strokeStyle = 'rgba(27,255,126,0.25)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(xPos, y.top); ctx.lineTo(xPos, y.bottom); ctx.stroke();
+        ctx.fillStyle = '#7a9982';
+        ctx.font = '10px Space Grotesk,sans-serif';
+        ctx.fillText('← Historical   Projected →', xPos - 94, y.top + 14);
+        ctx.restore();
+      }
+    }]
+  });
+})();
+
+/* ── VIZ 05 · GPU Bubble Chart ── */
+(function () {
+  const dcColor  = '#40c4ff';
+  const conColor = '#1bff7e';
+
+  const gpus = [
+    { label:'V100 SXM2 (2017)', x:300, y:0.37, bw:0.90, color: dcColor  },
+    { label:'RTX 3090 (2020)',  x:350, y:0.41, bw:0.94, color: conColor },
+    { label:'A100 SXM4 (2020)', x:400, y:0.78, bw:2.00, color: dcColor  },
+    { label:'RTX 4090 (2022)', x:450, y:0.73, bw:1.01, color: conColor },
+    { label:'H100 SXM5 (2022)', x:700, y:1.41, bw:3.35, color: dcColor  },
+    { label:'H200 SXM (2024)',  x:700, y:1.41, bw:4.80, color: dcColor  },
+  ];
+
+  const bwR = bw => Math.sqrt(bw) * 8;
+
+  new Chart(document.getElementById('oeBubbleChart'), {
+    type: 'bubble',
+    data: {
+      datasets: gpus.map(g => ({
+        label: g.label,
+        data: [{ x: g.x, y: g.y, r: bwR(g.bw) }],
+        backgroundColor: g.color + 'aa',
+        borderColor: g.color,
+        borderWidth: 1.5
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(12,16,13,0.97)',
+          titleColor: '#fff', bodyColor: '#c8d8cc',
+          borderColor: 'rgba(27,255,126,0.2)', borderWidth: 1, padding: 12,
+          callbacks: {
+            title: items => items[0].dataset.label,
+            label: ctx => {
+              const g = gpus[ctx.datasetIndex];
+              return [`TDP: ${g.x}W`, `TFLOPS/W: ${g.y}`, `Mem BW: ${g.bw} TB/s`];
+            }
+          }
+        }
+      },
+      scales: {
+        x: { min:200, max:820,
+             title: { display:true, text:'TDP (watts)', color:'#7a9982', font:{size:11} },
+             grid: { color:'rgba(27,255,126,0.06)' },
+             ticks: { color:'#7a9982', font:{size:11}, callback: v => v+'W' } },
+        y: { min:0.1, max:1.7,
+             title: { display:true, text:'FP16 TFLOPS per watt', color:'#7a9982', font:{size:11} },
+             grid: { color:'rgba(27,255,126,0.06)' },
+             ticks: { color:'#7a9982', font:{size:11}, callback: v => v.toFixed(2) } }
+      },
+      layout: { padding: 20 }
+    },
+    plugins: [{
+      id: 'oeGpuLabels',
+      afterDatasetsDraw(chart) {
+        if (chart.canvas.id !== 'oeBubbleChart') return;
+        const { ctx } = chart;
+        chart.data.datasets.forEach((ds, i) => {
+          const meta = chart.getDatasetMeta(i);
+          const pt   = meta.data[0];
+          const g    = gpus[i];
+          const r    = bwR(g.bw);
+          const offY = (g.label.includes('H100') || g.label.includes('H200')) ? -r-7 : (g.label.includes('V100') ? r+13 : -r-7);
+          ctx.save();
+          ctx.font = '500 10px Space Grotesk,sans-serif';
+          ctx.fillStyle = g.color;
+          ctx.textAlign = 'center';
+          ctx.fillText(g.label, pt.x, pt.y + offY);
+          ctx.restore();
+        });
+      }
+    }]
+  });
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     VISUALIZATION 06 — Regional Concentration & Growth Trends
+     Source: raniakha.webdev.iyaserver.com/acad274/13blab.html
+     Scoped prefix: rk-
+═══════════════════════════════════════════════════════════════ -->
+<style>
+  /* ── RK scoped variables ── */
+  .rk-section { margin-top: 0; }
+
+  /* Tooltip */
+  #rk-tooltip {
+    position: fixed; z-index: 1001; pointer-events: none;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .16s ease, transform .16s ease;
+    max-width: 260px; padding: 12px 14px;
+    border-radius: 16px; border: 1px solid rgba(27,255,126,0.34);
+    background: rgba(11,20,14,.97); backdrop-filter: blur(12px);
+    box-shadow: 0 20px 40px rgba(0,0,0,.45);
+    color: #f5fff9; font-family: 'Space Grotesk', sans-serif;
+  }
+  #rk-tooltip.rk-show { opacity: 1; transform: translateY(0); }
+  #rk-tooltip .rk-tt-title { font-weight: 800; font-size: .96rem; margin-bottom: 4px; }
+  #rk-tooltip .rk-tt-body { color: #e4fff0; line-height: 1.5; font-size: .9rem; }
+
+  /* Table */
+  .rk-table-wrap {
+    border: 1px solid rgba(27,255,126,0.1); border-radius: 16px;
+    overflow: auto; max-height: 480px;
+    background: rgba(3,10,8,.8);
+  }
+  .rk-data-table { width: 100%; min-width: 900px; border-collapse: collapse; }
+  .rk-data-table thead th {
+    position: sticky; top: 0;
+    background: linear-gradient(180deg, rgba(12,29,22,.98), rgba(8,21,16,.98));
+    color: #ebfff6; text-align: left; font-size: .78rem;
+    text-transform: uppercase; letter-spacing: .08em;
+    padding: 12px 14px; border-bottom: 1px solid rgba(27,255,126,0.25);
+    font-family: 'PP NeueBit', monospace;
+  }
+  .rk-data-table td {
+    padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.06);
+    color: #f3fff8; font-size: .92rem;
+  }
+  .rk-data-table tbody tr:nth-child(odd) { background: rgba(255,255,255,.02); }
+  .rk-data-table tbody tr:hover { background: rgba(27,255,126,0.06); }
+  .rk-badge {
+    display: inline-flex; padding: 4px 10px; border-radius: 999px;
+    border: 1px solid rgba(27,255,126,0.15); font-weight: 700; font-size: .78rem;
+  }
+  .rk-badge-now  { background: rgba(27,255,126,0.08);  color: #c9ffde; }
+  .rk-badge-proj { background: rgba(255,179,64,0.10);  color: #ffe4b8; }
+  .rk-badge-share{ background: rgba(64,196,255,0.08);  color: #d8feff; }
+  .rk-badge-der  { background: rgba(255,255,255,0.05); color: #d4efe2; }
+
+  /* Figure cards */
+  .rk-figure-card {
+    border: 1px solid rgba(27,255,126,0.1); border-radius: 20px;
+    padding: 14px; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+    margin-bottom: 20px;
+  }
+  .rk-frame-top {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; margin-bottom: 10px;
+  }
+  .rk-frame-dots { display: flex; gap: 7px; }
+  .rk-frame-dots span { width: 9px; height: 9px; border-radius: 50%; display: block; background: rgba(255,255,255,.2); }
+  .rk-frame-dots span:nth-child(1) { background: #ff7b72; }
+  .rk-frame-dots span:nth-child(2) { background: #ffd866; }
+  .rk-frame-dots span:nth-child(3) { background: #1bff7e; }
+  .rk-frame-label { font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: #e7fff3; }
+
+  .rk-chart-shell {
+    position: relative; border: 1px solid rgba(27,255,126,0.1);
+    border-radius: 16px; overflow: hidden;
+    background: #0d1510;
+  }
+  svg.rk-chart { display: block; width: 100%; height: auto; }
+
+  .rk-hint {
+    margin-top: 8px; font-size: .88rem;
+    color: rgba(27,255,126,0.6); font-family: 'Space Grotesk', sans-serif;
+  }
+
+  /* Callout grid */
+  .rk-callouts {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-top: 16px;
+  }
+  .rk-callout {
+    border: 1px solid rgba(27,255,126,0.1); border-radius: 16px;
+    padding: 16px; background: rgba(255,255,255,.025);
+  }
+  .rk-callout h3 { margin: 0 0 6px; color: #ebfff6; font-size: .95rem; font-family: 'PP NeueBit', monospace; letter-spacing: .04em; }
+  .rk-callout p  { margin: 0; color: var(--text-muted); font-size: .9rem; line-height: 1.6; }
+
+  @media (max-width: 700px) { .rk-callouts { grid-template-columns: 1fr; } }
+
+  /* SVG text classes (used by JS make()) */
+  .rk-axis-label  { fill: #d4efe2; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-family: 'Space Grotesk', sans-serif; }
+  .rk-axis-tick   { fill: #bfe3d1; font-size: 11px; font-family: 'Space Grotesk', sans-serif; }
+  .rk-chart-title { fill: #f6fff9; font-size: 22px; font-weight: 700; font-family: 'PP NeueBit', monospace; }
+  .rk-chart-sub   { fill: #c8e6d4; font-size: 13px; font-family: 'Space Grotesk', sans-serif; }
+  .rk-legend-text { fill: #d4efe2; font-size: 12px; font-family: 'Space Grotesk', sans-serif; }
+  .rk-series-label{ fill: #ffffff; font-size: 12px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+  .rk-dim-note    { fill: #f0fff6; font-size: 12px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; }
+
+  /* Keyframes — scoped names */
+  @keyframes rk-growBar  { from { transform: scaleY(0) } to { transform: scaleY(1) } }
+  @keyframes rk-bandPulse{ 0%,100%{filter:drop-shadow(0 0 0 rgba(126,246,255,.0))} 50%{filter:drop-shadow(0 0 16px rgba(126,246,255,.22))} }
+  @keyframes rk-pulseGlob{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.025)} }
+  @keyframes rk-pulse0   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
+  @keyframes rk-pulse1   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+  @keyframes rk-pulse2   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.035)} }
+  @keyframes rk-pulse3   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+  @keyframes rk-slideIn  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+</style>
+
+<div id="rk-tooltip"><div class="rk-tt-title"></div><div class="rk-tt-body"></div></div>
+
+<section class="viz-section">
+  <div class="viz-header">
+    <span class="section-label">Visualization 06</span>
+    <h2>Regional Concentration &amp; Growth Trends</h2>
+    <p class="viz-desc">Three interactive views — a regional constellation, a growth ladder with forecast band, and a proportional ribbon — that together map where AI data center electricity use sits today and where it is heading by 2030.</p>
+  </div>
+
+  <!-- Data table -->
+  <div class="viz-card" style="margin-bottom:32px">
+    <h3>Underlying Data Grid</h3>
+    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Source figures from the IEA <em>Energy and AI</em> materials and the 2024 LBNL <em>United States Data Center Energy Usage Report</em>.</p>
+    <div class="rk-table-wrap">
+      <table class="rk-data-table" aria-label="Data table for Visualization 06">
+        <thead>
+          <tr>
+            <th>Metric Group</th><th>Label</th><th>Region</th>
+            <th>Year</th><th>Value</th><th>Units</th><th>Status</th><th>Source</th>
+          </tr>
+        </thead>
+        <tbody id="rk-data-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Charts 1 & 2: grouped under Visualization 1 -->
+  <div class="viz-card" style="margin-bottom:32px">
+    <span class="section-label" style="display:inline-block;margin-bottom:12px">Visualization 1</span>
+
+    <h3 style="margin-bottom:6px">Regional Share Constellation</h3>
+    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Circle area scaled to TWh. Hover or click each region for details. The center circle represents the full 415 TWh global total.</p>
+    <div class="rk-figure-card">
+      <div class="rk-frame-top">
+        <div class="rk-frame-dots"><span></span><span></span><span></span></div>
+        <div class="rk-frame-label">Interactive SVG · hover or click</div>
+      </div>
+      <div class="rk-chart-shell">
+        <svg class="rk-chart" id="rk-shareChart" viewBox="0 0 1100 650" role="img" aria-label="Regional share constellation chart"></svg>
+      </div>
+    </div>
+    <p class="rk-hint" style="margin-bottom:28px">Global data center electricity is concentrated — the U.S. holds ~45% of the 2024 total, followed by China (25%) and Europe (15%).</p>
+
+    <h3 style="margin-bottom:6px">Growth Ladder + U.S. Forecast Band</h3>
+    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Bars show actual and IEA base-case values. The gradient ribbon represents the LBNL U.S. 2028 uncertainty range — click it for details.</p>
+    <div class="rk-figure-card">
+      <div class="rk-frame-top">
+        <div class="rk-frame-dots"><span></span><span></span><span></span></div>
+        <div class="rk-frame-label">Interactive SVG · hover bars, click forecast band</div>
+      </div>
+      <div class="rk-chart-shell">
+        <svg class="rk-chart" id="rk-growthChart" viewBox="0 0 1100 700" role="img" aria-label="Growth ladder chart"></svg>
+      </div>
+    </div>
+    <p class="rk-hint">The IEA base case has global demand more than doubling by 2030. The U.S. 2028 band (325–580 TWh) underscores forecast uncertainty.</p>
+  </div>
+
+  <!-- Chart 3: Share Ribbon -->
+  <div class="viz-card">
+    <h3>Share Ribbon</h3>
+    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">The same regional share data in proportional form. Hover each segment for the exact share and implied TWh.</p>
+    <div class="rk-figure-card">
+      <div class="rk-frame-top">
+        <div class="rk-frame-dots"><span></span><span></span><span></span></div>
+        <div class="rk-frame-label">Interactive SVG · hover segments</div>
+      </div>
+      <div class="rk-chart-shell">
+        <svg class="rk-chart" id="rk-ribbonChart" viewBox="0 0 1100 360" role="img" aria-label="Share ribbon chart"></svg>
+      </div>
+    </div>
+
+    <div class="rk-callouts" style="margin-top:24px">
+      <div class="rk-callout">
+        <h3>Concentration</h3>
+        <p>A few regions carry the bulk of global data center electricity use, so grid choices in those regions shape the whole global story.</p>
+      </div>
+      <div class="rk-callout">
+        <h3>Acceleration</h3>
+        <p>Moving from 415 TWh in 2024 to 945 TWh in the IEA base case for 2030 shows how quickly this load can expand in just six years.</p>
+      </div>
+      <div class="rk-callout">
+        <h3>Range</h3>
+        <p>The U.S. 2028 band of 325–580 TWh is a reminder that forecasting infrastructure demand is a range problem, not a single-number problem.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const rkTableData = [
+    {group:'Global electricity use',  label:'Global data center electricity consumption', region:'World',         year:'2024', value:415,    units:'TWh', type:'Current',            source:'IEA'},
+    {group:'Global electricity use',  label:'Global data center electricity consumption', region:'World',         year:'2030', value:945,    units:'TWh', type:'Projection',         source:'IEA Base Case'},
+    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'United States',year:'2024', value:45,     units:'%',   type:'Share',              source:'IEA'},
+    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'China',        year:'2024', value:25,     units:'%',   type:'Share',              source:'IEA'},
+    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'Europe',       year:'2024', value:15,     units:'%',   type:'Share',              source:'IEA'},
+    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'Rest of world',year:'2024', value:15,     units:'%',   type:'Share',              source:'IEA'},
+    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'United States',year:'2024', value:186.75, units:'TWh', type:'Derived',            source:'IEA'},
+    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'China',        year:'2024', value:103.75, units:'TWh', type:'Derived',            source:'IEA'},
+    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'Europe',       year:'2024', value:62.25,  units:'TWh', type:'Derived',            source:'IEA'},
+    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'Rest of world',year:'2024', value:62.25,  units:'TWh', type:'Derived',            source:'IEA'},
+    {group:'U.S. electricity use',    label:'U.S. data center electricity consumption',    region:'United States',year:'2023', value:176,    units:'TWh', type:'Current',            source:'LBNL'},
+    {group:'U.S. electricity use',    label:'Share of total U.S. electricity consumption', region:'United States',year:'2023', value:4.4,    units:'%',   type:'Current',            source:'LBNL'},
+    {group:'U.S. projection range',   label:'Low scenario U.S. data center electricity',   region:'United States',year:'2028', value:325,    units:'TWh', type:'Projection',         source:'LBNL'},
+    {group:'U.S. projection range',   label:'High scenario U.S. data center electricity',  region:'United States',year:'2028', value:580,    units:'TWh', type:'Projection',         source:'LBNL'},
+    {group:'U.S. projection range',   label:'Low scenario share of U.S. electricity',      region:'United States',year:'2028', value:6.7,    units:'%',   type:'Projection',         source:'LBNL'},
+    {group:'U.S. projection range',   label:'High scenario share of U.S. electricity',     region:'United States',year:'2028', value:12.0,   units:'%',   type:'Projection',         source:'LBNL'}
+  ];
+
+  const tbody = document.getElementById('rk-data-body');
+  for (const row of rkTableData) {
+    const tr = document.createElement('tr');
+    const fmt = Number.isInteger(row.value) ? row.value : row.value.toFixed(2).replace(/\.00$/,'');
+    let bc = 'rk-badge-der';
+    if (row.type === 'Current') bc = 'rk-badge-now';
+    else if (row.type === 'Projection') bc = 'rk-badge-proj';
+    else if (row.type === 'Share') bc = 'rk-badge-share';
+    tr.innerHTML = `<td>${row.group}</td><td>${row.label}</td><td>${row.region}</td><td>${row.year}</td><td>${fmt}</td><td>${row.units}</td><td><span class="rk-badge ${bc}">${row.type}</span></td><td>${row.source}</td>`;
+    tbody.appendChild(tr);
+  }
+
+  const rkTooltip = document.getElementById('rk-tooltip');
+  let rkPinned = null;
+
+  function rkShow(html, x, y) {
+    rkTooltip.innerHTML = html;
+    rkTooltip.classList.add('rk-show');
+    const pad = 16;
+    const rect = rkTooltip.getBoundingClientRect();
+    let left = x + 14, top = y + 14;
+    if (left + rect.width  > window.innerWidth  - pad) left = x - rect.width  - 14;
+    if (top  + rect.height > window.innerHeight - pad) top  = y - rect.height - 14;
+    rkTooltip.style.left = left + 'px';
+    rkTooltip.style.top  = top  + 'px';
+  }
+  function rkHide() { if (!rkPinned) rkTooltip.classList.remove('rk-show'); }
+
+  function rkMake(tag, attrs, parent) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+    if (parent) parent.appendChild(el);
+    return el;
+  }
+  function rkFmt(v) { return Number.isInteger(v) ? v.toString() : v.toFixed(2).replace(/\.00$/,''); }
+
+  /* ── Chart 1: Regional Share Constellation ── */
+  function rkShareChart() {
+    const svg = document.getElementById('rk-shareChart');
+    const W=1100, H=650;
+    rkMake('rect',{x:0,y:0,width:W,height:H,fill:'#0d1510'},svg);
+    rkMake('text',{x:70,y:44,class:'rk-chart-title'},svg).textContent='Regional Share of Global Data Center Electricity Use';
+    rkMake('text',{x:70,y:66,class:'rk-chart-sub'},svg).textContent='Circle area scaled to TWh — center circle = 415 TWh global total (2024)';
+
+    const global = {twh:415, x:305, y:330};
+    const regions = [
+      {name:'United States', share:45, twh:186.75, color:'#1bff7e', x:675, y:165},
+      {name:'China',         share:25, twh:103.75, color:'#40c4ff', x:860, y:285},
+      {name:'Europe',        share:15, twh:62.25,  color:'#ffb340', x:780, y:470},
+      {name:'Rest of world', share:15, twh:62.25,  color:'#ff8b8b', x:585, y:505}
+    ];
+    const scale = v => Math.sqrt(v) * 8.3;
+    const gR = scale(global.twh);
+
+    rkMake('circle',{cx:global.x,cy:global.y,r:gR*1.25,fill:'rgba(27,255,126,.05)',stroke:'rgba(27,255,126,.18)','stroke-width':1.2},svg);
+    rkMake('circle',{cx:global.x,cy:global.y,r:gR,fill:'rgba(27,255,126,.16)',stroke:'rgba(255,255,255,.28)','stroke-width':2.2,
+      style:`transform-origin:${global.x}px ${global.y}px;animation:rk-pulseGlob 4.2s ease-in-out infinite`},svg);
+    rkMake('text',{x:global.x,y:global.y-8,'text-anchor':'middle',class:'rk-chart-title',style:'font-size:40px'},svg).textContent='415 TWh';
+    rkMake('text',{x:global.x,y:global.y+22,'text-anchor':'middle',class:'rk-series-label',style:'font-size:15px'},svg).textContent='Global total';
+    rkMake('text',{x:global.x,y:global.y+44,'text-anchor':'middle',class:'rk-dim-note',style:'font-size:13px'},svg).textContent='2024';
+
+    regions.forEach((d, i) => {
+      const r = scale(d.twh);
+      rkMake('line',{x1:global.x+gR*0.72,y1:global.y,x2:d.x-r*0.55,y2:d.y,stroke:'rgba(255,255,255,.1)','stroke-width':1.6},svg);
+      const g = rkMake('g',{'data-name':d.name,style:'cursor:pointer'},svg);
+      rkMake('circle',{cx:d.x,cy:d.y,r:r*1.55,fill:d.color,opacity:.09},g);
+      rkMake('circle',{cx:d.x,cy:d.y,r:r,fill:d.color,opacity:.9,stroke:'rgba(255,255,255,.3)','stroke-width':2,
+        style:`transform-origin:${d.x}px ${d.y}px;animation:rk-pulse${i} 3.2s ease-in-out infinite`},g);
+      rkMake('text',{x:d.x,y:d.y+6,'text-anchor':'middle',class:'rk-chart-title',style:'font-size:20px'},g).textContent=d.share+'%';
+      rkMake('text',{x:d.x,y:d.y+r+24,'text-anchor':'middle',class:'rk-series-label'},g).textContent=d.name;
+      rkMake('text',{x:d.x,y:d.y+r+44,'text-anchor':'middle',class:'rk-dim-note'},g).textContent=rkFmt(d.twh)+' TWh';
+      const html = `<div class="rk-tt-title">${d.name}</div><div class="rk-tt-body"><strong>${d.share}%</strong> of global data center electricity use in 2024.<br><strong>${rkFmt(d.twh)} TWh</strong> implied from the 415 TWh global total.</div>`;
+      g.addEventListener('mousemove', e => { if (!rkPinned||rkPinned===g) rkShow(html,e.clientX,e.clientY); });
+      g.addEventListener('mouseenter', e => { if (!rkPinned) rkShow(html,e.clientX,e.clientY); });
+      g.addEventListener('mouseleave', rkHide);
+      g.addEventListener('click', e => { rkPinned = rkPinned===g ? null : g; rkPinned ? rkShow(html,e.clientX,e.clientY) : rkHide(); });
+    });
+
+    const lX=870, lY=520;
+    rkMake('text',{x:lX,y:lY-38,class:'rk-axis-label'},svg).textContent='How to read this';
+    rkMake('text',{x:lX,y:lY-16,class:'rk-legend-text'},svg).textContent='Center = 415 TWh global total';
+    rkMake('text',{x:lX,y:lY+2,class:'rk-legend-text'},svg).textContent='Outer circles = regional slices';
+    regions.forEach((d,i)=>{
+      rkMake('circle',{cx:lX,cy:lY+32+i*22,r:6,fill:d.color},svg);
+      rkMake('text',{x:lX+14,y:lY+36+i*22,class:'rk-legend-text'},svg).textContent=d.name;
+    });
+  }
+
+  /* ── Chart 2: Growth Ladder ── */
+  function rkGrowthChart() {
+    const svg = document.getElementById('rk-growthChart');
+    const W=1100,H=700,m={l:95,r:90,t:90,b:95},pw=W-m.l-m.r,ph=H-m.t-m.b;
+    rkMake('rect',{x:0,y:0,width:W,height:H,fill:'#0d1510'},svg);
+    const maxVal=1000;
+    const yPos = v => m.t + ph - (v/maxVal)*ph;
+    [0,200,400,600,800,1000].forEach(val=>{
+      const yy=yPos(val);
+      rkMake('line',{x1:m.l,y1:yy,x2:m.l+pw,y2:yy,stroke:'rgba(27,255,126,.07)'},svg);
+      rkMake('text',{x:m.l-12,y:yy+4,'text-anchor':'end',class:'rk-axis-tick'},svg).textContent=val;
+    });
+    rkMake('text',{x:m.l,y:44,class:'rk-chart-title'},svg).textContent='Current Demand and Forecast Growth';
+    rkMake('text',{x:m.l,y:66,class:'rk-chart-sub'},svg).textContent='Bars show actual / base-case values · ribbon shows the LBNL U.S. 2028 uncertainty band';
+    rkMake('text',{x:28,y:m.t+ph/2,transform:`rotate(-90 28 ${m.t+ph/2})`,'text-anchor':'middle',class:'rk-axis-label'},svg).textContent='Electricity Use (TWh)';
+
+    const bars=[
+      {label:'Global 2024', value:415, color:'#1bff7e', note:'Current global electricity use'},
+      {label:'Global 2030', value:945, color:'#40c4ff', note:'IEA base-case projection'},
+      {label:'U.S. 2023',   value:176, color:'#ffb340', note:'Current U.S. electricity use'}
+    ];
+    const xs=[210,455,700];
+    bars.forEach((d,i)=>{
+      const x=xs[i], w=120, top=yPos(d.value), h=m.t+ph-top;
+      const g=rkMake('g',{style:'cursor:pointer'},svg);
+      rkMake('rect',{x,y:top,width:w,height:h,rx:20,fill:d.color,opacity:.88,stroke:'rgba(255,255,255,.22)','stroke-width':1.5,
+        style:`transform-origin:${x+w/2}px ${m.t+ph}px;animation:rk-growBar .9s cubic-bezier(.2,.9,.2,1) ${i*140}ms both`},g);
+      rkMake('rect',{x:x+18,y:top+16,width:w-36,height:10,rx:6,fill:'rgba(255,255,255,.14)'},g);
+      rkMake('text',{x:x+w/2,y:top-14,'text-anchor':'middle',class:'rk-series-label',style:'font-size:15px'},g).textContent=d.value+' TWh';
+      rkMake('text',{x:x+w/2,y:m.t+ph+28,'text-anchor':'middle',class:'rk-axis-label'},g).textContent=d.label;
+      const html=`<div class="rk-tt-title">${d.label}</div><div class="rk-tt-body"><strong>${d.value} TWh</strong><br>${d.note}</div>`;
+      g.addEventListener('mousemove', e=>{if(!rkPinned||rkPinned===g) rkShow(html,e.clientX,e.clientY);});
+      g.addEventListener('mouseenter', e=>{if(!rkPinned) rkShow(html,e.clientX,e.clientY);});
+      g.addEventListener('mouseleave', rkHide);
+      g.addEventListener('click', e=>{rkPinned=rkPinned===g?null:g; rkPinned?rkShow(html,e.clientX,e.clientY):rkHide();});
+    });
+
+    const bandX=860,bandW=110,low=325,high=580;
+    const bandTop=yPos(high),bandBottom=yPos(low),bandH=bandBottom-bandTop;
+    rkMake('line',{x1:bandX+bandW/2,y1:yPos(176),x2:bandX+bandW/2,y2:bandBottom+8,stroke:'rgba(255,255,255,.18)','stroke-dasharray':'6 6','stroke-width':2},svg);
+    const defs=rkMake('defs',{},svg);
+    const lg=rkMake('linearGradient',{id:'rk-forecastGlow',x1:'0%',y1:'0%',x2:'0%',y2:'100%'},defs);
+    rkMake('stop',{offset:'0%','stop-color':'#40c4ff'},lg);
+    rkMake('stop',{offset:'100%','stop-color':'#1bff7e'},lg);
+    const bandG=rkMake('g',{style:'cursor:pointer'},svg);
+    rkMake('rect',{x:bandX,y:bandTop,width:bandW,height:bandH,rx:26,fill:'url(#rk-forecastGlow)',opacity:.9,stroke:'rgba(255,255,255,.25)','stroke-width':2,
+      style:'animation:rk-bandPulse 2.8s ease-in-out infinite'},bandG);
+    rkMake('text',{x:bandX+bandW/2,y:bandBottom+24,'text-anchor':'middle',class:'rk-series-label'},svg).textContent='325 TWh';
+    rkMake('text',{x:bandX+bandW/2,y:bandTop-14,'text-anchor':'middle',class:'rk-series-label'},svg).textContent='580 TWh';
+    rkMake('text',{x:bandX+bandW/2,y:m.t+ph+28,'text-anchor':'middle',class:'rk-axis-label'},svg).textContent='U.S. 2028 range';
+    rkMake('text',{x:bandX+bandW/2,y:bandTop+bandH/2+6,'text-anchor':'middle',class:'rk-chart-title',style:'font-size:16px'},svg).textContent='Forecast';
+    const bandHtml=`<div class="rk-tt-title">U.S. 2028 range</div><div class="rk-tt-body"><strong>325 to 580 TWh</strong><br>Equals <strong>6.7% to 12.0%</strong> of projected total U.S. electricity consumption (LBNL).</div>`;
+    bandG.addEventListener('mousemove', e=>{if(!rkPinned||rkPinned===bandG) rkShow(bandHtml,e.clientX,e.clientY);});
+    bandG.addEventListener('mouseenter', e=>{if(!rkPinned) rkShow(bandHtml,e.clientX,e.clientY);});
+    bandG.addEventListener('mouseleave', rkHide);
+    bandG.addEventListener('click', e=>{rkPinned=rkPinned===bandG?null:bandG; rkPinned?rkShow(bandHtml,e.clientX,e.clientY):rkHide();});
+
+    rkMake('rect',{x:782,y:102,width:248,height:88,rx:18,fill:'rgba(255,255,255,.04)',stroke:'rgba(255,255,255,.09)'},svg);
+    rkMake('text',{x:804,y:130,class:'rk-legend-text',style:'font-size:14px;font-weight:700'},svg).textContent='Growth multipliers';
+    rkMake('text',{x:804,y:154,class:'rk-legend-text'},svg).textContent='Global: 945 / 415 = 2.28×';
+    rkMake('text',{x:804,y:176,class:'rk-legend-text'},svg).textContent='U.S. low: 325 / 176 = 1.85×';
+  }
+
+  /* ── Chart 3: Share Ribbon ── */
+  function rkRibbonChart() {
+    const svg = document.getElementById('rk-ribbonChart');
+    const W=1100,H=360,m={l:70,r:70,t:82,b:76},pw=W-m.l-m.r;
+    rkMake('rect',{x:0,y:0,width:W,height:H,fill:'#0d1510'},svg);
+    rkMake('text',{x:m.l,y:44,class:'rk-chart-title'},svg).textContent='Regional Share Ribbon';
+    rkMake('text',{x:m.l,y:66,class:'rk-chart-sub'},svg).textContent='2024 shares of the 415 TWh global total';
+
+    const ribbonData=[
+      {name:'United States', share:45, twh:186.75, color:'#1bff7e'},
+      {name:'China',         share:25, twh:103.75, color:'#40c4ff'},
+      {name:'Europe',        share:15, twh:62.25,  color:'#ffb340'},
+      {name:'Rest of world', share:15, twh:62.25,  color:'#ff8b8b'}
+    ];
+    const y=150, h=64;
+    let curX=m.l;
+    ribbonData.forEach((d,i)=>{
+      const w=pw*(d.share/100);
+      const g=rkMake('g',{style:'cursor:pointer'},svg);
+      rkMake('rect',{x:curX,y,width:w,height:h,rx:20,fill:d.color,opacity:.88,stroke:'rgba(255,255,255,.2)','stroke-width':1.5,
+        style:`transform-origin:${curX+w/2}px ${y+h/2}px;animation:rk-slideIn .7s cubic-bezier(.2,.9,.2,1) ${i*110}ms both`},g);
+      if(w>120){
+        rkMake('text',{x:curX+w/2,y:y+27,'text-anchor':'middle',class:'rk-series-label',style:'font-size:14px'},g).textContent=d.name;
+        rkMake('text',{x:curX+w/2,y:y+47,'text-anchor':'middle',class:'rk-dim-note'},g).textContent=`${d.share}% · ${rkFmt(d.twh)} TWh`;
+      } else {
+        rkMake('text',{x:curX+w/2,y:y-12,'text-anchor':'middle',class:'rk-series-label'},g).textContent=d.name;
+        rkMake('text',{x:curX+w/2,y:y+h+20,'text-anchor':'middle',class:'rk-dim-note'},g).textContent=`${d.share}%`;
+      }
+      const html=`<div class="rk-tt-title">${d.name}</div><div class="rk-tt-body"><strong>${d.share}%</strong> of the 2024 global total.<br><strong>${rkFmt(d.twh)} TWh</strong> implied from 415 TWh.</div>`;
+      g.addEventListener('mousemove', e=>{if(!rkPinned||rkPinned===g) rkShow(html,e.clientX,e.clientY);});
+      g.addEventListener('mouseenter', e=>{if(!rkPinned) rkShow(html,e.clientX,e.clientY);});
+      g.addEventListener('mouseleave', rkHide);
+      g.addEventListener('click', e=>{rkPinned=rkPinned===g?null:g; rkPinned?rkShow(html,e.clientX,e.clientY):rkHide();});
+      curX+=w;
+    });
+    rkMake('text',{x:m.l,y:290,class:'rk-legend-text',style:'font-size:13px'},svg).textContent='A proportional view makes the 45% U.S. share immediately legible alongside other regions.';
+  }
+
+  rkShareChart();
+  rkGrowthChart();
+  rkRibbonChart();
+
+  window.addEventListener('scroll', ()=>{ if(!rkPinned) rkTooltip.classList.remove('rk-show'); });
+  document.addEventListener('click', e=>{
+    if (e.target.closest('#rk-shareChart,#rk-growthChart,#rk-ribbonChart')) return;
+    rkPinned=null; rkTooltip.classList.remove('rk-show');
+  });
+})();
+</script>
+</body>
+</html>
