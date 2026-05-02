@@ -556,8 +556,8 @@ const gpuData = [
 ];
 
 // Viz 2: LBNL 2024 U.S. Data Center Energy — Figure 2.1 / Table 2.1
-// Values in TWh, estimated from LBNL 2024 figure interpolation
-const lbnlData = [
+// Fallback values in TWh (used if live `datacenter_components` fetch fails)
+const lbnlFallbackData = [
   { year: 2000, enterprise: 46, colo: 11,  hyper: 4  },
   { year: 2001, enterprise: 47, colo: 12,  hyper: 4  },
   { year: 2002, enterprise: 47, colo: 12,  hyper: 5  },
@@ -584,11 +584,42 @@ const lbnlData = [
   { year: 2023, enterprise: 40, colo: 38,  hyper: 98 },
 ];
 
+let lbnlData = [...lbnlFallbackData];
+
+function lbnlNum(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function lbnlMapComponent(raw) {
+  const c = String(raw || '').trim().toLowerCase();
+  if (c.includes('enterprise')) return 'enterprise';
+  if (c.includes('colo')) return 'colo';
+  if (c.includes('hyper') || c.includes('cloud')) return 'hyper';
+  return null;
+}
+
+function lbnlFromComponents(rows) {
+  const byYear = new Map();
+  for (const r of rows || []) {
+    const year = Number(r.year);
+    const key = lbnlMapComponent(r.component);
+    if (!Number.isFinite(year) || !key) continue;
+    if (!byYear.has(year)) byYear.set(year, { year, enterprise: 0, colo: 0, hyper: 0 });
+    byYear.get(year)[key] += lbnlNum(r.consumption_twh);
+  }
+
+  return [...byYear.values()]
+    .sort((a, b) => a.year - b.year)
+    .filter(d => d.enterprise || d.colo || d.hyper);
+}
+
 // populate table 2
-(function(){
+function renderTable2(data){
   const tbody = document.getElementById('table-2-body');
+  tbody.innerHTML = '';
   const subset = [2000,2005,2010,2015,2018,2019,2020,2021,2022,2023];
-  lbnlData.filter(d => subset.includes(d.year)).forEach((d,i,arr) => {
+  data.filter(d => subset.includes(d.year)).forEach((d,i,arr) => {
     const total = d.enterprise + d.colo + d.hyper;
     const prevTotal = i > 0 ? arr[i-1].enterprise + arr[i-1].colo + arr[i-1].hyper : null;
     const yoy = prevTotal ? (((total - prevTotal)/prevTotal)*100).toFixed(1)+'%' : '—';
@@ -603,7 +634,7 @@ const lbnlData = [
       <td class="val-mint">${share}</td>
     </tr>`;
   });
-})();
+}
 
 
 // ═══════════════════════════════════
@@ -730,8 +761,9 @@ const lbnlData = [
 // ═══════════════════════════════════
 // VIZ 2: STACKED AREA
 // ═══════════════════════════════════
-(function(){
+function renderAreaChart(data){
   const container = document.getElementById('area-chart');
+  container.innerHTML = '';
   const W = container.clientWidth || 800;
   const H = Math.max(360, W * 0.44);
   const margin = { top: 30, right: 30, bottom: 56, left: 65 };
@@ -746,9 +778,9 @@ const lbnlData = [
   const keys = ['enterprise','colo','hyper'];
   const colors = { enterprise: '#3d5e47', colo: '#1baa55', hyper: '#1bff7e' };
 
-  const stack = d3.stack().keys(keys)(lbnlData);
+  const stack = d3.stack().keys(keys)(data);
 
-  const xScale = d3.scaleLinear().domain([2000,2023]).range([0,iw]);
+  const xScale = d3.scaleLinear().domain(d3.extent(data, d => d.year)).range([0,iw]);
   const yScale = d3.scaleLinear().domain([0, 200]).range([ih,0]);
 
   // Gridlines
@@ -820,7 +852,7 @@ const lbnlData = [
     .y(d => yScale(d.enterprise + d.colo + d.hyper))
     .curve(d3.curveMonotoneX);
 
-  g.append('path').datum(lbnlData)
+  g.append('path').datum(data)
     .attr('d', totalLine)
     .attr('fill','none')
     .attr('stroke','rgba(255,255,255,0.2)')
@@ -835,8 +867,8 @@ const lbnlData = [
     .on('mousemove', function(event){
       const [mx] = d3.pointer(event);
       const year = Math.round(xScale.invert(mx));
-      const idx = bisect(lbnlData, year, 0);
-      const d = lbnlData[Math.min(idx, lbnlData.length-1)];
+      const idx = bisect(data, year, 0);
+      const d = data[Math.min(idx, data.length-1)];
       if (!d) return;
       tooltip.style.opacity = 1;
       tooltip.style.left = (event.pageX+14)+'px';
@@ -852,7 +884,25 @@ const lbnlData = [
     .attr('letter-spacing','0.06em')
     .text('Year');
 
-})();
+}
+
+async function initViz2() {
+  try {
+    const res = await fetch('database.php', { cache: 'no-store' });
+    const json = await res.json();
+    if (res.ok && !json.error && Array.isArray(json.datacenter_components)) {
+      const live = lbnlFromComponents(json.datacenter_components);
+      if (live.length) lbnlData = live;
+    }
+  } catch (e) {
+    /* fallback already loaded */
+  }
+
+  renderTable2(lbnlData);
+  renderAreaChart(lbnlData);
+}
+
+initViz2();
 </script>
 
 <!-- ═══════════════════════════════════════════
@@ -1520,13 +1570,13 @@ const lbnlData = [
   <div class="iea-stats">
     <div class="iea-stat">
       <div class="s-label">Global demand, 2022</div>
-      <div class="s-value">460 TWh</div>
+      <div class="s-value" id="iea-stat-global-2022">460 TWh</div>
       <div class="s-sub">Actual figure from IEA report</div>
     </div>
     <div class="iea-stat">
       <div class="s-label">IEA base case, 2026</div>
-      <div class="s-value">~800 TWh</div>
-      <div class="s-sub">Range: 620–1,050 TWh</div>
+      <div class="s-value" id="iea-stat-global-2026-base">~800 TWh</div>
+      <div class="s-sub" id="iea-stat-global-2026-range">Range: 620–1,050 TWh</div>
     </div>
     <div class="iea-stat">
       <div class="s-label">Internal energy split</div>
@@ -1539,13 +1589,7 @@ const lbnlData = [
   <div style="font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(27,255,126,0.6); padding-bottom:12px; border-bottom:1px solid rgba(50,205,115,0.15); margin-bottom:16px;">
     Regional snapshot — 2026 forecast (TWh)
   </div>
-  <div class="iea-region-grid">
-    <div class="iea-region"><div class="r-name">United States</div><div class="r-value">200–260</div><div class="r-unit">TWh · ~6% of US demand</div></div>
-    <div class="iea-region"><div class="r-name">European Union</div><div class="r-value">&lt;150</div><div class="r-unit">TWh · IEA estimate</div></div>
-    <div class="iea-region"><div class="r-name">China</div><div class="r-value">~300</div><div class="r-unit">TWh forecast 2026</div></div>
-    <div class="iea-region"><div class="r-name">Ireland</div><div class="r-value">5.3</div><div class="r-unit">TWh · up to 32% national</div></div>
-    <div class="iea-region"><div class="r-name">Denmark</div><div class="r-value">6</div><div class="r-unit">TWh · ~20% national</div></div>
-  </div>
+  <div class="iea-region-grid" id="iea-region-grid"></div>
 
   <!-- Charts -->
   <div class="iea-charts-grid">
@@ -1585,20 +1629,20 @@ const lbnlData = [
         </g>
         <line x1="64" y1="350" x2="720" y2="350" stroke="rgba(27,255,126,0.2)" stroke-width="1"/>
         <!-- 2022: 460 TWh → height = 460/1100*306 ≈ 128 -->
-        <rect x="110" y="222" width="100" height="128" fill="url(#ieaGrad1)" rx="8"/>
-        <text x="160" y="214" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">460</text>
+        <rect id="iea-bar-2022" x="110" y="222" width="100" height="128" fill="url(#ieaGrad1)" rx="8"/>
+        <text id="iea-val-2022" x="160" y="214" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">460</text>
         <text x="160" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2022 actual</text>
         <!-- 2026 low: 620 → height ≈ 173 -->
-        <rect x="250" y="177" width="100" height="173" fill="url(#ieaGrad2)" rx="8" opacity="0.85"/>
-        <text x="300" y="169" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">620</text>
+        <rect id="iea-bar-2026-low" x="250" y="177" width="100" height="173" fill="url(#ieaGrad2)" rx="8" opacity="0.85"/>
+        <text id="iea-val-2026-low" x="300" y="169" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">620</text>
         <text x="300" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2026 low</text>
         <!-- 2026 base: 805 → height ≈ 224 -->
-        <rect x="390" y="126" width="100" height="224" fill="url(#ieaGrad1)" rx="8"/>
-        <text x="440" y="118" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">~805</text>
+        <rect id="iea-bar-2026-base" x="390" y="126" width="100" height="224" fill="url(#ieaGrad1)" rx="8"/>
+        <text id="iea-val-2026-base" x="440" y="118" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">~805</text>
         <text x="440" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2026 base</text>
         <!-- 2026 high: 1050 → height ≈ 292 -->
-        <rect x="530" y="58" width="100" height="292" fill="url(#ieaGrad2)" rx="8"/>
-        <text x="580" y="50" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">1,050</text>
+        <rect id="iea-bar-2026-high" x="530" y="58" width="100" height="292" fill="url(#ieaGrad2)" rx="8"/>
+        <text id="iea-val-2026-high" x="580" y="50" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">1,050</text>
         <text x="580" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2026 high</text>
         <!-- unit label -->
         <text x="392" y="22" fill="#7a9982" font-size="11" font-family="Space Mono,monospace" text-anchor="middle" letter-spacing="0.1em">TWH / YEAR</text>
@@ -1656,54 +1700,180 @@ const lbnlData = [
         <thead>
           <tr><th>Dataset</th><th>2022</th><th>2026</th><th>Notes</th></tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Global electricity demand</td>
-            <td class="val-mint">460 TWh</td>
-            <td class="val-mint">620–1,050 TWh</td>
-            <td>Base case just over 800 TWh</td>
-          </tr>
-          <tr>
-            <td>Internal energy split</td>
-            <td class="val-mint">40% / 40% / 20%</td>
-            <td>N/A</td>
-            <td>Computing / Cooling / Other IT equipment</td>
-          </tr>
-          <tr>
-            <td>United States</td>
-            <td class="val-mint">~200 TWh</td>
-            <td class="val-mint">~260 TWh</td>
-            <td>~4% of US electricity in 2022; ~6% in 2026</td>
-          </tr>
-          <tr>
-            <td>European Union</td>
-            <td class="val-mint">&lt;100 TWh</td>
-            <td class="val-mint">~150 TWh</td>
-            <td>IEA regional estimate</td>
-          </tr>
-          <tr>
-            <td>China</td>
-            <td>—</td>
-            <td class="val-mint">~300 TWh</td>
-            <td>2026 forecast from IEA report</td>
-          </tr>
-          <tr>
-            <td>Ireland</td>
-            <td class="val-mint">5.3 TWh</td>
-            <td class="val-mint">Up to 32% national</td>
-            <td>One of the most data-centre-dense countries per capita</td>
-          </tr>
-          <tr>
-            <td>Denmark</td>
-            <td>—</td>
-            <td class="val-mint">6 TWh</td>
-            <td>~20% of national electricity demand by 2026</td>
-          </tr>
-        </tbody>
+        <tbody id="iea-data-body"></tbody>
       </table>
     </div>
   </div>
 </section>
+
+<script>
+(function(){
+  const ieaDefaults = {
+    global2022: 460,
+    global2026Low: 620,
+    global2026Base: 805,
+    global2026High: 1050,
+    regions: [
+      {name: 'United States', note: '~6% of US demand', v2022: 200, v2026: 260},
+      {name: 'European Union', note: 'IEA estimate', v2022: 95, v2026: 150},
+      {name: 'China',          note: 'TWh forecast 2026', v2022: null, v2026: 300},
+      {name: 'Ireland',        note: 'TWh · up to 32% national', v2022: 5.3, v2026: null},
+      {name: 'Denmark',        note: 'TWh · ~20% national', v2022: null, v2026: 6}
+    ]
+  };
+
+  const ieaRegionAlias = {
+    'us': 'united states',
+    'u.s.': 'united states',
+    'u.s': 'united states',
+    'usa': 'united states',
+    'united states': 'united states',
+    'eu': 'european union',
+    'europe': 'european union',
+    'european union': 'european union',
+    'china': 'china',
+    'ireland': 'ireland',
+    'denmark': 'denmark',
+    'world': 'world',
+    'global': 'world'
+  };
+
+  function ieaNormRegion(region) {
+    const key = String(region || '').trim().toLowerCase();
+    return ieaRegionAlias[key] || key;
+  }
+
+  function ieaNormUnit(unit) {
+    return String(unit || '').trim().toLowerCase().replace(/\s+/g, '');
+  }
+
+  function ieaNum(v) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function ieaFmt(v) {
+    if (!Number.isFinite(v)) return '—';
+    return Number.isInteger(v) ? v.toLocaleString('en-US') : v.toFixed(1).replace(/\.0$/, '');
+  }
+
+  function ieaPick(rows, { year, region, unit, scenarioNeedle }) {
+    const scoped = rows.filter(r => {
+      if (Number(r.year) !== Number(year)) return false;
+      if (ieaNormRegion(r.region) !== ieaNormRegion(region)) return false;
+      if (unit && ieaNormUnit(r.unit) !== ieaNormUnit(unit)) return false;
+      return true;
+    });
+    if (!scoped.length) return null;
+    if (!scenarioNeedle) return ieaNum(scoped[0].value);
+    const hit = scoped.find(r => String(r.scenario || '').toLowerCase().includes(String(scenarioNeedle).toLowerCase()));
+    return ieaNum((hit || scoped[0]).value);
+  }
+
+  function ieaRender(state) {
+    const stat2022 = document.getElementById('iea-stat-global-2022');
+    const stat2026 = document.getElementById('iea-stat-global-2026-base');
+    const statRange = document.getElementById('iea-stat-global-2026-range');
+    if (stat2022) stat2022.textContent = `${ieaFmt(state.global2022)} TWh`;
+    if (stat2026) stat2026.textContent = `~${ieaFmt(state.global2026Base)} TWh`;
+    if (statRange) statRange.textContent = `Range: ${ieaFmt(state.global2026Low)}–${ieaFmt(state.global2026High)} TWh`;
+
+    const regionGrid = document.getElementById('iea-region-grid');
+    if (regionGrid) {
+      regionGrid.innerHTML = state.regions.map(r => `
+        <div class="iea-region">
+          <div class="r-name">${r.name}</div>
+          <div class="r-value">${Number.isFinite(r.v2026) ? ieaFmt(r.v2026) : ieaFmt(r.v2022)}</div>
+          <div class="r-unit">TWh · ${r.note}</div>
+        </div>
+      `).join('');
+    }
+
+    const yBottom = 350;
+    const chartRange = 292;
+    const chartMax = 1050;
+    const bars = [
+      { key: '2022', val: state.global2022, prefix: '' },
+      { key: '2026-low', val: state.global2026Low, prefix: '' },
+      { key: '2026-base', val: state.global2026Base, prefix: '~' },
+      { key: '2026-high', val: state.global2026High, prefix: '' }
+    ];
+
+    bars.forEach(b => {
+      const h = Math.max(0, Math.min(chartRange, (b.val / chartMax) * chartRange));
+      const y = yBottom - h;
+      const rect = document.getElementById(`iea-bar-${b.key}`);
+      const label = document.getElementById(`iea-val-${b.key}`);
+      if (rect) {
+        rect.setAttribute('y', y.toFixed(2));
+        rect.setAttribute('height', h.toFixed(2));
+      }
+      if (label) {
+        label.setAttribute('y', (y - 8).toFixed(2));
+        label.textContent = `${b.prefix}${ieaFmt(b.val)}`;
+      }
+    });
+
+    const tbody = document.getElementById('iea-data-body');
+    if (tbody) {
+      const regionRows = state.regions.map(r => `
+        <tr>
+          <td>${r.name}</td>
+          <td class="val-mint">${Number.isFinite(r.v2022) ? `${ieaFmt(r.v2022)} TWh` : '—'}</td>
+          <td class="val-mint">${Number.isFinite(r.v2026) ? `${ieaFmt(r.v2026)} TWh` : '—'}</td>
+          <td>${r.note}</td>
+        </tr>
+      `).join('');
+
+      tbody.innerHTML = `
+        <tr>
+          <td>Global electricity demand</td>
+          <td class="val-mint">${ieaFmt(state.global2022)} TWh</td>
+          <td class="val-mint">${ieaFmt(state.global2026Low)}–${ieaFmt(state.global2026High)} TWh</td>
+          <td>Base case ${ieaFmt(state.global2026Base)} TWh</td>
+        </tr>
+        <tr>
+          <td>Internal energy split</td>
+          <td class="val-mint">40% / 40% / 20%</td>
+          <td>N/A</td>
+          <td>Computing / Cooling / Other IT equipment</td>
+        </tr>
+        ${regionRows}
+      `;
+    }
+  }
+
+  function ieaBuildState(rows) {
+    return {
+      global2022: ieaPick(rows, { year: 2022, region: 'World', unit: 'TWh' }) ?? ieaDefaults.global2022,
+      global2026Low: ieaPick(rows, { year: 2026, region: 'World', unit: 'TWh', scenarioNeedle: 'low' }) ?? ieaDefaults.global2026Low,
+      global2026Base: ieaPick(rows, { year: 2026, region: 'World', unit: 'TWh', scenarioNeedle: 'base' }) ?? ieaDefaults.global2026Base,
+      global2026High: ieaPick(rows, { year: 2026, region: 'World', unit: 'TWh', scenarioNeedle: 'high' }) ?? ieaDefaults.global2026High,
+      regions: ieaDefaults.regions.map(r => ({
+        ...r,
+        v2022: ieaPick(rows, { year: 2022, region: r.name, unit: 'TWh' }) ?? r.v2022,
+        v2026: ieaPick(rows, { year: 2026, region: r.name, unit: 'TWh', scenarioNeedle: 'base' }) ?? ieaPick(rows, { year: 2026, region: r.name, unit: 'TWh' }) ?? r.v2026
+      }))
+    };
+  }
+
+  async function ieaInit() {
+    let state = ieaBuildState([]);
+    try {
+      const res = await fetch('database.php', { cache: 'no-store' });
+      const json = await res.json();
+      if (res.ok && !json.error && Array.isArray(json.regional_data_annex)) {
+        state = ieaBuildState(json.regional_data_annex);
+      }
+    } catch (e) {
+      /* fallback already prepared */
+    }
+    ieaRender(state);
+  }
+
+  ieaInit();
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════
      AI ENERGY VIZ  (Visualization 05)
@@ -2252,35 +2422,142 @@ const lbnlData = [
 
 <script>
 (function(){
-  const rkTableData = [
-    {group:'Global electricity use',  label:'Global data center electricity consumption', region:'World',         year:'2024', value:415,    units:'TWh', type:'Current',            source:'IEA'},
-    {group:'Global electricity use',  label:'Global data center electricity consumption', region:'World',         year:'2030', value:945,    units:'TWh', type:'Projection',         source:'IEA Base Case'},
-    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'United States',year:'2024', value:45,     units:'%',   type:'Share',              source:'IEA'},
-    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'China',        year:'2024', value:25,     units:'%',   type:'Share',              source:'IEA'},
-    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'Europe',       year:'2024', value:15,     units:'%',   type:'Share',              source:'IEA'},
-    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'Rest of world',year:'2024', value:15,     units:'%',   type:'Share',              source:'IEA'},
-    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'United States',year:'2024', value:186.75, units:'TWh', type:'Derived',            source:'IEA'},
-    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'China',        year:'2024', value:103.75, units:'TWh', type:'Derived',            source:'IEA'},
-    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'Europe',       year:'2024', value:62.25,  units:'TWh', type:'Derived',            source:'IEA'},
-    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'Rest of world',year:'2024', value:62.25,  units:'TWh', type:'Derived',            source:'IEA'},
-    {group:'U.S. electricity use',    label:'U.S. data center electricity consumption',    region:'United States',year:'2023', value:176,    units:'TWh', type:'Current',            source:'LBNL'},
-    {group:'U.S. electricity use',    label:'Share of total U.S. electricity consumption', region:'United States',year:'2023', value:4.4,    units:'%',   type:'Current',            source:'LBNL'},
-    {group:'U.S. projection range',   label:'Low scenario U.S. data center electricity',   region:'United States',year:'2028', value:325,    units:'TWh', type:'Projection',         source:'LBNL'},
-    {group:'U.S. projection range',   label:'High scenario U.S. data center electricity',  region:'United States',year:'2028', value:580,    units:'TWh', type:'Projection',         source:'LBNL'},
-    {group:'U.S. projection range',   label:'Low scenario share of U.S. electricity',      region:'United States',year:'2028', value:6.7,    units:'%',   type:'Projection',         source:'LBNL'},
-    {group:'U.S. projection range',   label:'High scenario share of U.S. electricity',     region:'United States',year:'2028', value:12.0,   units:'%',   type:'Projection',         source:'LBNL'}
-  ];
+  const rkDefaults = {
+    global2024: 415,
+    global2030: 945,
+    us2023: 176,
+    us2023Pct: 4.4,
+    us2028Low: 325,
+    us2028High: 580,
+    us2028LowPct: 6.7,
+    us2028HighPct: 12.0,
+    regions: [
+      {name:'United States', share:45, color:'#1bff7e', x:675, y:165},
+      {name:'China',         share:25, color:'#40c4ff', x:860, y:285},
+      {name:'Europe',        share:15, color:'#ffb340', x:780, y:470},
+      {name:'Rest of world', share:15, color:'#ff8b8b', x:585, y:505}
+    ]
+  };
 
-  const tbody = document.getElementById('rk-data-body');
-  for (const row of rkTableData) {
-    const tr = document.createElement('tr');
-    const fmt = Number.isInteger(row.value) ? row.value : row.value.toFixed(2).replace(/\.00$/,'');
-    let bc = 'rk-badge-der';
-    if (row.type === 'Current') bc = 'rk-badge-now';
-    else if (row.type === 'Projection') bc = 'rk-badge-proj';
-    else if (row.type === 'Share') bc = 'rk-badge-share';
-    tr.innerHTML = `<td>${row.group}</td><td>${row.label}</td><td>${row.region}</td><td>${row.year}</td><td>${fmt}</td><td>${row.units}</td><td><span class="rk-badge ${bc}">${row.type}</span></td><td>${row.source}</td>`;
-    tbody.appendChild(tr);
+  const rkRegionAlias = {
+    'us': 'united states',
+    'u.s.': 'united states',
+    'u.s': 'united states',
+    'usa': 'united states',
+    'united states': 'united states',
+    'rest of world': 'rest of world',
+    'row': 'rest of world',
+    'rest-of-world': 'rest of world'
+  };
+
+  function rkNormRegion(region) {
+    const key = String(region || '').trim().toLowerCase();
+    return rkRegionAlias[key] || key;
+  }
+
+  function rkNum(v) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function rkNormUnit(unit) {
+    return String(unit || '').trim().toLowerCase().replace(/\s+/g, '');
+  }
+
+  function rkFindValue(rows, opts) {
+    const unit = rkNormUnit(opts.unit);
+    const region = rkNormRegion(opts.region);
+    const year = Number(opts.year);
+    const scenarioNeedle = String(opts.scenarioNeedle || '').trim().toLowerCase();
+
+    const scoped = rows.filter(r => {
+      if (Number(r.year) !== year) return false;
+      if (rkNormRegion(r.region) !== region) return false;
+      if (unit && rkNormUnit(r.unit) !== unit) return false;
+      return true;
+    });
+
+    if (!scoped.length) return null;
+    if (!scenarioNeedle) {
+      return rkNum(scoped[0].value);
+    }
+
+    const withScenario = scoped.find(r => String(r.scenario || '').toLowerCase().includes(scenarioNeedle));
+    return rkNum((withScenario || scoped[0]).value);
+  }
+
+  function rkNormalizeShare(v) {
+    if (!Number.isFinite(v)) return null;
+    return v <= 1 ? v * 100 : v;
+  }
+
+  function rkBuildState(annexRows) {
+    const rows = Array.isArray(annexRows) ? annexRows : [];
+
+    const global2024 = rkFindValue(rows, {year: 2024, region: 'World', unit: 'TWh'}) ?? rkDefaults.global2024;
+    const global2030 = rkFindValue(rows, {year: 2030, region: 'World', unit: 'TWh'}) ?? rkDefaults.global2030;
+    const us2023 = rkFindValue(rows, {year: 2023, region: 'United States', unit: 'TWh'}) ?? rkDefaults.us2023;
+    const us2023Pct = rkNormalizeShare(rkFindValue(rows, {year: 2023, region: 'United States', unit: '%'})) ?? rkDefaults.us2023Pct;
+    const us2028Low = rkFindValue(rows, {year: 2028, region: 'United States', unit: 'TWh', scenarioNeedle: 'low'}) ?? rkDefaults.us2028Low;
+    const us2028High = rkFindValue(rows, {year: 2028, region: 'United States', unit: 'TWh', scenarioNeedle: 'high'}) ?? rkDefaults.us2028High;
+    const us2028LowPct = rkNormalizeShare(rkFindValue(rows, {year: 2028, region: 'United States', unit: '%', scenarioNeedle: 'low'})) ?? rkDefaults.us2028LowPct;
+    const us2028HighPct = rkNormalizeShare(rkFindValue(rows, {year: 2028, region: 'United States', unit: '%', scenarioNeedle: 'high'})) ?? rkDefaults.us2028HighPct;
+
+    const regions = rkDefaults.regions.map(r => {
+      const liveShare = rkNormalizeShare(rkFindValue(rows, {year: 2024, region: r.name, unit: '%'}));
+      const share = liveShare ?? r.share;
+      return {
+        ...r,
+        share,
+        twh: (global2024 * share) / 100
+      };
+    });
+
+    return {
+      isLive: rows.length > 0,
+      global2024,
+      global2030,
+      us2023,
+      us2023Pct,
+      us2028Low,
+      us2028High,
+      us2028LowPct,
+      us2028HighPct,
+      regions
+    };
+  }
+
+  let rkState = rkBuildState([]);
+
+  function rkTableRows(state) {
+    const src = state.isLive ? 'regional_data_annex' : 'Fallback constants';
+    return [
+      {group:'Global electricity use',  label:'Global data center electricity consumption', region:'World',         year:'2024', value:state.global2024,  units:'TWh', type:'Current',    source:src},
+      {group:'Global electricity use',  label:'Global data center electricity consumption', region:'World',         year:'2030', value:state.global2030,  units:'TWh', type:'Projection', source:src},
+      ...state.regions.map(r => ({group:'Regional shares',          label:'Share of global 2024 data center electricity', region:r.name, year:'2024', value:r.share, units:'%',   type:'Share',      source:src})),
+      ...state.regions.map(r => ({group:'Regional electricity use', label:'Implied from share × global 2024 TWh',         region:r.name, year:'2024', value:r.twh,   units:'TWh', type:'Derived',    source:src})),
+      {group:'U.S. electricity use',    label:'U.S. data center electricity consumption',    region:'United States',year:'2023', value:state.us2023,      units:'TWh', type:'Current',    source:src},
+      {group:'U.S. electricity use',    label:'Share of total U.S. electricity consumption', region:'United States',year:'2023', value:state.us2023Pct,   units:'%',   type:'Current',    source:src},
+      {group:'U.S. projection range',   label:'Low scenario U.S. data center electricity',   region:'United States',year:'2028', value:state.us2028Low,   units:'TWh', type:'Projection', source:src},
+      {group:'U.S. projection range',   label:'High scenario U.S. data center electricity',  region:'United States',year:'2028', value:state.us2028High,  units:'TWh', type:'Projection', source:src},
+      {group:'U.S. projection range',   label:'Low scenario share of U.S. electricity',      region:'United States',year:'2028', value:state.us2028LowPct,units:'%',   type:'Projection', source:src},
+      {group:'U.S. projection range',   label:'High scenario share of U.S. electricity',     region:'United States',year:'2028', value:state.us2028HighPct,units:'%',  type:'Projection', source:src}
+    ];
+  }
+
+  function rkRenderTable() {
+    const tbody = document.getElementById('rk-data-body');
+    tbody.innerHTML = '';
+    for (const row of rkTableRows(rkState)) {
+      const tr = document.createElement('tr');
+      const fmt = Number.isInteger(row.value) ? row.value : row.value.toFixed(2).replace(/\.00$/,'');
+      let bc = 'rk-badge-der';
+      if (row.type === 'Current') bc = 'rk-badge-now';
+      else if (row.type === 'Projection') bc = 'rk-badge-proj';
+      else if (row.type === 'Share') bc = 'rk-badge-share';
+      tr.innerHTML = `<td>${row.group}</td><td>${row.label}</td><td>${row.region}</td><td>${row.year}</td><td>${fmt}</td><td>${row.units}</td><td><span class="rk-badge ${bc}">${row.type}</span></td><td>${row.source}</td>`;
+      tbody.appendChild(tr);
+    }
   }
 
   const rkTooltip = document.getElementById('rk-tooltip');
@@ -2310,18 +2587,14 @@ const lbnlData = [
   /* ── Chart 1: Regional Share Constellation ── */
   function rkShareChart() {
     const svg = document.getElementById('rk-shareChart');
+    svg.innerHTML = '';
     const W=1100, H=650;
     rkMake('rect',{x:0,y:0,width:W,height:H,fill:'#0d1510'},svg);
     rkMake('text',{x:70,y:44,class:'rk-chart-title'},svg).textContent='Regional Share of Global Data Center Electricity Use';
-    rkMake('text',{x:70,y:66,class:'rk-chart-sub'},svg).textContent='Circle area scaled to TWh — center circle = 415 TWh global total (2024)';
+    rkMake('text',{x:70,y:66,class:'rk-chart-sub'},svg).textContent=`Circle area scaled to TWh — center circle = ${rkFmt(rkState.global2024)} TWh global total (2024)`;
 
-    const global = {twh:415, x:305, y:330};
-    const regions = [
-      {name:'United States', share:45, twh:186.75, color:'#1bff7e', x:675, y:165},
-      {name:'China',         share:25, twh:103.75, color:'#40c4ff', x:860, y:285},
-      {name:'Europe',        share:15, twh:62.25,  color:'#ffb340', x:780, y:470},
-      {name:'Rest of world', share:15, twh:62.25,  color:'#ff8b8b', x:585, y:505}
-    ];
+    const global = {twh:rkState.global2024, x:305, y:330};
+    const regions = rkState.regions;
     const scale = v => Math.sqrt(v) * 8.3;
     const gR = scale(global.twh);
 
@@ -2342,7 +2615,7 @@ const lbnlData = [
       rkMake('text',{x:d.x,y:d.y+6,'text-anchor':'middle',class:'rk-chart-title',style:'font-size:20px'},g).textContent=d.share+'%';
       rkMake('text',{x:d.x,y:d.y+r+24,'text-anchor':'middle',class:'rk-series-label'},g).textContent=d.name;
       rkMake('text',{x:d.x,y:d.y+r+44,'text-anchor':'middle',class:'rk-dim-note'},g).textContent=rkFmt(d.twh)+' TWh';
-      const html = `<div class="rk-tt-title">${d.name}</div><div class="rk-tt-body"><strong>${d.share}%</strong> of global data center electricity use in 2024.<br><strong>${rkFmt(d.twh)} TWh</strong> implied from the 415 TWh global total.</div>`;
+      const html = `<div class="rk-tt-title">${d.name}</div><div class="rk-tt-body"><strong>${rkFmt(d.share)}%</strong> of global data center electricity use in 2024.<br><strong>${rkFmt(d.twh)} TWh</strong> implied from the ${rkFmt(global.twh)} TWh global total.</div>`;
       g.addEventListener('mousemove', e => { if (!rkPinned||rkPinned===g) rkShow(html,e.clientX,e.clientY); });
       g.addEventListener('mouseenter', e => { if (!rkPinned) rkShow(html,e.clientX,e.clientY); });
       g.addEventListener('mouseleave', rkHide);
@@ -2362,6 +2635,7 @@ const lbnlData = [
   /* ── Chart 2: Growth Ladder ── */
   function rkGrowthChart() {
     const svg = document.getElementById('rk-growthChart');
+    svg.innerHTML = '';
     const W=1100,H=700,m={l:95,r:90,t:90,b:95},pw=W-m.l-m.r,ph=H-m.t-m.b;
     rkMake('rect',{x:0,y:0,width:W,height:H,fill:'#0d1510'},svg);
     const maxVal=1000;
@@ -2376,9 +2650,9 @@ const lbnlData = [
     rkMake('text',{x:28,y:m.t+ph/2,transform:`rotate(-90 28 ${m.t+ph/2})`,'text-anchor':'middle',class:'rk-axis-label'},svg).textContent='Electricity Use (TWh)';
 
     const bars=[
-      {label:'Global 2024', value:415, color:'#1bff7e', note:'Current global electricity use'},
-      {label:'Global 2030', value:945, color:'#40c4ff', note:'IEA base-case projection'},
-      {label:'U.S. 2023',   value:176, color:'#ffb340', note:'Current U.S. electricity use'}
+      {label:'Global 2024', value:rkState.global2024, color:'#1bff7e', note:'Current global electricity use'},
+      {label:'Global 2030', value:rkState.global2030, color:'#40c4ff', note:'IEA base-case projection'},
+      {label:'U.S. 2023',   value:rkState.us2023,     color:'#ffb340', note:'Current U.S. electricity use'}
     ];
     const xs=[210,455,700];
     bars.forEach((d,i)=>{
@@ -2396,9 +2670,9 @@ const lbnlData = [
       g.addEventListener('click', e=>{rkPinned=rkPinned===g?null:g; rkPinned?rkShow(html,e.clientX,e.clientY):rkHide();});
     });
 
-    const bandX=860,bandW=110,low=325,high=580;
+    const bandX=860,bandW=110,low=rkState.us2028Low,high=rkState.us2028High;
     const bandTop=yPos(high),bandBottom=yPos(low),bandH=bandBottom-bandTop;
-    rkMake('line',{x1:bandX+bandW/2,y1:yPos(176),x2:bandX+bandW/2,y2:bandBottom+8,stroke:'rgba(255,255,255,.18)','stroke-dasharray':'6 6','stroke-width':2},svg);
+    rkMake('line',{x1:bandX+bandW/2,y1:yPos(rkState.us2023),x2:bandX+bandW/2,y2:bandBottom+8,stroke:'rgba(255,255,255,.18)','stroke-dasharray':'6 6','stroke-width':2},svg);
     const defs=rkMake('defs',{},svg);
     const lg=rkMake('linearGradient',{id:'rk-forecastGlow',x1:'0%',y1:'0%',x2:'0%',y2:'100%'},defs);
     rkMake('stop',{offset:'0%','stop-color':'#40c4ff'},lg);
@@ -2410,7 +2684,7 @@ const lbnlData = [
     rkMake('text',{x:bandX+bandW/2,y:bandTop-14,'text-anchor':'middle',class:'rk-series-label'},svg).textContent='580 TWh';
     rkMake('text',{x:bandX+bandW/2,y:m.t+ph+28,'text-anchor':'middle',class:'rk-axis-label'},svg).textContent='U.S. 2028 range';
     rkMake('text',{x:bandX+bandW/2,y:bandTop+bandH/2+6,'text-anchor':'middle',class:'rk-chart-title',style:'font-size:16px'},svg).textContent='Forecast';
-    const bandHtml=`<div class="rk-tt-title">U.S. 2028 range</div><div class="rk-tt-body"><strong>325 to 580 TWh</strong><br>Equals <strong>6.7% to 12.0%</strong> of projected total U.S. electricity consumption (LBNL).</div>`;
+    const bandHtml=`<div class="rk-tt-title">U.S. 2028 range</div><div class="rk-tt-body"><strong>${rkFmt(low)} to ${rkFmt(high)} TWh</strong><br>Equals <strong>${rkFmt(rkState.us2028LowPct)}% to ${rkFmt(rkState.us2028HighPct)}%</strong> of projected total U.S. electricity consumption.</div>`;
     bandG.addEventListener('mousemove', e=>{if(!rkPinned||rkPinned===bandG) rkShow(bandHtml,e.clientX,e.clientY);});
     bandG.addEventListener('mouseenter', e=>{if(!rkPinned) rkShow(bandHtml,e.clientX,e.clientY);});
     bandG.addEventListener('mouseleave', rkHide);
@@ -2418,24 +2692,20 @@ const lbnlData = [
 
     rkMake('rect',{x:782,y:102,width:248,height:88,rx:18,fill:'rgba(255,255,255,.04)',stroke:'rgba(255,255,255,.09)'},svg);
     rkMake('text',{x:804,y:130,class:'rk-legend-text',style:'font-size:14px;font-weight:700'},svg).textContent='Growth multipliers';
-    rkMake('text',{x:804,y:154,class:'rk-legend-text'},svg).textContent='Global: 945 / 415 = 2.28×';
-    rkMake('text',{x:804,y:176,class:'rk-legend-text'},svg).textContent='U.S. low: 325 / 176 = 1.85×';
+    rkMake('text',{x:804,y:154,class:'rk-legend-text'},svg).textContent=`Global: ${rkFmt(rkState.global2030)} / ${rkFmt(rkState.global2024)} = ${(rkState.global2030 / rkState.global2024).toFixed(2)}×`;
+    rkMake('text',{x:804,y:176,class:'rk-legend-text'},svg).textContent=`U.S. low: ${rkFmt(rkState.us2028Low)} / ${rkFmt(rkState.us2023)} = ${(rkState.us2028Low / rkState.us2023).toFixed(2)}×`;
   }
 
   /* ── Chart 3: Share Ribbon ── */
   function rkRibbonChart() {
     const svg = document.getElementById('rk-ribbonChart');
+    svg.innerHTML = '';
     const W=1100,H=360,m={l:70,r:70,t:82,b:76},pw=W-m.l-m.r;
     rkMake('rect',{x:0,y:0,width:W,height:H,fill:'#0d1510'},svg);
     rkMake('text',{x:m.l,y:44,class:'rk-chart-title'},svg).textContent='Regional Share Ribbon';
-    rkMake('text',{x:m.l,y:66,class:'rk-chart-sub'},svg).textContent='2024 shares of the 415 TWh global total';
+    rkMake('text',{x:m.l,y:66,class:'rk-chart-sub'},svg).textContent=`2024 shares of the ${rkFmt(rkState.global2024)} TWh global total`;
 
-    const ribbonData=[
-      {name:'United States', share:45, twh:186.75, color:'#1bff7e'},
-      {name:'China',         share:25, twh:103.75, color:'#40c4ff'},
-      {name:'Europe',        share:15, twh:62.25,  color:'#ffb340'},
-      {name:'Rest of world', share:15, twh:62.25,  color:'#ff8b8b'}
-    ];
+    const ribbonData = rkState.regions;
     const y=150, h=64;
     let curX=m.l;
     ribbonData.forEach((d,i)=>{
@@ -2450,7 +2720,7 @@ const lbnlData = [
         rkMake('text',{x:curX+w/2,y:y-12,'text-anchor':'middle',class:'rk-series-label'},g).textContent=d.name;
         rkMake('text',{x:curX+w/2,y:y+h+20,'text-anchor':'middle',class:'rk-dim-note'},g).textContent=`${d.share}%`;
       }
-      const html=`<div class="rk-tt-title">${d.name}</div><div class="rk-tt-body"><strong>${d.share}%</strong> of the 2024 global total.<br><strong>${rkFmt(d.twh)} TWh</strong> implied from 415 TWh.</div>`;
+      const html=`<div class="rk-tt-title">${d.name}</div><div class="rk-tt-body"><strong>${rkFmt(d.share)}%</strong> of the 2024 global total.<br><strong>${rkFmt(d.twh)} TWh</strong> implied from ${rkFmt(rkState.global2024)} TWh.</div>`;
       g.addEventListener('mousemove', e=>{if(!rkPinned||rkPinned===g) rkShow(html,e.clientX,e.clientY);});
       g.addEventListener('mouseenter', e=>{if(!rkPinned) rkShow(html,e.clientX,e.clientY);});
       g.addEventListener('mouseleave', rkHide);
@@ -2460,9 +2730,24 @@ const lbnlData = [
     rkMake('text',{x:m.l,y:290,class:'rk-legend-text',style:'font-size:13px'},svg).textContent='A proportional view makes the 45% U.S. share immediately legible alongside other regions.';
   }
 
-  rkShareChart();
-  rkGrowthChart();
-  rkRibbonChart();
+  async function rkInit() {
+    try {
+      const res = await fetch('database.php', { cache: 'no-store' });
+      const json = await res.json();
+      if (res.ok && !json.error && Array.isArray(json.regional_data_annex)) {
+        rkState = rkBuildState(json.regional_data_annex);
+      }
+    } catch (e) {
+      /* graceful fallback to constants */
+    }
+
+    rkRenderTable();
+    rkShareChart();
+    rkGrowthChart();
+    rkRibbonChart();
+  }
+
+  rkInit();
 
   window.addEventListener('scroll', ()=>{ if(!rkPinned) rkTooltip.classList.remove('rk-show'); });
   document.addEventListener('click', e=>{
