@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Assumptions — The Energy Index</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="energyindexlogo.png" alt="" />
+    <span class="nav-logo-text">The Energy Index</span>
+  </a>
+  <div class="nav-links">
+    <a href="purpose.html">Purpose</a>
+    <a href="assumptions.html">Assumptions</a>
+    <a href="resources.html">Resources</a>
+    <a href="visualizations.html" class="nav-cta">Explore the Data →</a>
+  </div>
+</nav>
+
+<!-- ASSUMPTIONS -->
+<section class="assumptions-section" style="padding-top: 64px;">
+  <h2>Our Assumptions</h2>
+  <div class="assumption-grid">
+
+    <div class="assumption-card">
+      <div class="c-tag">PUE Benchmarks</div>
+      <div class="c-sub">Sourced from LBNL 2024 report</div>
+      <p class="c-text">
+        Power Usage Effectiveness (PUE) values are drawn from the Lawrence Berkeley National Lab
+        2024 U.S. Data Center Energy Usage Report. We use the reported range of 1.1–2.4x as
+        representative of hyperscale to legacy enterprise data centers.
+      </p>
+    </div>
+
+    <div class="assumption-card">
+      <div class="c-tag">GPU Scope</div>
+      <div class="c-sub">NVIDIA architectures only (Volta → Hopper)</div>
+      <p class="c-text">
+        GPU comparisons are limited to NVIDIA data center GPUs across four generations: Volta (V100),
+        Ampere (A100), Ada Lovelace, and Hopper (H100). AMD and Google TPU workloads are excluded
+        from the hardware efficiency analysis.
+      </p>
+    </div>
+
+    <div class="assumption-card">
+      <div class="c-tag">Grid Carbon</div>
+      <div class="c-sub">Based on IEA regional averages</div>
+      <p class="c-text">
+        Carbon intensity by grid region uses IEA country-level averages (gCO₂/kWh). Sub-regional
+        variation (e.g. ERCOT vs PJM within the U.S.) is not captured. This may understate variance
+        in large, grid-diverse countries.
+      </p>
+    </div>
+
+    <div class="assumption-card">
+      <div class="c-tag">Renewable Claims</div>
+      <div class="c-sub">PPA-based, not realtime matched</div>
+      <p class="c-text">
+        When data centers report renewable energy percentages, we treat these as Power Purchase
+        Agreement-based figures, not real-time 24/7 matching. Actual hourly carbon intensity may
+        differ from annual averages.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+</body>
+</html>
