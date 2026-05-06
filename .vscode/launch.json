@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Open Visualizations (PHP server, Chrome)",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:8000/visualizations.html",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "Serve PHP (localhost:8000)"
+    },
+    {
+      "name": "Open Visualizations (PHP server)",
+      "type": "pwa-msedge",
+      "request": "launch",
+      "url": "http://localhost:8000/visualizations.html",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "Serve PHP (localhost:8000)"
+    }
+  ]
+}
