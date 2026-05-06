@@ -16,9 +16,9 @@
   <a href="index.html" class="nav-logo">The Energy Index</a>
   <div style="display:flex;align-items:center;gap:28px;">
     <span class="nav-label">Data Visualization Lab · Milestone 2</span>
-    <a href="purpose.html" class="nav-label" style="text-decoration:none;letter-spacing:0.08em;">Purpose</a>
-    <a href="assumptions.html" class="nav-label" style="text-decoration:none;letter-spacing:0.08em;">Assumptions</a>
-    <a href="resources.html" class="nav-label" style="text-decoration:none;letter-spacing:0.08em;">Resources</a>
+    <a href="purpose.html" class="nav-label nav-label-link">Purpose</a>
+    <a href="assumptions.html" class="nav-label nav-label-link">Assumptions</a>
+    <a href="resources.html" class="nav-label nav-label-link">Resources</a>
   </div>
 </nav>
 
@@ -111,7 +111,7 @@
      GPU Architecture Efficiency: Performance vs. Energy Cost
      Data: MDPI Kappa-Energy Index paper, Table 3 & 4
      ═══════════════════════════════════════════════════════════ -->
-<section>
+<section id="viz-01">
   <div class="section-header reveal">
     <div class="section-header-left">
       <div class="section-label">Visualization 01</div>
@@ -146,7 +146,7 @@
   <!-- VIZ 1: Bubble Scatter -->
   <div class="viz-card reveal">
     <div class="viz-title">Cluster Power vs. Density Map</div>
-    <div class="viz-sub">X-axis shows cluster power capacity in MW, Y-axis shows AI chips per MW, and bubble size shows estimated chip count. Brighter green marks operational clusters.</div>
+    <div class="viz-sub">Each bubble is a real AI cluster. The further right, the more power it consumes. The higher up, the more AI chips it fits per megawatt. Bigger bubbles = more total chips installed.</div>
     <div id="scatter-chart"></div>
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--mint)"></div> Operational</div>
@@ -155,8 +155,8 @@
       <div class="legend-item" style="margin-left:auto; color: var(--text-faint); font-size:11px;">Bubble area ∝ AI chip count</div>
     </div>
     <div class="insight">
-      <div class="insight-label">Key Insight</div>
-      <p>This live view highlights how quickly planned mega-clusters are scaling. Comparing chip counts to power capacity surfaces which deployments are densest, not just largest.</p>
+      <div class="insight-label">How to Read This Chart</div>
+      <p><strong style="color:#e8f0ea;">Hover over any bubble</strong> to see the cluster name, power draw, chip count, and country. Clusters in the <strong style="color:var(--mint)">top-left</strong> are the most efficient — high chip density at low power. Clusters in the <strong style="color:var(--amber)">bottom-right</strong> are power-hungry but chip-sparse. The ideal zone (dashed green box) marks clusters that pack the most AI compute per megawatt.</p>
     </div>
   </div>
 </section>
@@ -167,7 +167,7 @@
      U.S. Data Center Electricity Consumption by Type (2000–2023)
      Data: LBNL 2024 U.S. Data Center Energy Usage Report
      ═══════════════════════════════════════════════════════════ -->
-<section>
+<section id="viz-02">
   <div class="section-header reveal">
     <div class="section-header-left">
       <div class="section-label">Visualization 02</div>
@@ -200,8 +200,8 @@
 
   <!-- VIZ 2: Stacked Area Chart -->
   <div class="viz-card reveal">
-    <div class="viz-title">Stacked Area: Electricity by Component</div>
-    <div class="viz-sub">A live component-level stack from `datacenter_components`. The AI server band makes the newer accelerator-driven load visible within the broader facility mix.</div>
+    <div class="viz-title">U.S. Data Center Electricity by Component (2014–2023)</div>
+    <div class="viz-sub">This stacked area chart shows how total U.S. data center electricity use breaks down by component type over time. Each colored band represents one category — they stack on top of each other to show the total.</div>
     <div id="area-chart"></div>
     <div class="legend">
       <div class="legend-item"><div class="legend-rect" style="background:#31483a"></div> Infrastructure</div>
@@ -211,12 +211,135 @@
       <div class="legend-item"><div class="legend-rect" style="background:var(--mint)"></div> AI Servers</div>
     </div>
     <div class="insight">
-      <div class="insight-label">Key Insight</div>
-      <p>Because this chart is built directly from the component table, it shows where load is accumulating inside the facility stack rather than relying on a fixed enterprise/colo/hyperscale estimate.</p>
+      <div class="insight-label">How to Read This Chart</div>
+      <p><strong style="color:#e8f0ea;">Hover over any year</strong> to see a full breakdown of electricity use by component for that year. The <strong style="color:var(--mint)">bright green band at the top</strong> is AI server load — watch how it grows from near-zero and begins pulling the total upward from 2020 onward. The dashed white line shows the overall total.</p>
     </div>
   </div>
 </section>
 
+
+<!-- ══════════════════════════════════════════════════
+     SCENARIO EXPLORER — Interactive slider section
+══════════════════════════════════════════════════ -->
+<section class="scenario-section">
+  <div class="section-header">
+    <div class="section-header-left">
+      <div class="section-label">Interactive Explorer</div>
+      <h2>Build Your Scenario</h2>
+    </div>
+    <div class="section-header-right">
+      <p>Adjust the three key levers — facility efficiency, GPU generation, and grid carbon intensity — to see how total energy footprint and carbon output change. All calculations use real data ranges from the live database.</p>
+    </div>
+  </div>
+
+  <div class="scenario-grid">
+    <!-- Controls -->
+    <div class="scenario-controls">
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>Facility Efficiency (PUE) <span class="cite" data-cite-title="LBNL 2024 U.S. Data Center Energy Usage Report" data-cite-body="PUE range 1.1 (best hyperscale) to 2.4 (legacy enterprise). A PUE of 1.0 would be perfect efficiency — all power going to compute." data-cite-url="https://eta-publications.lbl.gov/sites/default/files/2024-12/lbnl-2024-united-states-data-center-energy-usage-report_1.pdf" data-cite-link="lbl.gov →">1</span></span>
+          <strong id="pue-display">1.5</strong>
+        </div>
+        <input type="range" class="scenario-slider" id="pue-slider" min="110" max="240" value="150" step="1">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);font-family:'Space Mono',monospace;">
+          <span>1.1 — Best (hyperscale)</span><span>2.4 — Worst (legacy)</span>
+        </div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>GPU Generation <span class="cite" data-cite-title="Kappa-Energy Index — MDPI Sensors 2025" data-cite-body="Each GPU generation delivers roughly 2.5× more compute efficiency per watt. H100 achieves ~1.41 TFLOPS/W vs V100 at ~0.37." data-cite-url="https://www.mdpi.com/1424-8220/25/3/846" data-cite-link="mdpi.com →">2</span></span>
+          <strong id="gpu-display">A100</strong>
+        </div>
+        <div class="gpu-selector" id="gpu-selector">
+          <button class="gpu-chip-btn" data-gpu="V100" data-eff="0.37">V100</button>
+          <button class="gpu-chip-btn active" data-gpu="A100" data-eff="0.77">A100</button>
+          <button class="gpu-chip-btn" data-gpu="H100" data-eff="1.41">H100</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-faint);font-family:'Space Mono',monospace;margin-top:4px;">Efficiency: <span id="gpu-eff-display">0.77</span> TFLOPS/W</div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>Grid Carbon Intensity <span class="cite" data-cite-title="IEA Energy & AI Dataset" data-cite-body="Carbon intensity ranges from ~30 gCO₂/kWh (Norway hydro) to ~700+ gCO₂/kWh (coal-heavy grids). Same workload, 8× carbon difference." data-cite-url="https://www.iea.org/data-and-statistics/data-product/energy-and-ai" data-cite-link="iea.org →">3</span></span>
+          <strong id="carbon-display">400 gCO₂/kWh</strong>
+        </div>
+        <input type="range" class="scenario-slider" id="carbon-slider" min="30" max="750" value="400" step="10">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);font-family:'Space Mono',monospace;">
+          <span>30 — Norway (hydro)</span><span>750 — Coal-heavy grid</span>
+        </div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>Workload Size (GPU·hours/day)</span>
+          <strong id="workload-display">1,000</strong>
+        </div>
+        <input type="range" class="scenario-slider" id="workload-slider" min="100" max="10000" value="1000" step="100">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);font-family:'Space Mono',monospace;">
+          <span>100 — Small lab</span><span>10,000 — Large cluster</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Output -->
+    <div class="scenario-output">
+      <div class="scenario-result">
+        <div class="r-label">Daily Energy Use</div>
+        <div class="r-value" id="res-energy">—</div>
+        <div class="r-sub">MWh consumed per day (compute + overhead)</div>
+      </div>
+      <div class="scenario-result">
+        <div class="r-label">Daily Carbon Footprint</div>
+        <div class="r-value" id="res-carbon">—</div>
+        <div class="r-sub">kg CO₂ equivalent per day</div>
+      </div>
+
+      <div class="scenario-bar-wrap">
+        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">vs. best-practice baseline</div>
+        <div class="scenario-bar-row">
+          <span style="width:80px">Energy</span>
+          <div class="scenario-bar-track"><div class="scenario-bar-fill" id="bar-energy" style="width:0%;background:var(--mint)"></div></div>
+          <span id="bar-energy-label" style="width:40px;text-align:right">—</span>
+        </div>
+        <div class="scenario-bar-row">
+          <span style="width:80px">Carbon</span>
+          <div class="scenario-bar-track"><div class="scenario-bar-fill" id="bar-carbon" style="width:0%;background:var(--mint)"></div></div>
+          <span id="bar-carbon-label" style="width:40px;text-align:right">—</span>
+        </div>
+      </div>
+
+      <div class="scenario-verdict" id="scenario-verdict"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     NARRATIVE GUIDE — Step-by-step floating panel
+══════════════════════════════════════════════════ -->
+<div id="narrative-guide">
+  <div class="ng-header">
+    <span class="ng-eyebrow">Interactive Guide</span>
+    <button class="ng-close" id="ng-close" title="Close guide">✕</button>
+  </div>
+  <div class="ng-step-counter"><span id="ng-step-num">1</span> of <span id="ng-step-total">5</span></div>
+  <div class="ng-title" id="ng-title"></div>
+  <div class="ng-body" id="ng-body"></div>
+  <div class="ng-actions">
+    <button class="ng-btn ng-btn-ghost" id="ng-prev" disabled>← Back</button>
+    <button class="ng-btn ng-btn-primary" id="ng-next">Next →</button>
+  </div>
+  <div class="ng-progress">
+    <div class="ng-progress-fill" id="ng-progress-fill"></div>
+  </div>
+</div>
+
+<!-- Trigger button (shown in bottom-right when guide is closed) -->
+<button id="ng-trigger" title="Open interactive guide">
+  <span>&#9654;</span> Guide
+</button>
 
 <!-- FOOTER -->
 <footer>
@@ -228,6 +351,22 @@
 
 <script>
 // ═══════════════════════════════════
+
+// ── Count-up animation utility ───────────────────────────────
+function animateCountUp(el, endValue, suffix, duration) {
+  if (!el) return;
+  const start = 0;
+  const startTime = performance.now();
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    const current = Math.round(start + (endValue - start) * eased);
+    el.textContent = current.toLocaleString() + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 
 window.vizStatusStore = {
   'viz-01': { status: 'live', note: 'Connecting to database.php...' },
@@ -662,6 +801,15 @@ function renderViz02AreaChart(){
   ).selectAll('line').style('stroke','rgba(27,255,126,0.06)').style('stroke-dasharray','3,4');
   g.selectAll('.domain').remove();
 
+  // Clip path for left-to-right reveal animation
+  const defs = svg.append('defs');
+  defs.append('clipPath').attr('id', 'area-reveal-clip')
+    .append('rect')
+      .attr('x', 0).attr('y', -margin.top)
+      .attr('width', 0).attr('height', H)
+      .transition().duration(1600).ease(d3.easeCubicOut)
+      .attr('width', iw + margin.right);
+
   const area = d3.area()
     .x(d => xScale(d.data.year))
     .y0(d => yScale(d[0]))
@@ -670,8 +818,9 @@ function renderViz02AreaChart(){
 
   const tooltip = document.getElementById('tooltip');
 
-  // Draw areas
-  g.selectAll('.layer').data(stack).enter().append('path')
+  // Draw areas with clip-path for left-to-right reveal
+  const areaGroup = g.append('g').attr('clip-path', 'url(#area-reveal-clip)');
+  areaGroup.selectAll('.layer').data(stack).enter().append('path')
     .attr('class','layer')
     .attr('d', area)
     .attr('fill', d => colors[d.key])
@@ -783,217 +932,6 @@ initViz02Live();
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
-<style>
-  /* ── GPU section scoped styles ── */
-  .gpu-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    margin: 32px 0 24px;
-  }
-  .gpu-stat-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 20px 20px 16px;
-  }
-  .gpu-stat-card .s-label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-  }
-  .gpu-stat-card .s-value {
-    font-family: 'PP NeueBit', monospace;
-    font-size: 38px;
-    font-weight: bold;
-    line-height: 1;
-    color: var(--mint);
-  }
-  .gpu-stat-card .s-sub {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 4px;
-    line-height: 1.4;
-  }
-
-  .gpu-toolbar {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 28px;
-  }
-  .gpu-control {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    border: 1px solid var(--border);
-    background: rgba(21,25,22,0.7);
-    border-radius: 999px;
-    padding: 9px 16px;
-  }
-  .gpu-control label {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    white-space: nowrap;
-  }
-  .gpu-control select {
-    appearance: none;
-    border: none;
-    outline: none;
-    background: transparent;
-    color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 13px;
-    min-width: 130px;
-    cursor: pointer;
-  }
-  .gpu-control select option { background: #151916; }
-
-  .gpu-charts-grid {
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 18px;
-    margin-bottom: 18px;
-  }
-  .gpu-chart-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 24px 24px 20px;
-  }
-  .gpu-chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-    padding-bottom: 14px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  .gpu-chart-header h3 {
-    margin: 0 0 4px;
-    font-size: 20px;
-    line-height: 1.2;
-  }
-  .gpu-chart-header .chart-sub {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin: 0;
-  }
-  .gpu-chart-wrap {
-    position: relative;
-    width: 100%;
-    height: 500px;
-  }
-  .gpu-legend {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    align-items: center;
-    margin-top: 2px;
-  }
-  .gpu-legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--text-muted);
-  }
-  .gpu-dot {
-    width: 9px; height: 9px;
-    border-radius: 999px;
-    display: inline-block;
-    flex-shrink: 0;
-  }
-
-  .gpu-table-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 24px 24px 20px;
-    margin-top: 18px;
-  }
-  .gpu-table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding-bottom: 14px;
-    margin-bottom: 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .gpu-table-header h3 { margin: 0; font-size: 20px; }
-  .gpu-row-count {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--text-muted);
-    letter-spacing: 0.06em;
-  }
-  .gpu-table-scroll {
-    max-height: 380px;
-    overflow: auto;
-    margin-top: 0;
-  }
-  .gpu-table-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
-  .gpu-table-scroll::-webkit-scrollbar-track { background: transparent; }
-  .gpu-table-scroll::-webkit-scrollbar-thumb { background: rgba(27,255,126,0.2); border-radius: 4px; }
-
-  .gpu-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  .gpu-table thead th {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--mint);
-    padding: 13px 14px;
-    text-align: left;
-    border-bottom: 1px solid var(--mint-border);
-    background: var(--bg-card);
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    white-space: nowrap;
-  }
-  .gpu-table tbody td {
-    padding: 11px 14px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
-  }
-  .gpu-table tbody td:first-child { color: var(--text); font-weight: 500; }
-  .gpu-table tbody td:nth-child(2) { color: var(--text); }
-  .gpu-table tbody tr:hover td { background: var(--mint-dim); }
-  .gpu-table .val-mint { color: var(--mint); font-family: 'Space Mono', monospace; }
-
-  .gpu-status-bar {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
-    margin-bottom: 28px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .gpu-status-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--mint);
-    display: inline-block;
-    flex-shrink: 0;
-  }
-
-  @media (max-width: 1000px) {
-    .gpu-stats { grid-template-columns: repeat(2, 1fr); }
-    .gpu-charts-grid { grid-template-columns: 1fr; }
-  }
-</style>
 
 <section style="padding: var(--pad-v) var(--pad-h); border-top: 1px solid var(--border);">
   <div class="section-header">
@@ -1343,120 +1281,17 @@ initViz02Live();
 })();
 </script>
 
+<div class="insight" style="margin: 0 var(--pad-h) 32px;">
+  <div class="insight-label">How to Use This Dashboard</div>
+  <p><strong style="color:#e8f0ea;">Use the filters at the top</strong> (Manufacturer, Year Range, Sort By) to narrow down the dataset. The <strong style="color:#e8f0ea;">bubble chart</strong> plots each GPU by memory size (X) vs. shader count (Y) — bubble size reflects memory bus width. The <strong style="color:#e8f0ea;">bar chart</strong> ranks GPUs by your chosen metric. <strong style="color:#e8f0ea;">Hover over any point or bar</strong> for full specs. The data table below shows all filtered records with raw numbers.</p>
+</div>
+
 <!-- ═══════════════════════════════════════════
      IEA ENERGY DEMAND  (Visualization 04)
   Data: Live regional/world annex rows from database.php
 ════════════════════════════════════════════ -->
-<style>
-  .iea-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin: 28px 0;
-  }
-  .iea-stat {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 22px 20px 18px;
-  }
-  .iea-stat .s-label {
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--text-muted); margin-bottom: 8px;
-  }
-  .iea-stat .s-value {
-    font-family: 'PP NeueBit', monospace;
-    font-size: 40px; font-weight: bold;
-    line-height: 1; color: var(--mint);
-  }
-  .iea-stat .s-sub {
-    font-size: 12px; color: var(--text-muted); margin-top: 5px; line-height: 1.4;
-  }
 
-  .iea-region-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    margin: 0 0 32px;
-  }
-  .iea-region {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 16px 14px;
-  }
-  .iea-region .r-name {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
-    text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
-  }
-  .iea-region .r-value {
-    font-family: 'PP NeueBit', monospace;
-    font-size: 28px; font-weight: bold;
-    color: var(--sky); line-height: 1;
-  }
-  .iea-region .r-unit {
-    font-size: 11px; color: var(--text-muted); margin-top: 3px;
-  }
-
-  .iea-charts-grid {
-    display: grid;
-    grid-template-columns: 1.3fr 0.7fr;
-    gap: 18px;
-    margin-bottom: 18px;
-  }
-  .iea-chart-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 24px;
-  }
-  .iea-chart-card h3 { font-size: 20px; margin: 0 0 6px; line-height: 1.2; }
-  .iea-chart-card .chart-sub {
-    font-size: 12px; color: var(--text-muted); margin: 0 0 20px;
-  }
-  .iea-legend {
-    display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px;
-  }
-  .iea-legend-item {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 12px; color: var(--text-muted);
-  }
-  .iea-swatch {
-    width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex-shrink: 0;
-  }
-
-  .iea-table-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 24px 24px 20px;
-    margin-top: 18px;
-  }
-  .iea-table-card h3 { font-size: 20px; margin: 0 0 16px; }
-  .iea-table-scroll { overflow-x: auto; }
-  .iea-table {
-    width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px;
-  }
-  .iea-table thead th {
-    font-family: 'Space Mono', monospace; font-size: 10px;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--mint); padding: 13px 14px; text-align: left;
-    border-bottom: 1px solid var(--mint-border);
-    background: var(--bg-card); position: sticky; top: 0; z-index: 1;
-  }
-  .iea-table tbody td {
-    padding: 11px 14px; border-bottom: 1px solid var(--border);
-    color: var(--text-muted); vertical-align: top;
-  }
-  .iea-table tbody td:first-child { color: var(--text); font-weight: 500; }
-  .iea-table tbody tr:hover td { background: var(--mint-dim); }
-  .iea-table .val-mint { color: var(--mint); font-family: 'Space Mono', monospace; font-size: 12px; }
-
-  @media (max-width: 900px) {
-    .iea-stats { grid-template-columns: 1fr 1fr; }
-    .iea-region-grid { grid-template-columns: repeat(2, 1fr); }
-    .iea-charts-grid { grid-template-columns: 1fr; }
-  }
-</style>
-
-<section style="padding: var(--pad-v) var(--pad-h); border-top: 1px solid var(--border);">
+<section id="viz-04" style="padding: var(--pad-v) var(--pad-h); border-top: 1px solid var(--border);">
   <div class="section-header">
     <div class="section-header-left">
       <div class="section-label">Visualization 04</div>
@@ -1572,9 +1407,9 @@ initViz02Live();
       const gEl = document.getElementById('ieaStatGlobal2022');
       const bEl = document.getElementById('ieaStatBase2026');
       const sEl = document.getElementById('ieaStatSplit');
-      if (gEl && world2024) gEl.textContent = `${Math.round(Number(world2024.value))} TWh`;
-      if (bEl && world2030) bEl.textContent = `${Math.round(Number(world2030.value))} TWh`;
-      if (sEl && latestTotal) sEl.textContent = `${Math.round((latestAi / latestTotal) * 100)}%`;
+      if (gEl && world2024) animateCountUp(gEl, Math.round(Number(world2024.value)), ' TWh', 1200);
+      if (bEl && world2030) animateCountUp(bEl, Math.round(Number(world2030.value)), ' TWh', 1400);
+      if (sEl && latestTotal) animateCountUp(sEl, Math.round((latestAi / latestTotal) * 100), '%', 1000);
 
       const topRegions = electricity
         .filter(r => String(r.scenario || '').toLowerCase().includes('base') && Number(r.year) === 2030 && String(r.region || '').toLowerCase() !== 'world')
@@ -1663,85 +1498,15 @@ initViz02Live();
 })();
 </script>
 
+<div class="insight" style="margin: 0 var(--pad-h) 32px;">
+  <div class="insight-label">How to Read This Section</div>
+  <p>The <strong style="color:#e8f0ea;">three stat cards</strong> at the top show global electricity demand now vs. the 2030 base case — watch them count up from zero as the data loads. The <strong style="color:#e8f0ea;">bar chart on the left</strong> shows world totals by year (green = actual, blue = 2030 projection). The <strong style="color:#e8f0ea;">chart on the right</strong> compares the top 5 regions side-by-side: 2024 actual vs. 2030 base case. <strong style="color:#e8f0ea;">Hover any bar</strong> for exact TWh values. The regional cards below rank the biggest electricity consumers by projected 2030 demand.</p>
+</div>
+
 <!-- ═══════════════════════════════════════════
      AI ENERGY VIZ  (Visualization 05)
   Data: Live regional_data_annex + gpu_specs tables from database.php
 ════════════════════════════════════════════ -->
-<style>
-  /* badge pills */
-  .oe-badge {
-    display: inline-block;
-    padding: 2px 9px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    font-family: 'Space Mono', monospace;
-  }
-  .oe-badge-green  { background: rgba(27,255,126,0.10);  color: #1bff7e; }
-  .oe-badge-amber  { background: rgba(255,179,64,0.10);  color: #ffb340; }
-  .oe-badge-red    { background: rgba(255,107,107,0.10); color: #ff6b6b; }
-  .oe-badge-blue   { background: rgba(64,196,255,0.10);  color: #40c4ff; }
-
-  .oe-two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    margin-top: 18px;
-  }
-
-  .oe-chart-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 24px;
-  }
-  .oe-chart-card h3 { font-size: 20px; margin: 0 0 6px; line-height: 1.2; }
-  .oe-chart-card .chart-sub {
-    font-size: 12px; color: var(--text-muted); margin: 0 0 18px;
-  }
-
-  .oe-legend {
-    display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;
-  }
-  .oe-legend-item {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 12px; color: var(--text-muted);
-  }
-  .oe-swatch {
-    width: 11px; height: 11px; border-radius: 2px; display: inline-block; flex-shrink: 0;
-  }
-
-  .oe-table-wrap { overflow-x: auto; }
-  .oe-table {
-    width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px;
-  }
-  .oe-table thead th {
-    font-family: 'Space Mono', monospace; font-size: 10px;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--mint); padding: 13px 14px; text-align: left;
-    border-bottom: 1px solid var(--mint-border);
-    background: var(--bg-card); position: sticky; top: 0; white-space: nowrap;
-  }
-  .oe-table tbody td {
-    padding: 11px 14px; border-bottom: 1px solid var(--border);
-    color: var(--text-muted); vertical-align: middle;
-  }
-  .oe-table tbody td:first-child { color: var(--text); font-weight: 600; }
-  .oe-table tbody tr:hover td { background: var(--mint-dim); }
-  .oe-table .num { font-family: 'Space Mono', monospace; font-size: 12px; text-align: right; }
-  .oe-table .val-mint { color: var(--mint); font-family: 'Space Mono', monospace; font-size: 12px; }
-
-  .oe-table-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 24px 24px 20px;
-    margin-bottom: 18px;
-  }
-  .oe-table-card h3 { font-size: 20px; margin: 0 0 6px; }
-  .oe-table-card .chart-sub { font-size: 12px; color: var(--text-muted); margin: 0 0 18px; }
-
-  @media (max-width: 860px) { .oe-two-col { grid-template-columns: 1fr; } }
-</style>
 
 <section style="padding: var(--pad-v) var(--pad-h); border-top: 1px solid var(--border);">
   <div class="section-header">
@@ -1928,122 +1693,16 @@ async function hydrateViz05FromDatabase() {
 hydrateViz05FromDatabase();
 </script>
 
+<div class="insight" style="margin: 0 var(--pad-h) 32px;">
+  <div class="insight-label">How to Read This Section</div>
+  <p>This section pairs two views. The <strong style="color:#e8f0ea;">regional electricity table</strong> shows how data center demand compares across regions from 2022 → 2030, including energy mix and carbon intensity. The <strong style="color:#e8f0ea;">GPU efficiency bubble chart</strong> below it plots individual GPU models by estimated power draw (X) vs. compute efficiency (Y) — bigger bubbles indicate wider memory bandwidth. <strong style="color:#e8f0ea;">The core tension:</strong> GPU hardware got ~4× more efficient per watt from V100 to H100, but AI workloads grew 10× in the same window — hardware gains alone cannot offset demand growth.</p>
+</div>
+
 <!-- ═══════════════════════════════════════════════════════════════
      VISUALIZATION 06 — Regional Concentration & Growth Trends
   Source: Live regional_data_annex records from database.php
      Scoped prefix: rk-
 ═══════════════════════════════════════════════════════════════ -->
-<style>
-  /* ── RK scoped variables ── */
-  .rk-section { margin-top: 0; }
-
-  /* Tooltip */
-  #rk-tooltip {
-    position: fixed; z-index: 1001; pointer-events: none;
-    opacity: 0; transform: translateY(6px);
-    transition: opacity .16s ease, transform .16s ease;
-    max-width: 260px; padding: 12px 14px;
-    border-radius: 16px; border: 1px solid rgba(27,255,126,0.34);
-    background: rgba(11,20,14,.97); backdrop-filter: blur(12px);
-    box-shadow: 0 20px 40px rgba(0,0,0,.45);
-    color: #f5fff9; font-family: 'Space Grotesk', sans-serif;
-  }
-  #rk-tooltip.rk-show { opacity: 1; transform: translateY(0); }
-  #rk-tooltip .rk-tt-title { font-weight: 800; font-size: .96rem; margin-bottom: 4px; }
-  #rk-tooltip .rk-tt-body { color: #e4fff0; line-height: 1.5; font-size: .9rem; }
-
-  /* Table */
-  .rk-table-wrap {
-    border: 1px solid rgba(27,255,126,0.1); border-radius: 16px;
-    overflow: auto; max-height: 480px;
-    background: rgba(3,10,8,.8);
-  }
-  .rk-data-table { width: 100%; min-width: 900px; border-collapse: collapse; }
-  .rk-data-table thead th {
-    position: sticky; top: 0;
-    background: linear-gradient(180deg, rgba(12,29,22,.98), rgba(8,21,16,.98));
-    color: #ebfff6; text-align: left; font-size: .78rem;
-    text-transform: uppercase; letter-spacing: .08em;
-    padding: 12px 14px; border-bottom: 1px solid rgba(27,255,126,0.25);
-    font-family: 'PP NeueBit', monospace;
-  }
-  .rk-data-table td {
-    padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.06);
-    color: #f3fff8; font-size: .92rem;
-  }
-  .rk-data-table tbody tr:nth-child(odd) { background: rgba(255,255,255,.02); }
-  .rk-data-table tbody tr:hover { background: rgba(27,255,126,0.06); }
-  .rk-badge {
-    display: inline-flex; padding: 4px 10px; border-radius: 999px;
-    border: 1px solid rgba(27,255,126,0.15); font-weight: 700; font-size: .78rem;
-  }
-  .rk-badge-now  { background: rgba(27,255,126,0.08);  color: #c9ffde; }
-  .rk-badge-proj { background: rgba(255,179,64,0.10);  color: #ffe4b8; }
-  .rk-badge-share{ background: rgba(64,196,255,0.08);  color: #d8feff; }
-  .rk-badge-der  { background: rgba(255,255,255,0.05); color: #d4efe2; }
-
-  /* Figure cards */
-  .rk-figure-card {
-    border: 1px solid rgba(27,255,126,0.1); border-radius: 20px;
-    padding: 14px; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-    margin-bottom: 20px;
-  }
-  .rk-frame-top {
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 12px; margin-bottom: 10px;
-  }
-  .rk-frame-dots { display: flex; gap: 7px; }
-  .rk-frame-dots span { width: 9px; height: 9px; border-radius: 50%; display: block; background: rgba(255,255,255,.2); }
-  .rk-frame-dots span:nth-child(1) { background: #ff7b72; }
-  .rk-frame-dots span:nth-child(2) { background: #ffd866; }
-  .rk-frame-dots span:nth-child(3) { background: #1bff7e; }
-  .rk-frame-label { font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: #e7fff3; }
-
-  .rk-chart-shell {
-    position: relative; border: 1px solid rgba(27,255,126,0.1);
-    border-radius: 16px; overflow: hidden;
-    background: #0d1510;
-  }
-  svg.rk-chart { display: block; width: 100%; height: auto; }
-
-  .rk-hint {
-    margin-top: 8px; font-size: .88rem;
-    color: rgba(27,255,126,0.6); font-family: 'Space Grotesk', sans-serif;
-  }
-
-  /* Callout grid */
-  .rk-callouts {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 16px; margin-top: 16px;
-  }
-  .rk-callout {
-    border: 1px solid rgba(27,255,126,0.1); border-radius: 16px;
-    padding: 16px; background: rgba(255,255,255,.025);
-  }
-  .rk-callout h3 { margin: 0 0 6px; color: #ebfff6; font-size: .95rem; font-family: 'PP NeueBit', monospace; letter-spacing: .04em; }
-  .rk-callout p  { margin: 0; color: var(--text-muted); font-size: .9rem; line-height: 1.6; }
-
-  @media (max-width: 700px) { .rk-callouts { grid-template-columns: 1fr; } }
-
-  /* SVG text classes (used by JS make()) */
-  .rk-axis-label  { fill: #d4efe2; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-family: 'Space Grotesk', sans-serif; }
-  .rk-axis-tick   { fill: #bfe3d1; font-size: 11px; font-family: 'Space Grotesk', sans-serif; }
-  .rk-chart-title { fill: #f6fff9; font-size: 22px; font-weight: 700; font-family: 'PP NeueBit', monospace; }
-  .rk-chart-sub   { fill: #c8e6d4; font-size: 13px; font-family: 'Space Grotesk', sans-serif; }
-  .rk-legend-text { fill: #d4efe2; font-size: 12px; font-family: 'Space Grotesk', sans-serif; }
-  .rk-series-label{ fill: #ffffff; font-size: 12px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
-  .rk-dim-note    { fill: #f0fff6; font-size: 12px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; }
-
-  /* Keyframes — scoped names */
-  @keyframes rk-growBar  { from { transform: scaleY(0) } to { transform: scaleY(1) } }
-  @keyframes rk-bandPulse{ 0%,100%{filter:drop-shadow(0 0 0 rgba(126,246,255,.0))} 50%{filter:drop-shadow(0 0 16px rgba(126,246,255,.22))} }
-  @keyframes rk-pulseGlob{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.025)} }
-  @keyframes rk-pulse0   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
-  @keyframes rk-pulse1   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
-  @keyframes rk-pulse2   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.035)} }
-  @keyframes rk-pulse3   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
-  @keyframes rk-slideIn  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
-</style>
 
 <div id="rk-tooltip"><div class="rk-tt-title"></div><div class="rk-tt-body"></div></div>
 
@@ -2051,7 +1710,7 @@ hydrateViz05FromDatabase();
   <div class="viz-header">
     <span class="section-label">Visualization 06</span>
     <h2>Regional Concentration &amp; Growth Trends</h2>
-    <p class="viz-desc">Three live views built from `regional_data_annex` — a regional constellation, a growth ladder, and a proportional ribbon showing where electricity demand is concentrated today and how it shifts by 2030 base case.</p>
+    <p class="viz-desc">Three interactive charts showing where global electricity demand is concentrated and how it shifts by 2030. Start with the <strong style="color:#e8f0ea;">constellation</strong> (circle size = 2024 demand), then follow growth in the <strong style="color:#e8f0ea;">growth ladder</strong>, and see proportional share change in the <strong style="color:#e8f0ea;">ribbon chart</strong>. Hover or click any region to highlight it across all three views.</p>
   </div>
 
   <!-- Data table -->
@@ -2398,6 +2057,329 @@ hydrateViz05FromDatabase();
     if (e.target.closest('#rk-shareChart,#rk-growthChart,#rk-ribbonChart')) return;
     rkPinned=null; rkTooltip.classList.remove('rk-show');
   });
+})();
+
+// ── Scenario Explorer ────────────────────────────────────────
+(function() {
+  // GPU specs: TDP in kW
+  const gpuSpecs = { V100: 0.300, A100: 0.400, H100: 0.700 };
+  let currentGPU = 'A100';
+
+  // Best-practice and worst-case reference points (for bar scaling)
+  const BEST = { pue: 1.1, gpu: 'H100', carbon: 30 };
+  const WORST = { pue: 2.4, gpu: 'V100', carbon: 750 };
+
+  function calcEnergy(workload, pue, gpu) {
+    // kWh/day = GPU·hours × GPU TDP (kW) × PUE
+    return workload * gpuSpecs[gpu] * pue;
+  }
+
+  function calcCarbon(energyKwh, carbonIntensity) {
+    // kgCO₂/day = kWh × gCO₂/kWh ÷ 1000
+    return energyKwh * carbonIntensity / 1000;
+  }
+
+  function fmt(n) {
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+    return n >= 10 ? Math.round(n).toLocaleString() : n.toFixed(1);
+  }
+
+  function getVerdict(pue, gpu, carbon) {
+    const score = ((pue - 1.1) / (2.4 - 1.1)) * 0.4
+                + (1 - ['H100','A100','V100'].indexOf(gpu) / 2) * 0.3
+                + ((carbon - 30) / (750 - 30)) * 0.3;
+    if (score < 0.2) return { text: 'Excellent scenario — near best-practice across all three levers.', cls: 'verdict-good' };
+    if (score < 0.45) return { text: 'Good scenario — one or two levers have meaningful room for improvement.', cls: 'verdict-ok' };
+    if (score < 0.7) return { text: 'High footprint — switching to a cleaner grid or newer GPUs would reduce impact significantly.', cls: 'verdict-warn' };
+    return { text: 'Critical footprint — this combination wastes energy at every layer. Upgrade hardware, location, or both.', cls: 'verdict-bad' };
+  }
+
+  function update() {
+    const pue = parseInt(document.getElementById('pue-slider').value, 10) / 100;
+    const carbon = parseInt(document.getElementById('carbon-slider').value, 10);
+    const workload = parseInt(document.getElementById('workload-slider').value, 10);
+
+    document.getElementById('pue-display').textContent = pue.toFixed(2);
+    document.getElementById('carbon-display').textContent = carbon + ' gCO₂/kWh';
+    document.getElementById('workload-display').textContent = workload.toLocaleString();
+
+    const energy = calcEnergy(workload, pue, currentGPU);
+    const co2 = calcCarbon(energy, carbon);
+    const bestEnergy = calcEnergy(workload, BEST.pue, BEST.gpu);
+    const bestCarbon = calcCarbon(bestEnergy, BEST.carbon);
+    const worstEnergy = calcEnergy(workload, WORST.pue, WORST.gpu);
+    const worstCarbon = calcCarbon(worstEnergy, WORST.carbon);
+
+    document.getElementById('res-energy').textContent = fmt(energy) + ' MWh';
+    document.getElementById('res-carbon').textContent = fmt(co2) + ' kg CO₂';
+
+    // Bar widths: scale 0–100% from best to worst
+    const energyPct = Math.min(100, Math.max(4, ((energy - bestEnergy) / (worstEnergy - bestEnergy)) * 100));
+    const carbonPct = Math.min(100, Math.max(4, ((co2 - bestCarbon) / (worstCarbon - bestCarbon)) * 100));
+
+    const barEnergy = document.getElementById('bar-energy');
+    const barCarbon = document.getElementById('bar-carbon');
+    barEnergy.style.width = energyPct + '%';
+    barCarbon.style.width = carbonPct + '%';
+
+    // Color bars: green → amber → red
+    const eColor = energyPct < 30 ? '#1bff7e' : energyPct < 65 ? '#ffb340' : '#ff8b8b';
+    const cColor = carbonPct < 30 ? '#1bff7e' : carbonPct < 65 ? '#ffb340' : '#ff8b8b';
+    barEnergy.style.background = eColor;
+    barCarbon.style.background = cColor;
+
+    // Multiplier labels
+    const eMult = energy / bestEnergy;
+    const cMult = co2 / bestCarbon;
+    document.getElementById('bar-energy-label').textContent = eMult.toFixed(1) + '×';
+    document.getElementById('bar-carbon-label').textContent = cMult.toFixed(1) + '×';
+
+    // Verdict
+    const v = getVerdict(pue, currentGPU, carbon);
+    const verdictEl = document.getElementById('scenario-verdict');
+    verdictEl.textContent = v.text;
+    verdictEl.className = 'scenario-verdict ' + v.cls;
+  }
+
+  // GPU selector buttons
+  document.querySelectorAll('.gpu-chip-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.gpu-chip-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentGPU = this.dataset.gpu;
+      document.getElementById('gpu-display').textContent = currentGPU;
+      document.getElementById('gpu-eff-display').textContent = this.dataset.eff;
+      update();
+    });
+  });
+
+  document.getElementById('pue-slider').addEventListener('input', update);
+  document.getElementById('carbon-slider').addEventListener('input', update);
+  document.getElementById('workload-slider').addEventListener('input', update);
+
+  // Cite popover for scenario section
+  const scenarioPop = document.getElementById('cite-popover');
+  if (!scenarioPop) {
+    const pop = document.createElement('div');
+    pop.id = 'cite-popover';
+    pop.className = 'cite-popover';
+    pop.innerHTML = '<span class="cite-close" id="cite-close">✕</span><strong id="cite-title"></strong><span id="cite-body"></span><br><a id="cite-link" href="#" target="_blank" rel="noopener"></a>';
+    document.body.appendChild(pop);
+    const titleEl = pop.querySelector('#cite-title');
+    const bodyEl = pop.querySelector('#cite-body');
+    const linkEl = pop.querySelector('#cite-link');
+    function posCite(x,y){const pw=320,ph=120,vw=window.innerWidth,vh=window.innerHeight;let l=x+12,t=y-20;if(l+pw>vw-16)l=x-pw-12;if(t+ph>vh-16)t=vh-ph-16;pop.style.left=l+'px';pop.style.top=t+'px';}
+    document.addEventListener('click',function(e){const c=e.target.closest('.cite');if(c){e.stopPropagation();titleEl.textContent=c.dataset.citeTitle;bodyEl.textContent=c.dataset.citeBody;linkEl.href=c.dataset.citeUrl;linkEl.textContent=c.dataset.citeLink;pop.classList.add('visible');posCite(e.clientX,e.clientY);return;}if(e.target.id==='cite-close'||!pop.contains(e.target))pop.classList.remove('visible');});
+  }
+
+  // Run initial calculation
+  update();
+})();
+
+// ── Scroll-reveal animations ─────────────────────────────────
+(function() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    section { opacity: 0; transform: translateY(24px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    section.visible { opacity: 1; transform: translateY(0); }
+    .viz-card { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .viz-card.visible { opacity: 1; transform: translateY(0); }
+  `;
+  document.head.appendChild(style);
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.reveal, section, .viz-card').forEach(el => observer.observe(el));
+})();
+
+// ── Narrative Guide ───────────────────────────────────────────
+(function() {
+  const steps = [
+    {
+      title: 'Welcome to The Energy Index',
+      body: 'This page has 6 live data visualizations + an interactive scenario builder. Follow this guide to understand what each one shows and what conclusions to draw.',
+      target: '.hero'
+    },
+    {
+      title: 'Step 1 — GPU Architecture Trade-off',
+      body: 'Scroll to Viz 01. This scatter plot compares NVIDIA GPU generations on compute efficiency vs. power draw. Hover any point to see specs. Notice: each generation roughly doubles efficiency per watt.',
+      target: '#viz-01'
+    },
+    {
+      title: 'Step 2 — U.S. Electricity Over Time',
+      body: 'Scroll to Viz 02. The area chart shows how U.S. data center electricity consumption has grown. Watch the left-to-right reveal on load. The slope is accelerating.',
+      target: '#viz-02'
+    },
+    {
+      title: 'Step 3 — IEA Demand Snapshot',
+      body: 'Viz 04 shows IEA projections through 2030. The gap between actual and projected demand shows how quickly AI infrastructure is scaling beyond earlier estimates.',
+      target: '#viz-04'
+    },
+    {
+      title: 'Step 4 — Try the Scenario Explorer',
+      body: 'Scroll down to "Build Your Scenario." Drag the sliders to change PUE, grid carbon, and workload size. Click between GPU generations. Watch the bars update — this is the core finding of the project.',
+      target: '.scenario-section'
+    },
+    {
+      title: 'Key Conclusion',
+      body: 'The best-to-worst spread is 10× or more. No single lever closes the gap alone — you need low PUE + clean grid + modern GPUs together. That\'s the argument this site makes.',
+      target: '.scenario-section'
+    }
+  ];
+
+  let current = 0;
+  const guide = document.getElementById('narrative-guide');
+  const trigger = document.getElementById('ng-trigger');
+  const titleEl = document.getElementById('ng-title');
+  const bodyEl = document.getElementById('ng-body');
+  const stepNumEl = document.getElementById('ng-step-num');
+  const stepTotalEl = document.getElementById('ng-step-total');
+  const progressEl = document.getElementById('ng-progress-fill');
+  const prevBtn = document.getElementById('ng-prev');
+  const nextBtn = document.getElementById('ng-next');
+  let highlightEl = null;
+
+  // ── Drag to reposition (entire box) ──────────────────────
+  let dragging = false, ox = 0, oy = 0;
+  guide.style.cursor = 'grab';
+
+  guide.addEventListener('mousedown', function(e) {
+    // Don't drag when clicking buttons, the close X, or interactive elements
+    if (e.target.closest('button, input, a, select')) return;
+    dragging = true;
+    const rect = guide.getBoundingClientRect();
+    guide.style.bottom = 'auto';
+    guide.style.right = 'auto';
+    guide.style.top = rect.top + 'px';
+    guide.style.left = rect.left + 'px';
+    ox = e.clientX - rect.left;
+    oy = e.clientY - rect.top;
+    guide.style.cursor = 'grabbing';
+    guide.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    const x = Math.max(0, Math.min(window.innerWidth - guide.offsetWidth, e.clientX - ox));
+    const y = Math.max(0, Math.min(window.innerHeight - guide.offsetHeight, e.clientY - oy));
+    guide.style.left = x + 'px';
+    guide.style.top = y + 'px';
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (!dragging) return;
+    dragging = false;
+    guide.style.cursor = 'grab';
+    guide.style.userSelect = '';
+  });
+
+  // ── Scroll-driven step updates ────────────────────────────
+  const stepTargets = steps.map(s => s.target ? document.querySelector(s.target) : null);
+
+  function getScrollStep() {
+    const mid = window.innerHeight / 2;
+    // Walk targets in reverse to find the deepest one scrolled past midpoint
+    for (let i = stepTargets.length - 1; i >= 0; i--) {
+      const el = stepTargets[i];
+      if (!el) continue;
+      const rect = el.getBoundingClientRect();
+      if (rect.top <= mid) return i;
+    }
+    return 0;
+  }
+
+  let scrollTicking = false;
+  window.addEventListener('scroll', function() {
+    if (guide.classList.contains('ng-hidden')) return;
+    if (scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(function() {
+      const newStep = getScrollStep();
+      if (newStep !== current) {
+        current = newStep;
+        // Update display without triggering scroll-into-view (user is scrolling)
+        const s = steps[current];
+        titleEl.textContent = s.title;
+        bodyEl.textContent = s.body;
+        stepNumEl.textContent = current + 1;
+        progressEl.style.width = ((current + 1) / steps.length * 100) + '%';
+        prevBtn.disabled = current === 0;
+        nextBtn.textContent = current === steps.length - 1 ? 'Done ✓' : 'Next →';
+        removeHighlight();
+        if (s.target) {
+          const el = document.querySelector(s.target);
+          if (el) { el.classList.add('ng-highlight'); highlightEl = el; }
+        }
+      }
+      scrollTicking = false;
+    });
+  }, { passive: true });
+
+  stepTotalEl.textContent = steps.length;
+
+  function removeHighlight() {
+    if (highlightEl) { highlightEl.classList.remove('ng-highlight'); highlightEl = null; }
+  }
+
+  function applyStep(idx) {
+    const s = steps[idx];
+    titleEl.textContent = s.title;
+    bodyEl.textContent = s.body;
+    stepNumEl.textContent = idx + 1;
+    progressEl.style.width = ((idx + 1) / steps.length * 100) + '%';
+    prevBtn.disabled = idx === 0;
+    nextBtn.textContent = idx === steps.length - 1 ? 'Done ✓' : 'Next →';
+
+    removeHighlight();
+    if (s.target) {
+      const el = document.querySelector(s.target);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => { el.classList.add('ng-highlight'); highlightEl = el; }, 500);
+      }
+    }
+  }
+
+  function showGuide() {
+    guide.classList.remove('ng-hidden');
+    trigger.classList.remove('ng-trigger-visible');
+    applyStep(current);
+  }
+
+  function hideGuide() {
+    guide.classList.add('ng-hidden');
+    trigger.classList.add('ng-trigger-visible');
+    removeHighlight();
+  }
+
+  document.getElementById('ng-close').addEventListener('click', hideGuide);
+  trigger.addEventListener('click', showGuide);
+
+  prevBtn.addEventListener('click', function() {
+    if (current > 0) { current--; applyStep(current); }
+  });
+
+  nextBtn.addEventListener('click', function() {
+    if (current < steps.length - 1) {
+      current++;
+      applyStep(current);
+    } else {
+      hideGuide();
+    }
+  });
+
+  // Auto-show after 2.5s on first load
+  setTimeout(showGuide, 2500);
 })();
 </script>
 </body>

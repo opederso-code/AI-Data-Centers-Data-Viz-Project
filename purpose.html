@@ -6,10 +6,7 @@
   <title>Our Purpose — The Energy Index</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="stylesheet" href="index.css" />
-  <style>
-    .purpose-section p { font-size: 18px; }
-    .box-body { font-size: 16px; }
-  </style>
+  
 </head>
 <body>
 
@@ -31,7 +28,10 @@
 <section class="purpose-section">
   <h2>Our Purpose</h2>
   <p>
-    AI data centers are scaling faster than the grid can adapt. This project argues that <strong>hardware choice, energy source, and location</strong> are the three levers that determine whether that growth is sustainable — and that the efficiency gap between best and worst practice is already enormous.
+    AI infrastructure is <strong>growing faster</strong> than our ability to measure its impact. This project <strong>connects the dots</strong> between hardware efficiency, energy mix, and carbon output to surface where the real leverage is.
+  </p>
+  <p style="font-size:16px; color:rgba(255,255,255,0.6); max-width:640px;">
+    <strong style="color:#e5e5e5;">Key conclusion:</strong> Facility efficiency (PUE) <span class="cite" data-cite-title="LBNL 2024 U.S. Data Center Energy Usage Report" data-cite-body="Covers PUE ranges from 1.1 (hyperscale best practice) to 2.4 (legacy enterprise), a 2× energy waste gap for identical workloads." data-cite-url="https://eta-publications.lbl.gov/sites/default/files/2024-12/lbnl-2024-united-states-data-center-energy-usage-report_1.pdf" data-cite-link="lbl.gov →">1</span>, grid carbon intensity <span class="cite" data-cite-title="IEA Energy & AI Dataset" data-cite-body="IEA regional data showing up to 8× carbon variance for the same AI workload depending on grid location." data-cite-url="https://www.iea.org/data-and-statistics/data-product/energy-and-ai" data-cite-link="iea.org →">2</span>, and GPU generation <span class="cite" data-cite-title="Kappa-Energy Index — MDPI Sensors 2025" data-cite-body="Measures energy efficiency across GPU generations. Gen-over-gen improvement ~2.5× while workloads grew 10×." data-cite-url="https://www.mdpi.com/1424-8220/25/3/846" data-cite-link="mdpi.com →">3</span> each contribute independently to total energy footprint. Optimizing all three together produces dramatically better outcomes than any single lever alone — hardware improvements alone won't close the gap while AI workloads keep growing at 10× the pace of efficiency gains.
   </p>
 </section>
 
@@ -51,12 +51,25 @@
 <div class="scaling-section">
   <div class="scaling-spacer"></div>
   <div class="scaling-box box-card">
-    <div class="box-title">WHAT WE CONCLUDE</div>
+    <div class="box-title">INFORM SCALING STRATEGIES</div>
     <p class="box-body">
-      The data shows that facility efficiency (PUE), grid carbon intensity, and GPU generation each contribute independently to total energy footprint — and that optimizing all three together produces dramatically better outcomes than any single lever alone. Hardware improvements alone won't close the gap while workloads keep growing.
+      The data shows that the best-practice combination — high-efficiency facility (PUE ~1.1), low-carbon grid, and latest-gen GPUs — can reduce total energy footprint by over 10× compared to worst-case deployment. Location and hardware choice are the most underutilized levers.
     </p>
   </div>
 </div>
 
+<div id="cite-popover" class="cite-popover">
+  <span class="cite-close" id="cite-close">✕</span>
+  <strong id="cite-title"></strong>
+  <span id="cite-body"></span>
+  <br><a id="cite-link" href="#" target="_blank" rel="noopener"></a>
+</div>
+<script>
+(function(){
+  const pop=document.getElementById('cite-popover'),titleEl=document.getElementById('cite-title'),bodyEl=document.getElementById('cite-body'),linkEl=document.getElementById('cite-link');
+  function pos(x,y){const pw=320,ph=120,vw=window.innerWidth,vh=window.innerHeight;let l=x+12,t=y-20;if(l+pw>vw-16)l=x-pw-12;if(t+ph>vh-16)t=vh-ph-16;pop.style.left=l+'px';pop.style.top=t+'px';}
+  document.addEventListener('click',function(e){const c=e.target.closest('.cite');if(c){e.stopPropagation();titleEl.textContent=c.dataset.citeTitle;bodyEl.textContent=c.dataset.citeBody;linkEl.href=c.dataset.citeUrl;linkEl.textContent=c.dataset.citeLink;pop.classList.add('visible');pos(e.clientX,e.clientY);return;}if(e.target.id==='cite-close'||!pop.contains(e.target))pop.classList.remove('visible');});
+})();
+</script>
 </body>
 </html>

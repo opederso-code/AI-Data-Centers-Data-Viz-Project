@@ -29,7 +29,7 @@
   <div class="assumption-grid">
 
     <div class="assumption-card">
-      <div class="c-tag">PUE Benchmarks</div>
+      <div class="c-tag">PUE Benchmarks <span class="cite" data-cite-title="LBNL 2024 U.S. Data Center Energy Usage Report" data-cite-body="Lawrence Berkeley National Lab. PUE range 1.1–2.4x across hyperscale to legacy enterprise data centers." data-cite-url="https://eta-publications.lbl.gov/sites/default/files/2024-12/lbnl-2024-united-states-data-center-energy-usage-report_1.pdf" data-cite-link="lbl.gov →">1</span></div>
       <div class="c-sub">Sourced from LBNL 2024 report</div>
       <p class="c-text">
         Power Usage Effectiveness (PUE) values are drawn from the Lawrence Berkeley National Lab
@@ -39,7 +39,7 @@
     </div>
 
     <div class="assumption-card">
-      <div class="c-tag">GPU Scope</div>
+      <div class="c-tag">GPU Scope <span class="cite" data-cite-title="Kappa-Energy Index — MDPI Sensors 2025" data-cite-body="Performance-vs-energy tradeoff across NVIDIA GPU generations. AMD and TPU workloads excluded from hardware efficiency analysis." data-cite-url="https://www.mdpi.com/1424-8220/25/3/846" data-cite-link="mdpi.com →">2</span></div>
       <div class="c-sub">NVIDIA architectures only (Volta → Hopper)</div>
       <p class="c-text">
         GPU comparisons are limited to NVIDIA data center GPUs across four generations: Volta (V100),
@@ -49,7 +49,7 @@
     </div>
 
     <div class="assumption-card">
-      <div class="c-tag">Grid Carbon</div>
+      <div class="c-tag">Grid Carbon <span class="cite" data-cite-title="IEA Energy & AI Dataset" data-cite-body="Carbon intensity by grid region uses IEA country-level averages (gCO₂/kWh). Sub-regional variation not captured." data-cite-url="https://www.iea.org/data-and-statistics/data-product/energy-and-ai" data-cite-link="iea.org →">3</span></div>
       <div class="c-sub">Based on IEA regional averages</div>
       <p class="c-text">
         Carbon intensity by grid region uses IEA country-level averages (gCO₂/kWh). Sub-regional
@@ -59,7 +59,7 @@
     </div>
 
     <div class="assumption-card">
-      <div class="c-tag">Renewable Claims</div>
+      <div class="c-tag">Renewable Claims <span class="cite" data-cite-title="IEA Energy & AI Observatory" data-cite-body="Live portal tracking real-time AI energy metrics and country-level renewable consumption breakdowns. PPA figures may differ from actual hourly carbon intensity." data-cite-url="https://www.iea.org/data-and-statistics/data-tools/energy-and-ai-observatory" data-cite-link="iea.org →">4</span></div>
       <div class="c-sub">PPA-based, not realtime matched</div>
       <p class="c-text">
         When data centers report renewable energy percentages, we treat these as Power Purchase
@@ -71,5 +71,18 @@
   </div>
 </section>
 
+<div id="cite-popover" class="cite-popover">
+  <span class="cite-close" id="cite-close">✕</span>
+  <strong id="cite-title"></strong>
+  <span id="cite-body"></span>
+  <br><a id="cite-link" href="#" target="_blank" rel="noopener"></a>
+</div>
+<script>
+(function(){
+  const pop=document.getElementById('cite-popover'),titleEl=document.getElementById('cite-title'),bodyEl=document.getElementById('cite-body'),linkEl=document.getElementById('cite-link');
+  function pos(x,y){const pw=320,ph=120,vw=window.innerWidth,vh=window.innerHeight;let l=x+12,t=y-20;if(l+pw>vw-16)l=x-pw-12;if(t+ph>vh-16)t=vh-ph-16;pop.style.left=l+'px';pop.style.top=t+'px';}
+  document.addEventListener('click',function(e){const c=e.target.closest('.cite');if(c){e.stopPropagation();titleEl.textContent=c.dataset.citeTitle;bodyEl.textContent=c.dataset.citeBody;linkEl.href=c.dataset.citeUrl;linkEl.textContent=c.dataset.citeLink;pop.classList.add('visible');pos(e.clientX,e.clientY);return;}if(e.target.id==='cite-close'||!pop.contains(e.target))pop.classList.remove('visible');});
+})();
+</script>
 </body>
 </html>

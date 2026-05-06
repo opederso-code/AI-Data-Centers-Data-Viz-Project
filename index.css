@@ -109,9 +109,14 @@ nav {
   color: rgba(255,255,255,0.65);
   text-decoration: none;
   letter-spacing: 0.01em;
-  transition: color 0.15s;
+  transition: color 0.15s, background 0.15s;
+  border-radius: 6px;
+  padding: 4px 10px;
 }
-.nav-links a:hover { color: white; }
+.nav-links a:not(.nav-cta):hover {
+  color: white;
+  background: rgba(255,255,255,0.08);
+}
 .nav-cta {
   background: var(--green) !important;
   color: var(--bg) !important;
@@ -499,3 +504,81 @@ nav {
   transition: opacity 0.15s;
 }
 .res-card:hover .res-link-label { opacity: 1; }
+
+
+/* ════ Landing page layout & animations ════ */
+html, body { height: 100%; }
+    body { display: flex; flex-direction: column; }
+    .hero { flex: 1; display: grid; align-content: center; }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-left { animation: fadeSlideUp 0.7s ease both; }
+    .stat-card { opacity: 0; animation: fadeSlideUp 0.6s ease both; }
+    .stat-card:nth-child(1) { animation-delay: 0.3s; }
+    .stat-card:nth-child(2) { animation-delay: 0.5s; }
+    .stat-card:nth-child(3) { animation-delay: 0.7s; }
+
+
+/* ════ Purpose page overrides ════ */
+.purpose-section p { font-size: 18px; }
+    .box-body { font-size: 16px; }
+
+
+/* ════ Inline Citations ════ */
+.cite {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: rgba(0,233,154,0.15);
+  border: 1px solid rgba(0,233,154,0.4);
+  color: var(--green);
+  font-size: 9px;
+  font-weight: 700;
+  font-family: 'Inter', system-ui, sans-serif;
+  letter-spacing: 0;
+  cursor: pointer;
+  vertical-align: middle;
+  margin-left: 4px;
+  position: relative;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.cite:hover { background: rgba(0,233,154,0.28); }
+
+.cite-popover {
+  position: fixed;
+  z-index: 9000;
+  max-width: 320px;
+  background: #0f1a12;
+  border: 1px solid rgba(0,233,154,0.35);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.75);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.15s, transform 0.15s;
+}
+.cite-popover.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.cite-popover strong { color: #e5e5e5; display: block; margin-bottom: 4px; }
+.cite-popover a { color: var(--green); text-decoration: none; }
+.cite-popover a:hover { text-decoration: underline; }
+.cite-popover .cite-close {
+  float: right;
+  cursor: pointer;
+  color: rgba(255,255,255,0.3);
+  font-size: 14px;
+  line-height: 1;
+  margin-left: 8px;
+}
+.cite-popover .cite-close:hover { color: white; }

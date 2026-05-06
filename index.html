@@ -6,11 +6,7 @@
   <title>The Energy Index</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="stylesheet" href="index.css" />
-  <style>
-    html, body { height: 100%; }
-    body { display: flex; flex-direction: column; }
-    .hero { flex: 1; display: grid; align-content: center; }
-  </style>
+  
 </head>
 <body>
 
@@ -36,26 +32,29 @@
       Use <span class="energy-word">ENERGY</span>
     </h1>
     <p class="hero-sub">
-      AI data centers are scaling faster than the grid can adapt. This project argues that <strong style="color:#e5e5e5;">hardware choice, energy source, and location</strong> are the three levers that determine whether that growth is sustainable — and that the efficiency gap between best and worst practice is already enormous.
+      AI data centers are scaling faster than the grid can adapt. Hardware choice, energy source, and location are the three levers that determine whether that growth is sustainable — and the efficiency gap between best and worst practice is already enormous.
+    </p>
+    <p class="hero-sub" style="margin-top:-12px; font-size:14px;">
+      <strong style="color:#e5e5e5;">Our conclusion:</strong> Optimizing all three levers together cuts total energy footprint by orders of magnitude more than any single factor alone.
     </p>
     <a href="visualizations.html" class="hero-btn">Explore the Data →</a>
   </div>
 
   <div class="hero-right">
     <div class="stat-card">
-      <div class="s-label">Finding 01 — Facility Efficiency</div>
+      <div class="s-label">PUE Range (Data Centers) <span class="cite" data-cite-title="LBNL 2024 U.S. Data Center Energy Usage Report" data-cite-body="Lawrence Berkeley National Lab report covering PUE ranges and hardware efficiency trends. Source for our 1.1–2.4x range." data-cite-url="https://eta-publications.lbl.gov/sites/default/files/2024-12/lbnl-2024-united-states-data-center-energy-usage-report_1.pdf" data-cite-link="lbl.gov →">1</span></div>
       <div class="s-value">1.1–2.4x</div>
-      <div class="s-sub">PUE spread means the worst data centers waste over twice the energy of the best — for identical workloads.</div>
+      <div class="s-sub">Power Usage Effectiveness</div>
     </div>
     <div class="stat-card">
-      <div class="s-label">Finding 02 — Grid Location</div>
+      <div class="s-label">Carbon Variance by Grid Region <span class="cite" data-cite-title="IEA Energy & AI Dataset" data-cite-body="Official IEA data product covering AI energy demand and electricity projections by region and scenario." data-cite-url="https://www.iea.org/data-and-statistics/data-product/energy-and-ai" data-cite-link="iea.org →">2</span></div>
       <div class="s-value">8x</div>
-      <div class="s-sub">Carbon footprint varies 8× for the same job depending on where it runs. Location is an underrated efficiency lever.</div>
+      <div class="s-sub">Same workload, but a very different footprint</div>
     </div>
     <div class="stat-card">
-      <div class="s-label">Finding 03 — Hardware Generation</div>
-      <div class="s-value">2.5x</div>
-      <div class="s-sub">Newer GPUs are 2.5× more efficient gen-over-gen, but AI workloads grew 10× — hardware alone won't close the gap.</div>
+      <div class="s-label">GPU Efficiency Improvement (Gen-Over-Gen) <span class="cite" data-cite-title="Kappa-Energy Index for Deep Learning Efficiency" data-cite-body="MDPI Sensors paper introducing a performance-vs-energy tradeoff metric across GPU generations, measuring efficiency via OpenZmeter and CodeCarbon." data-cite-url="https://www.mdpi.com/1424-8220/25/3/846" data-cite-link="mdpi.com →">3</span></div>
+      <div class="s-value">2.5X</div>
+      <div class="s-sub">But AI workloads grew 10x in the same period</div>
     </div>
   </div>
 </section>
@@ -64,5 +63,45 @@
 
 
 
+<div id="cite-popover" class="cite-popover">
+  <span class="cite-close" id="cite-close">✕</span>
+  <strong id="cite-title"></strong>
+  <span id="cite-body"></span>
+  <br><a id="cite-link" href="#" target="_blank" rel="noopener"></a>
+</div>
+
+<script>
+(function() {
+  const pop = document.getElementById('cite-popover');
+  const titleEl = document.getElementById('cite-title');
+  const bodyEl = document.getElementById('cite-body');
+  const linkEl = document.getElementById('cite-link');
+
+  function showCite(el, e) {
+    titleEl.textContent = el.dataset.citeTitle;
+    bodyEl.textContent = el.dataset.citeBody;
+    linkEl.href = el.dataset.citeUrl;
+    linkEl.textContent = el.dataset.citeLink;
+    pop.classList.add('visible');
+    positionPop(e.clientX, e.clientY);
+  }
+
+  function positionPop(x, y) {
+    const pw = 320, ph = 120;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    let left = x + 12, top = y - 20;
+    if (left + pw > vw - 16) left = x - pw - 12;
+    if (top + ph > vh - 16) top = vh - ph - 16;
+    pop.style.left = left + 'px';
+    pop.style.top = top + 'px';
+  }
+
+  document.addEventListener('click', function(e) {
+    const cite = e.target.closest('.cite');
+    if (cite) { e.stopPropagation(); showCite(cite, e); return; }
+    if (e.target.id === 'cite-close' || !pop.contains(e.target)) pop.classList.remove('visible');
+  });
+})();
+</script>
 </body>
 </html>
