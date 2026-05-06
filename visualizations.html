@@ -37,6 +37,74 @@
   </div>
 </div>
 
+<!-- VIZ STATUS DASHBOARD -->
+<section class="viz-health reveal" id="viz-status-dashboard">
+  <div class="viz-health-head">
+    <div>
+      <div class="section-label">Visualization Status</div>
+      <h2>Dashboard: Static, Live, Error, Fallback</h2>
+      <p>Real-time health map for each visualization on this page. Live status updates automatically as data loads.</p>
+    </div>
+    <div class="viz-health-counts">
+      <div class="viz-health-count"><span class="count-label">Static</span><span class="count-value" id="count-static">0</span></div>
+      <div class="viz-health-count"><span class="count-label">Live</span><span class="count-value" id="count-live">0</span></div>
+      <div class="viz-health-count"><span class="count-label">Fallback</span><span class="count-value" id="count-fallback">0</span></div>
+      <div class="viz-health-count"><span class="count-label">Error</span><span class="count-value" id="count-error">0</span></div>
+    </div>
+  </div>
+
+  <div class="viz-health-table-wrap">
+    <table class="viz-health-table">
+      <thead>
+        <tr>
+          <th>Visualization</th>
+          <th>Status</th>
+          <th>Type</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Visualization 01 — GPU Architecture Trade-off</td>
+          <td><span id="viz-status-viz-01" class="status-pill status-live">Live</span></td>
+          <td>database.php</td>
+          <td id="viz-note-viz-01">Connecting to database.php...</td>
+        </tr>
+        <tr>
+          <td>Visualization 02 — U.S. Electricity Over Time</td>
+          <td><span id="viz-status-viz-02" class="status-pill status-live">Live</span></td>
+          <td>database.php</td>
+          <td id="viz-note-viz-02">Connecting to database.php...</td>
+        </tr>
+        <tr>
+          <td>Visualization 03 — GPU Specs Dashboard</td>
+          <td><span id="viz-status-viz-03" class="status-pill status-live">Live</span></td>
+          <td>database.php</td>
+          <td id="viz-note-viz-03">Connecting to database.php...</td>
+        </tr>
+        <tr>
+          <td>Visualization 04 — IEA Demand Snapshot</td>
+          <td><span id="viz-status-viz-04" class="status-pill status-live">Live</span></td>
+          <td>database.php</td>
+          <td id="viz-note-viz-04">Connecting to database.php...</td>
+        </tr>
+        <tr>
+          <td>Visualization 05 — Electricity Surge + GPU Efficiency</td>
+          <td><span id="viz-status-viz-05" class="status-pill status-live">Live</span></td>
+          <td>database.php</td>
+          <td id="viz-note-viz-05">Connecting to database.php...</td>
+        </tr>
+        <tr>
+          <td>Visualization 06 — Regional Concentration Trends</td>
+          <td><span id="viz-status-viz-06" class="status-pill status-live">Live</span></td>
+          <td>database.php</td>
+          <td id="viz-note-viz-06">Connecting to database.php...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
 
 <!-- ═══════════════════════════════════════════════════════════
      VISUALIZATION 1: Slope / Connected Dot Chart
@@ -47,11 +115,11 @@
   <div class="section-header reveal">
     <div class="section-header-left">
       <div class="section-label">Visualization 01</div>
-      <h2>GPU Architecture:<br>Performance vs. Energy Cost</h2>
+      <h2>AI Cluster Scale:<br>Power vs. Chip Density</h2>
     </div>
     <div class="section-header-right">
-      <p>Six deep learning architectures benchmarked on two NVIDIA GPUs. Each row shows how training energy and top-1 accuracy interact — the ideal model sits at <em style="color:var(--mint)">low energy, high accuracy</em>. Data from the MDPI Kappa-Energy Index study (2025), Tables 3–7.</p>
-      <div class="source-tag">SOURCE — MDPI Sensors 25(3):846 · DOI:10.3390/s25030846</div>
+      <p>Each point represents a live cluster record from <em style="color:var(--mint)">database.php</em>. The chart compares cluster power capacity against estimated AI-chip density, with bubble size reflecting the scale of installed accelerators.</p>
+      <div class="source-tag">SOURCE — database.php · gpu_clusters</div>
     </div>
   </div>
 
@@ -60,88 +128,35 @@
     <table>
       <thead>
         <tr>
-          <th>Architecture</th>
-          <th>Params (M)</th>
-          <th>TITAN Xp Energy (Wh)</th>
-          <th>GTX 1080 Ti Energy (Wh)</th>
-          <th>Top-1 Accuracy (%)</th>
-          <th>Kappa-Energy Index</th>
-          <th>Efficiency Tier</th>
+          <th>Cluster</th>
+          <th>AI Chips</th>
+          <th>Power (MW)</th>
+          <th>Chips / MW</th>
+          <th>Status</th>
+          <th>Country</th>
+          <th>Owner</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>AlexNet</td>
-          <td>61.1</td>
-          <td class="val-mint">14.2</td>
-          <td class="val-mint">16.8</td>
-          <td>56.5</td>
-          <td class="val-amber">3.98</td>
-          <td>Low</td>
-        </tr>
-        <tr>
-          <td>VGG-16</td>
-          <td>138.4</td>
-          <td class="val-danger">210.5</td>
-          <td class="val-danger">248.3</td>
-          <td>71.6</td>
-          <td class="val-amber">0.34</td>
-          <td>Very Low</td>
-        </tr>
-        <tr>
-          <td>ResNet-18</td>
-          <td>11.7</td>
-          <td class="val-mint">28.7</td>
-          <td class="val-mint">33.4</td>
-          <td>69.8</td>
-          <td class="val-mint">2.43</td>
-          <td>High</td>
-        </tr>
-        <tr>
-          <td>EfficientNet-B3</td>
-          <td>12.2</td>
-          <td class="val-mint">41.3</td>
-          <td class="val-mint">49.6</td>
-          <td>82.1</td>
-          <td class="val-mint">1.99</td>
-          <td>High</td>
-        </tr>
-        <tr>
-          <td>ConvNeXt-T</td>
-          <td>28.6</td>
-          <td class="val-amber">67.9</td>
-          <td class="val-amber">79.2</td>
-          <td>82.1</td>
-          <td class="val-sky">1.21</td>
-          <td>Medium</td>
-        </tr>
-        <tr>
-          <td>Swin Transformer</td>
-          <td>28.3</td>
-          <td class="val-amber">89.4</td>
-          <td class="val-amber">104.8</td>
-          <td>81.3</td>
-          <td class="val-sky">0.91</td>
-          <td>Medium-Low</td>
-        </tr>
+      <tbody id="viz1-table-body">
+        <tr><td colspan="7" style="padding:20px 14px; color:var(--text-muted);">Loading live cluster data…</td></tr>
       </tbody>
     </table>
   </div>
 
   <!-- VIZ 1: Bubble Scatter -->
   <div class="viz-card reveal">
-    <div class="viz-title">Energy-Accuracy Trade-off Map</div>
-    <div class="viz-sub">Training energy consumption (Wh, TITAN Xp) vs. ImageNet Top-1 Accuracy. Bubble size = parameter count. Ideal quadrant: bottom-right (low energy, high accuracy).</div>
+    <div class="viz-title">Cluster Power vs. Density Map</div>
+    <div class="viz-sub">X-axis shows cluster power capacity in MW, Y-axis shows AI chips per MW, and bubble size shows estimated chip count. Brighter green marks operational clusters.</div>
     <div id="scatter-chart"></div>
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--mint)"></div> Highly efficient</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Moderate trade-off</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div> Energy-intensive</div>
-      <div class="legend-item" style="margin-left:auto; color: var(--text-faint); font-size:11px;">Bubble area ∝ parameter count</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--mint)"></div> Operational</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--sky)"></div> Planned / announced</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Density leader</div>
+      <div class="legend-item" style="margin-left:auto; color: var(--text-faint); font-size:11px;">Bubble area ∝ AI chip count</div>
     </div>
     <div class="insight">
       <div class="insight-label">Key Insight</div>
-      <p>ResNet-18 and EfficientNet-B3 dominate the efficiency frontier — EfficientNet achieves the highest accuracy (82.1%) at just 41 Wh, roughly 5× less energy than VGG-16 with 12% better accuracy. VGG-16 sits alone in the "energy trap" quadrant: the worst energy-per-accuracy ratio of all tested architectures.</p>
+      <p>This live view highlights how quickly planned mega-clusters are scaling. Comparing chip counts to power capacity surfaces which deployments are densest, not just largest.</p>
     </div>
   </div>
 </section>
@@ -156,11 +171,11 @@
   <div class="section-header reveal">
     <div class="section-header-left">
       <div class="section-label">Visualization 02</div>
-      <h2>U.S. Data Center Electricity<br>Consumption, 2000–2023</h2>
+      <h2>U.S. Data Center Electricity<br>Component Mix, 2014–2023</h2>
     </div>
     <div class="section-header-right">
-      <p>Twenty-three years of tracked electricity demand, disaggregated by facility type: traditional enterprise, colocation, and hyperscale/cloud. The rise of hyperscale is the dominant structural shift — and AI-optimized clusters are accelerating it further. From the LBNL 2024 report, Figure 2.1 & Table 2.1.</p>
-      <div class="source-tag">SOURCE — LBNL 2024 U.S. Data Center Energy Usage Report · eta-publications.lbl.gov</div>
+      <p>This visualization now uses the live <em style="color:var(--mint)">datacenter_components</em> table from <em style="color:var(--mint)">database.php</em>. It tracks how storage, networking, infrastructure, conventional servers, and AI servers contribute to total electricity demand.</p>
+      <div class="source-tag">SOURCE — database.php · datacenter_components</div>
     </div>
   </div>
 
@@ -170,12 +185,13 @@
       <thead>
         <tr>
           <th>Year</th>
-          <th>Traditional Enterprise (TWh)</th>
-          <th>Colocation (TWh)</th>
-          <th>Hyperscale / Cloud (TWh)</th>
+          <th>Infrastructure (TWh)</th>
+          <th>Network (TWh)</th>
+          <th>Storage (TWh)</th>
+          <th>Conventional Servers (TWh)</th>
+          <th>AI Servers (TWh)</th>
           <th>Total (TWh)</th>
-          <th>YoY Growth</th>
-          <th>Hyperscale Share</th>
+          <th>AI Share</th>
         </tr>
       </thead>
       <tbody id="table-2-body"></tbody>
@@ -184,17 +200,19 @@
 
   <!-- VIZ 2: Stacked Area Chart -->
   <div class="viz-card reveal">
-    <div class="viz-title">Stacked Area: Electricity by Facility Type</div>
-    <div class="viz-sub">Total U.S. data center electricity (TWh). The green surge from 2015 onward reflects hyperscale build-out driven by cloud and, increasingly, AI workloads.</div>
+    <div class="viz-title">Stacked Area: Electricity by Component</div>
+    <div class="viz-sub">A live component-level stack from `datacenter_components`. The AI server band makes the newer accelerator-driven load visible within the broader facility mix.</div>
     <div id="area-chart"></div>
     <div class="legend">
-      <div class="legend-item"><div class="legend-rect" style="background:#3d5e47"></div> Traditional Enterprise</div>
-      <div class="legend-item"><div class="legend-rect" style="background:#1baa55"></div> Colocation</div>
-      <div class="legend-item"><div class="legend-rect" style="background:var(--mint)"></div> Hyperscale / Cloud</div>
+      <div class="legend-item"><div class="legend-rect" style="background:#31483a"></div> Infrastructure</div>
+      <div class="legend-item"><div class="legend-rect" style="background:#456c5a"></div> Network</div>
+      <div class="legend-item"><div class="legend-rect" style="background:#6d8d7f"></div> Storage</div>
+      <div class="legend-item"><div class="legend-rect" style="background:#1baa55"></div> Conventional Servers</div>
+      <div class="legend-item"><div class="legend-rect" style="background:var(--mint)"></div> AI Servers</div>
     </div>
     <div class="insight">
       <div class="insight-label">Key Insight</div>
-      <p>U.S. data center electricity demand grew from ~61 TWh in 2000 to ~176 TWh in 2023 — a ~190% increase. But the composition shifted dramatically: hyperscale now accounts for ~55% of total consumption, up from near-zero in 2010. Critically, even as total demand surged, efficiency improvements (better PUE, server consolidation) prevented consumption from growing proportionally with compute capacity.</p>
+      <p>Because this chart is built directly from the component table, it shows where load is accumulating inside the facility stack rather than relying on a fixed enterprise/colo/hyperscale estimate.</p>
     </div>
   </div>
 </section>
@@ -211,77 +229,282 @@
 <script>
 // ═══════════════════════════════════
 
+window.vizStatusStore = {
+  'viz-01': { status: 'live', note: 'Connecting to database.php...' },
+  'viz-02': { status: 'live', note: 'Connecting to database.php...' },
+  'viz-03': { status: 'live', note: 'Connecting to database.php...' },
+  'viz-04': { status: 'live', note: 'Connecting to database.php...' },
+  'viz-05': { status: 'live', note: 'Connecting to database.php...' },
+  'viz-06': { status: 'live', note: 'Connecting to database.php...' }
+};
+
+function renderVizStatusDashboard() {
+  const counts = { static: 0, live: 0, fallback: 0, error: 0 };
+
+  Object.entries(window.vizStatusStore).forEach(([id, item]) => {
+    const status = ['static', 'live', 'fallback', 'error'].includes(item.status) ? item.status : 'error';
+    counts[status] += 1;
+
+    const statusEl = document.getElementById(`viz-status-${id}`);
+    const noteEl = document.getElementById(`viz-note-${id}`);
+    if (statusEl) {
+      statusEl.className = `status-pill status-${status}`;
+      statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+    }
+    if (noteEl && item.note) noteEl.textContent = item.note;
+  });
+
+  const staticCount = document.getElementById('count-static');
+  const liveCount = document.getElementById('count-live');
+  const fallbackCount = document.getElementById('count-fallback');
+  const errorCount = document.getElementById('count-error');
+
+  if (staticCount) staticCount.textContent = counts.static;
+  if (liveCount) liveCount.textContent = counts.live;
+  if (fallbackCount) fallbackCount.textContent = counts.fallback;
+  if (errorCount) errorCount.textContent = counts.error;
+}
+
+window.updateVizStatus = function(vizId, status, note) {
+  if (!window.vizStatusStore[vizId]) return;
+  window.vizStatusStore[vizId].status = status;
+  if (note) window.vizStatusStore[vizId].note = note;
+  renderVizStatusDashboard();
+};
+
+renderVizStatusDashboard();
+
+window.appData = {
+  loaded: false,
+  gpuSpecs: [],
+  datacenterComponents: [],
+  gpuClusters: [],
+  regionalDataAnnex: [],
+  worldDataAnnex: []
+};
+
+window.loadDatabaseData = (async function() {
+  try {
+    const res = await fetch('database.php', { cache: 'no-store' });
+    const raw = await res.text();
+    let json = null;
+
+    try {
+      json = JSON.parse(raw);
+    } catch (_) {
+      const preview = String(raw || '').trim().slice(0, 40);
+      if (preview.startsWith('<?php') || preview.startsWith('<')) {
+        throw new Error('database.php did not return JSON. PHP is likely not executing (serve with PHP, e.g. php -S localhost:8000).');
+      }
+      throw new Error('database.php returned invalid JSON.');
+    }
+
+    if (!res.ok || json.error) throw new Error(json.error || `HTTP ${res.status}`);
+
+    window.appData.gpuSpecs = Array.isArray(json.gpu_specs) ? json.gpu_specs : [];
+    window.appData.datacenterComponents = Array.isArray(json.datacenter_components) ? json.datacenter_components : [];
+    window.appData.gpuClusters = Array.isArray(json.gpu_clusters) ? json.gpu_clusters : [];
+    window.appData.regionalDataAnnex = Array.isArray(json.regional_data_annex) ? json.regional_data_annex : [];
+    window.appData.worldDataAnnex = Array.isArray(json.world_data_annex) ? json.world_data_annex : [];
+    window.appData.loaded = true;
+
+    const rows = [
+      window.appData.gpuSpecs.length,
+      window.appData.datacenterComponents.length,
+      window.appData.gpuClusters.length,
+      window.appData.regionalDataAnnex.length,
+      window.appData.worldDataAnnex.length
+    ].reduce((a,b)=>a+b,0);
+
+    ['viz-01','viz-02','viz-03','viz-04','viz-05','viz-06'].forEach(v => {
+      window.updateVizStatus(v, 'live', `Live database.php connected (${rows} total records).`);
+    });
+
+    return window.appData;
+  } catch (err) {
+    ['viz-01','viz-02','viz-03','viz-04','viz-05','viz-06'].forEach(v => {
+      window.updateVizStatus(v, 'error', `database.php load failed: ${err.message}`);
+    });
+
+    window.appData.loaded = false;
+    window.appData.error = err.message;
+    return window.appData;
+  }
+})();
+
+window.getDatabaseData = async function() {
+  return window.loadDatabaseData;
+};
+
 
 // ═══════════════════════════════════
 // DATA
 // ═══════════════════════════════════
 
-// Viz 1: GPU architectures — MDPI Kappa-Energy Index paper, Tables 3-7
-const gpuData = [
-  { name: 'AlexNet',        energy: 14.2,  accuracy: 56.5, params: 61.1,  color: '#ffb340' },
-  { name: 'VGG-16',         energy: 210.5, accuracy: 71.6, params: 138.4, color: '#ff5f5f' },
-  { name: 'ResNet-18',      energy: 28.7,  accuracy: 69.8, params: 11.7,  color: '#1bff7e' },
-  { name: 'EfficientNet-B3',energy: 41.3,  accuracy: 82.1, params: 12.2,  color: '#1bff7e' },
-  { name: 'ConvNeXt-T',     energy: 67.9,  accuracy: 82.1, params: 28.6,  color: '#40c4ff' },
-  { name: 'Swin Transformer',energy:89.4,  accuracy: 81.3, params: 28.3,  color: '#40c4ff' },
-];
+let gpuData = [];
 
-// Viz 2: LBNL 2024 U.S. Data Center Energy — Figure 2.1 / Table 2.1
-// Values in TWh, estimated from LBNL 2024 figure interpolation
-const lbnlData = [
-  { year: 2000, enterprise: 46, colo: 11,  hyper: 4  },
-  { year: 2001, enterprise: 47, colo: 12,  hyper: 4  },
-  { year: 2002, enterprise: 47, colo: 12,  hyper: 5  },
-  { year: 2003, enterprise: 48, colo: 13,  hyper: 5  },
-  { year: 2004, enterprise: 48, colo: 14,  hyper: 6  },
-  { year: 2005, enterprise: 49, colo: 15,  hyper: 7  },
-  { year: 2006, enterprise: 50, colo: 17,  hyper: 8  },
-  { year: 2007, enterprise: 51, colo: 19,  hyper: 10 },
-  { year: 2008, enterprise: 52, colo: 20,  hyper: 11 },
-  { year: 2009, enterprise: 51, colo: 20,  hyper: 11 },
-  { year: 2010, enterprise: 51, colo: 21,  hyper: 13 },
-  { year: 2011, enterprise: 51, colo: 22,  hyper: 15 },
-  { year: 2012, enterprise: 51, colo: 23,  hyper: 18 },
-  { year: 2013, enterprise: 51, colo: 24,  hyper: 22 },
-  { year: 2014, enterprise: 50, colo: 25,  hyper: 27 },
-  { year: 2015, enterprise: 49, colo: 27,  hyper: 35 },
-  { year: 2016, enterprise: 48, colo: 28,  hyper: 43 },
-  { year: 2017, enterprise: 47, colo: 29,  hyper: 52 },
-  { year: 2018, enterprise: 46, colo: 30,  hyper: 62 },
-  { year: 2019, enterprise: 45, colo: 31,  hyper: 70 },
-  { year: 2020, enterprise: 44, colo: 32,  hyper: 80 },
-  { year: 2021, enterprise: 43, colo: 34,  hyper: 91 },
-  { year: 2022, enterprise: 42, colo: 36,  hyper: 98 },
-  { year: 2023, enterprise: 40, colo: 38,  hyper: 98 },
-];
+function deriveViz1FromGpuClusters(clusters) {
+  if (!Array.isArray(clusters) || !clusters.length) return [];
+  const filtered = clusters
+    .filter(r => Number.isFinite(Number(r.power_capacity_mw)) && Number.isFinite(Number(r.total_number_of_ai_chips || r.h100_equivalents)))
+    .sort((a, b) => Number(b.total_number_of_ai_chips || b.h100_equivalents || 0) - Number(a.total_number_of_ai_chips || a.h100_equivalents || 0))
+    .slice(0, 14);
+
+  if (!filtered.length) return [];
+
+  const maxChips = Math.max(...filtered.map(r => Number(r.total_number_of_ai_chips || r.h100_equivalents)));
+  return filtered.map(r => {
+    const chips = Number(r.total_number_of_ai_chips || r.h100_equivalents);
+    const power = Number(r.power_capacity_mw);
+    const density = chips / Math.max(power, 1);
+    const status = String(r.status || 'Unknown');
+    return {
+      name: r.name || 'Cluster',
+      energy: power,
+      accuracy: density,
+      params: chips,
+      color: status.toLowerCase().includes('operat') || status.toLowerCase().includes('active') ? '#1bff7e' : density === Math.max(...filtered.map(v => Number(v.total_number_of_ai_chips || v.h100_equivalents) / Math.max(Number(v.power_capacity_mw || 1), 1))) ? '#ffb340' : '#40c4ff',
+      status,
+      country: r.country || '—',
+      owner: r.owner || '—'
+    };
+  });
+}
+
+function renderViz1Table(data) {
+  const tbody = document.getElementById('viz1-table-body');
+  if (!tbody) return;
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="padding:20px 14px; color:#ff6b6b;">No live `gpu_clusters` records available.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(d => {
+    const chips = Math.round(Number(d.params)).toLocaleString();
+    const power = Number(d.energy).toFixed(1);
+    const density = Math.round(Number(d.accuracy)).toLocaleString();
+    const energyClass = Number(power) > 1000 ? 'val-danger' : Number(power) > 250 ? 'val-amber' : 'val-mint';
+    return `<tr>
+      <td>${d.name}</td>
+      <td>${chips}</td>
+      <td class="${energyClass}">${power}</td>
+      <td class="val-mint">${density}</td>
+      <td>${d.status}</td>
+      <td>${d.country}</td>
+      <td>${d.owner}</td>
+    </tr>`;
+  }).join('');
+}
+
+let lbnlData = [];
+
+function parseViz02Row(row) {
+  const year = Number(
+    row.year ?? row.Year ?? row.report_year ?? row.reportYear ?? row.yr
+  );
+
+  const infrastructure = Number(row.infrastructure ?? 0);
+  const network = Number(row.network ?? 0);
+  const storage = Number(row.storage ?? 0);
+  const conventional = Number(row.servers_conventional ?? row.conventional ?? 0);
+  const ai = Number(row.servers_ai ?? row.ai ?? 0);
+
+  if (!Number.isFinite(year)) {
+    return null;
+  }
+
+  return { year, infrastructure, network, storage, conventional, ai };
+}
+
+async function loadViz02LiveData() {
+  try {
+    const db = await window.getDatabaseData();
+    const rows = db.datacenterComponents || [];
+    if (!rows.length) {
+      lbnlData = [];
+      return;
+    }
+
+    const byYear = new Map();
+    rows.forEach(r => {
+      const year = Number(r.year);
+      const comp = String(r.component || '').toLowerCase();
+      const value = Number(r.consumption_twh);
+      if (!Number.isFinite(year) || !Number.isFinite(value)) return;
+      if (!byYear.has(year)) byYear.set(year, { year, infrastructure: 0, network: 0, storage: 0, conventional: 0, ai: 0 });
+      const row = byYear.get(year);
+      if (comp.includes('infrastructure')) row.infrastructure += value;
+      else if (comp.includes('network')) row.network += value;
+      else if (comp.includes('storage')) row.storage += value;
+      else if (comp.includes('conventional')) row.conventional += value;
+      else if (comp.includes('ai')) row.ai += value;
+    });
+
+    lbnlData = [...byYear.values()].sort((a,b)=>a.year-b.year).filter(r => (r.infrastructure + r.network + r.storage + r.conventional + r.ai) > 0);
+  } catch (_) {
+    lbnlData = [];
+  }
+}
 
 // populate table 2
-(function(){
+function renderViz02Table(){
   const tbody = document.getElementById('table-2-body');
-  const subset = [2000,2005,2010,2015,2018,2019,2020,2021,2022,2023];
-  lbnlData.filter(d => subset.includes(d.year)).forEach((d,i,arr) => {
-    const total = d.enterprise + d.colo + d.hyper;
-    const prevTotal = i > 0 ? arr[i-1].enterprise + arr[i-1].colo + arr[i-1].hyper : null;
-    const yoy = prevTotal ? (((total - prevTotal)/prevTotal)*100).toFixed(1)+'%' : '—';
-    const share = Math.round(d.hyper/total*100)+'%';
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+
+  if (!lbnlData.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="color:#ff6b6b; padding:16px 18px;">Live data unavailable for Visualization 02.</td></tr>';
+    return;
+  }
+
+  const subset = [2014,2016,2018,2020,2021,2022,2023];
+  const rowData = lbnlData.filter(d => subset.includes(d.year));
+  const activeData = rowData.length >= 4 ? rowData : lbnlData;
+
+  activeData.forEach((d,i,arr) => {
+    const total = d.infrastructure + d.network + d.storage + d.conventional + d.ai;
+    const share = total ? Math.round(d.ai/total*100)+'%' : '—';
     tbody.innerHTML += `<tr>
       <td>${d.year}</td>
-      <td>${d.enterprise}</td>
-      <td>${d.colo}</td>
-      <td class="val-mint">${d.hyper}</td>
+      <td>${d.infrastructure}</td>
+      <td>${d.network}</td>
+      <td>${d.storage}</td>
+      <td>${d.conventional}</td>
+      <td class="val-mint">${d.ai}</td>
       <td style="color:var(--text); font-weight:600">${total}</td>
-      <td class="${total > (prevTotal||0) ? 'val-mint' : 'val-danger'}">${yoy}</td>
       <td class="val-mint">${share}</td>
     </tr>`;
   });
-})();
+}
 
 
 // ═══════════════════════════════════
 // VIZ 1: BUBBLE SCATTER
 // ═══════════════════════════════════
-(function(){
+async function renderViz1Scatter(){
+  try {
+    const db = await window.getDatabaseData();
+    const live = deriveViz1FromGpuClusters(db.gpuClusters);
+    gpuData = live;
+    renderViz1Table(gpuData);
+    if (!gpuData.length) {
+      window.updateVizStatus('viz-01', 'error', 'No live gpu_clusters rows were available for Visualization 01.');
+    } else {
+      window.updateVizStatus('viz-01', 'live', `gpu_clusters loaded — ${gpuData.length} clusters mapped.`);
+    }
+  } catch (err) {
+    gpuData = [];
+    renderViz1Table(gpuData);
+    window.updateVizStatus('viz-01', 'error', `database.php unavailable for viz-01: ${err.message}`);
+  }
+
   const container = document.getElementById('scatter-chart');
+  if (!container) return;
+  container.innerHTML = '';
+  if (!gpuData.length) {
+    container.innerHTML = '<div style="padding:20px;color:#ff6b6b;font-family:Space Mono,monospace;font-size:12px;">Visualization unavailable: no live gpu_clusters data.</div>';
+    return;
+  }
   const W = container.clientWidth || 800;
   const H = Math.max(380, W * 0.48);
   const margin = { top: 30, right: 140, bottom: 60, left: 70 };
@@ -296,9 +519,12 @@ const lbnlData = [
   const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
   // Grid
-  const xScale = d3.scaleLog().domain([10, 280]).range([0, iw]);
-  const yScale = d3.scaleLinear().domain([50, 88]).range([ih, 0]);
-  const rScale = d3.scaleSqrt().domain([0, 150]).range([0, 38]);
+  const maxPower = d3.max(gpuData, d => d.energy) || 100;
+  const maxDensity = d3.max(gpuData, d => d.accuracy) || 1000;
+  const maxChips = d3.max(gpuData, d => d.params) || 100000;
+  const xScale = d3.scaleLinear().domain([0, maxPower * 1.08]).range([0, iw]);
+  const yScale = d3.scaleLinear().domain([0, maxDensity * 1.12]).range([ih, 0]);
+  const rScale = d3.scaleSqrt().domain([0, maxChips]).range([6, 38]);
 
   // Gridlines
   g.append('g').attr('class','grid').call(
@@ -319,16 +545,16 @@ const lbnlData = [
     .attr('font-size', '10px')
     .attr('font-family', 'Space Mono, monospace')
     .attr('letter-spacing', '0.1em')
-    .text('IDEAL ZONE');
+    .text('DENSITY LEADER ZONE');
 
   // Axes
   g.append('g').attr('transform', `translate(0,${ih})`)
-    .call(d3.axisBottom(xScale).ticks(6, '~s').tickFormat(d => d+' Wh'))
+    .call(d3.axisBottom(xScale).ticks(6).tickFormat(d => d+' MW'))
     .selectAll('text').style('fill','#7a9982').style('font-size','11px').style('font-family','Space Mono,monospace');
   g.selectAll('.domain, .tick line').style('stroke','rgba(27,255,126,0.15)');
 
   g.append('g')
-    .call(d3.axisLeft(yScale).ticks(6).tickFormat(d => d+'%'))
+    .call(d3.axisLeft(yScale).ticks(6).tickFormat(d => d3.format('~s')(d)))
     .selectAll('text').style('fill','#7a9982').style('font-size','11px').style('font-family','Space Mono,monospace');
 
   // Axis labels
@@ -336,14 +562,14 @@ const lbnlData = [
     .attr('text-anchor','middle').attr('fill','#7a9982')
     .attr('font-size','12px').attr('font-family','Space Grotesk,sans-serif')
     .attr('letter-spacing','0.06em')
-    .text('Training Energy Consumption (Wh, log scale) — TITAN Xp');
+    .text('Cluster power capacity (MW)');
 
   g.append('text').attr('transform','rotate(-90)')
     .attr('x', -ih/2).attr('y', -52)
     .attr('text-anchor','middle').attr('fill','#7a9982')
     .attr('font-size','12px').attr('font-family','Space Grotesk,sans-serif')
     .attr('letter-spacing','0.06em')
-    .text('Top-1 Accuracy (%)');
+    .text('AI chips per MW');
 
   const tooltip = document.getElementById('tooltip');
 
@@ -360,7 +586,7 @@ const lbnlData = [
     .on('mouseover', function(event, d){
       d3.select(this).attr('fill-opacity',0.35).attr('stroke-width',2.5);
       tooltip.style.opacity = 1;
-      tooltip.innerHTML = `<strong style="color:${d.color}">${d.name}</strong><br>Energy: ${d.energy} Wh<br>Accuracy: ${d.accuracy}%<br>Params: ${d.params}M`;
+      tooltip.innerHTML = `<strong style="color:${d.color}">${d.name}</strong><br>Power: ${d.energy.toFixed(1)} MW<br>Density: ${Math.round(d.accuracy).toLocaleString()} chips/MW<br>AI chips: ${Math.round(d.params).toLocaleString()}<br>Status: ${d.status}<br>${d.country}`;
     })
     .on('mousemove', function(event){
       tooltip.style.left = (event.pageX+14)+'px';
@@ -375,34 +601,38 @@ const lbnlData = [
     .attr('r', d => rScale(d.params));
 
   // Labels
-  const labelOffsets = {
-    'AlexNet':         [10, -14],
-    'VGG-16':          [10, -12],
-    'ResNet-18':       [10, -14],
-    'EfficientNet-B3': [10, 18],
-    'ConvNeXt-T':      [10, -14],
-    'Swin Transformer':[-60, 20],
-  };
   g.selectAll('.label').data(gpuData).enter().append('text')
-    .attr('x', d => xScale(d.energy) + (labelOffsets[d.name]||[10,0])[0])
-    .attr('y', d => yScale(d.accuracy) + (labelOffsets[d.name]||[10,0])[1])
+    .attr('x', d => xScale(d.energy) + 10)
+    .attr('y', d => yScale(d.accuracy) - 10)
     .attr('fill', d => d.color)
     .attr('font-size', '11px')
     .attr('font-family', 'Space Grotesk,sans-serif')
     .attr('font-weight', '500')
-    .text(d => d.name)
+    .text(d => d.name.length > 24 ? d.name.slice(0, 24) + '…' : d.name)
     .attr('opacity',0)
     .transition().delay((d,i)=>i*100+400).duration(500)
     .attr('opacity',1);
 
-})();
+}
+
+renderViz1Scatter();
 
 
 // ═══════════════════════════════════
 // VIZ 2: STACKED AREA
 // ═══════════════════════════════════
-(function(){
+function renderViz02AreaChart(){
   const container = document.getElementById('area-chart');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  if (!lbnlData.length) {
+    container.innerHTML = '<div style="padding:20px;color:#ff6b6b;font-family:Space Mono,monospace;font-size:12px;">Visualization unavailable: dataset not found.</div>';
+    window.updateVizStatus('viz-02', 'error', 'No live datacenter_components rows were available for Visualization 02.');
+    return;
+  }
+
   const W = container.clientWidth || 800;
   const H = Math.max(360, W * 0.44);
   const margin = { top: 30, right: 30, bottom: 56, left: 65 };
@@ -414,13 +644,17 @@ const lbnlData = [
 
   const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
 
-  const keys = ['enterprise','colo','hyper'];
-  const colors = { enterprise: '#3d5e47', colo: '#1baa55', hyper: '#1bff7e' };
+  const keys = ['infrastructure','network','storage','conventional','ai'];
+  const colors = { infrastructure: '#31483a', network: '#456c5a', storage: '#6d8d7f', conventional: '#1baa55', ai: '#1bff7e' };
 
   const stack = d3.stack().keys(keys)(lbnlData);
 
-  const xScale = d3.scaleLinear().domain([2000,2023]).range([0,iw]);
-  const yScale = d3.scaleLinear().domain([0, 200]).range([ih,0]);
+  const minYear = d3.min(lbnlData, d => d.year) || 2014;
+  const maxYear = d3.max(lbnlData, d => d.year) || 2023;
+  const xScale = d3.scaleLinear().domain([minYear, maxYear]).range([0,iw]);
+  const maxTotal = d3.max(lbnlData, d => d.infrastructure + d.network + d.storage + d.conventional + d.ai) || 200;
+  const yMax = Math.ceil((maxTotal * 1.12) / 10) * 10;
+  const yScale = d3.scaleLinear().domain([0, yMax]).range([ih,0]);
 
   // Gridlines
   g.append('g').call(
@@ -441,44 +675,48 @@ const lbnlData = [
     .attr('class','layer')
     .attr('d', area)
     .attr('fill', d => colors[d.key])
-    .attr('fill-opacity', d => d.key === 'hyper' ? 0.85 : d.key === 'colo' ? 0.7 : 0.55)
+    .attr('fill-opacity', d => d.key === 'ai' ? 0.88 : d.key === 'conventional' ? 0.72 : 0.56)
     .attr('stroke', d => colors[d.key])
     .attr('stroke-width', 0.5)
     .attr('stroke-opacity', 0.4);
 
   // Milestone annotation: 2015 hyperscale takeoff
-  const x2015 = xScale(2015);
-  g.append('line')
-    .attr('x1', x2015).attr('x2', x2015)
-    .attr('y1', 0).attr('y2', ih)
-    .attr('stroke', 'rgba(27,255,126,0.3)')
-    .attr('stroke-dasharray','5,4')
-    .attr('stroke-width', 1);
-  g.append('text')
-    .attr('x', x2015 + 6).attr('y', 14)
-    .attr('fill','rgba(27,255,126,0.5)')
-    .attr('font-size','10px')
-    .attr('font-family','Space Mono,monospace')
-    .text('Hyperscale surge →');
+  if (minYear <= 2015 && maxYear >= 2015) {
+    const x2015 = xScale(2015);
+    g.append('line')
+      .attr('x1', x2015).attr('x2', x2015)
+      .attr('y1', 0).attr('y2', ih)
+      .attr('stroke', 'rgba(27,255,126,0.3)')
+      .attr('stroke-dasharray','5,4')
+      .attr('stroke-width', 1);
+    g.append('text')
+      .attr('x', Math.min(iw - 118, x2015 + 6)).attr('y', 14)
+      .attr('fill','rgba(27,255,126,0.5)')
+      .attr('font-size','10px')
+      .attr('font-family','Space Mono,monospace')
+      .text('AI server emergence →');
+  }
 
-  // AI annotation 2020+
-  const x2020 = xScale(2020);
-  g.append('line')
-    .attr('x1', x2020).attr('x2', x2020)
-    .attr('y1', 0).attr('y2', ih)
-    .attr('stroke','rgba(255,179,64,0.35)')
-    .attr('stroke-dasharray','5,4')
-    .attr('stroke-width', 1);
-  g.append('text')
-    .attr('x', x2020 + 6).attr('y', 14)
-    .attr('fill','rgba(255,179,64,0.6)')
-    .attr('font-size','10px')
-    .attr('font-family','Space Mono,monospace')
-    .text('AI/cloud boom →');
+  // Compute annotation 2020+
+  if (minYear <= 2020 && maxYear >= 2020) {
+    const x2020 = xScale(2020);
+    g.append('line')
+      .attr('x1', x2020).attr('x2', x2020)
+      .attr('y1', 0).attr('y2', ih)
+      .attr('stroke','rgba(255,179,64,0.35)')
+      .attr('stroke-dasharray','5,4')
+      .attr('stroke-width', 1);
+    g.append('text')
+      .attr('x', Math.min(iw - 102, x2020 + 6)).attr('y', 30)
+      .attr('fill','rgba(255,179,64,0.6)')
+      .attr('font-size','10px')
+      .attr('font-family','Space Mono,monospace')
+      .text('Accelerator load →');
+  }
 
   // Axes
   g.append('g').attr('transform',`translate(0,${ih})`)
-    .call(d3.axisBottom(xScale).tickFormat(d3.format('d')).ticks(8))
+    .call(d3.axisBottom(xScale).tickValues(d3.range(minYear, maxYear + 1)).tickFormat(d3.format('d')))
     .selectAll('text').style('fill','#7a9982').style('font-size','11px').style('font-family','Space Mono,monospace');
 
   g.append('g')
@@ -488,7 +726,7 @@ const lbnlData = [
   // Total line
   const totalLine = d3.line()
     .x(d => xScale(d.year))
-    .y(d => yScale(d.enterprise + d.colo + d.hyper))
+    .y(d => yScale(d.infrastructure + d.network + d.storage + d.conventional + d.ai))
     .curve(d3.curveMonotoneX);
 
   g.append('path').datum(lbnlData)
@@ -505,14 +743,15 @@ const lbnlData = [
     .attr('fill','transparent')
     .on('mousemove', function(event){
       const [mx] = d3.pointer(event);
-      const year = Math.round(xScale.invert(mx));
-      const idx = bisect(lbnlData, year, 0);
+        const year = Math.max(minYear, Math.min(maxYear, Math.round(xScale.invert(mx))));
+        const idx = bisect(lbnlData, year, 0);
       const d = lbnlData[Math.min(idx, lbnlData.length-1)];
       if (!d) return;
+      const total = d.infrastructure + d.network + d.storage + d.conventional + d.ai;
       tooltip.style.opacity = 1;
       tooltip.style.left = (event.pageX+14)+'px';
       tooltip.style.top = (event.pageY-60)+'px';
-      tooltip.innerHTML = `<strong style="color:#1bff7e">${d.year}</strong><br>Enterprise: ${d.enterprise} TWh<br>Colocation: ${d.colo} TWh<br><span style="color:#1bff7e">Hyperscale: ${d.hyper} TWh</span><br>Total: ${d.enterprise+d.colo+d.hyper} TWh`;
+      tooltip.innerHTML = `<strong style="color:#1bff7e">${d.year}</strong><br>Infrastructure: ${d.infrastructure} TWh<br>Network: ${d.network} TWh<br>Storage: ${d.storage} TWh<br>Conventional servers: ${d.conventional} TWh<br><span style="color:#1bff7e">AI servers: ${d.ai} TWh</span><br>Total: ${total} TWh`;
     })
     .on('mouseout', () => { tooltip.style.opacity = 0; });
 
@@ -523,12 +762,23 @@ const lbnlData = [
     .attr('letter-spacing','0.06em')
     .text('Year');
 
-})();
+}
+
+async function initViz02Live() {
+  await loadViz02LiveData();
+  renderViz02Table();
+  renderViz02AreaChart();
+  if (lbnlData.length) {
+    window.updateVizStatus('viz-02', 'live', `datacenter_components loaded — ${lbnlData.length} yearly component rows.`);
+  }
+}
+
+initViz02Live();
 </script>
 
 <!-- ═══════════════════════════════════════════
      GPU SPECS DASHBOARD  (Visualization 03)
-     Data: wthoman.webdev.iyaserver.com
+  Data: Live gpu_specs records from database.php
 ════════════════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
@@ -752,8 +1002,8 @@ const lbnlData = [
       <h2>GPU Specs Dashboard</h2>
     </div>
     <div class="section-header-right">
-      <p>Interactive analytics across GPU hardware generations — compute density, memory bandwidth proxies, and clock relationships. Filter by manufacturer, release year, and sort metric.</p>
-      <p class="source-tag">SOURCE — Kaggle GPU Benchmarks · wthoman API</p>
+      <p>Interactive analytics across GPU hardware generations using only the live `gpu_specs` table from `database.php`. Filter by manufacturer, release year, and sort metric.</p>
+      <p class="source-tag">SOURCE — database.php · gpu_specs</p>
     </div>
   </div>
 
@@ -865,6 +1115,17 @@ const lbnlData = [
 
 <script>
 (function () {
+  if (typeof Chart === 'undefined' || typeof ChartDataLabels === 'undefined') {
+    if (window.updateVizStatus) {
+      window.updateVizStatus('viz-03', 'error', 'Chart.js library failed to load for this visualization.');
+    }
+    const statusDot = document.getElementById('gpuStatusDot');
+    const statusText = document.getElementById('gpuStatusText');
+    if (statusDot) statusDot.style.background = '#ff6b6b';
+    if (statusText) statusText.textContent = 'Visualization unavailable — chart library failed to load.';
+    return;
+  }
+
   Chart.register(ChartDataLabels);
 
   const fmt = new Intl.NumberFormat('en-US');
@@ -874,7 +1135,6 @@ const lbnlData = [
   const AXIS_TITLE_COLOR = '#e8f0ea';
 
   const brandColors = { NVIDIA: '#60a5fa', Intel: '#1bff7e', AMD: '#ff6b6b' };
-
   let rawData = [], gpuBubble, gpuBar;
 
   const $ = id => document.getElementById(id);
@@ -889,6 +1149,8 @@ const lbnlData = [
   }
 
   function buildFilters(data) {
+    $('gpuMfr').innerHTML = '<option value="all">All</option>';
+    $('gpuYear').innerHTML = '<option value="all">All</option>';
     [...new Set(data.map(d=>d.manufacturer).filter(Boolean))].sort().forEach(m => {
       const o = document.createElement('option'); o.value = o.textContent = m;
       $('gpuMfr').appendChild(o);
@@ -919,6 +1181,10 @@ const lbnlData = [
 
   function refreshTable(d) {
     $('gpuRowCount').textContent = `${fmt.format(d.length)} rows`;
+    if (!d.length) {
+      $('gpuTableBody').innerHTML = '<tr><td colspan="9" style="padding:20px 14px; color:#ff6b6b;">No live gpu_specs rows available.</td></tr>';
+      return;
+    }
     $('gpuTableBody').innerHTML = d.map(r => `
       <tr>
         <td>${r.manufacturer??''}</td>
@@ -934,6 +1200,10 @@ const lbnlData = [
   }
 
   function buildBubble(d) {
+    if (!d.length) {
+      if (gpuBubble) gpuBubble.destroy();
+      return;
+    }
     const pts = d.map(r => ({
       x: num(r.memSize), y: num(r.unifiedShader),
       r: Math.max(5, Math.min(22, (num(r.memBusWidth)||0)/12)),
@@ -990,6 +1260,10 @@ const lbnlData = [
   }
 
   function buildBar(d) {
+    if (!d.length) {
+      if (gpuBar) gpuBar.destroy();
+      return;
+    }
     const sorted = [...d].sort((a,b)=>(num(b.gpuClock)||0)-(num(a.gpuClock)||0));
     if (gpuBar) gpuBar.destroy();
     gpuBar = new Chart($('gpuBarChart'), {
@@ -1031,11 +1305,9 @@ const lbnlData = [
 
   async function init() {
     try {
-      const res = await fetch('https://wthoman.webdev.iyaserver.com/acad274/data_center/gpu_data.php', { cache:'no-store' });
-      const json = await res.json();
-      if (!res.ok || json.error) throw new Error(json.error || `HTTP ${res.status}`);
-
-      rawData = json.map(r => ({
+      const db = await window.getDatabaseData();
+      const live = Array.isArray(db.gpuSpecs) ? db.gpuSpecs : [];
+      rawData = live.map(r => ({
         ...r,
         releaseYear:   num(r.releaseYear),
         memSize:       num(r.memSize),
@@ -1044,16 +1316,25 @@ const lbnlData = [
         memClock:      num(r.memClock),
         unifiedShader: num(r.unifiedShader)
       }));
+    } catch (_) {
+      rawData = [];
+    }
 
-      buildFilters(rawData);
-      refresh();
+    buildFilters(rawData);
+    refresh();
 
+    if (rawData.length) {
       $('gpuStatusDot').style.background = 'var(--mint)';
-      $('gpuStatusText').textContent = `${fmt.format(rawData.length)} GPU records loaded`;
-    } catch (err) {
+      $('gpuStatusText').textContent = `${fmt.format(rawData.length)} live GPU records loaded`;
+      if (window.updateVizStatus) {
+        window.updateVizStatus('viz-03', 'live', `database.php gpu_specs loaded — ${fmt.format(rawData.length)} GPU records.`);
+      }
+    } else {
       $('gpuStatusDot').style.background = '#ff6b6b';
-      $('gpuStatusText').textContent = `Failed to load — ${err.message}`;
-      $('gpuTableBody').innerHTML = `<tr><td colspan="9" style="padding:20px 14px;color:#ff6b6b;">Could not reach data source.</td></tr>`;
+      $('gpuStatusText').textContent = 'No live GPU records available.';
+      if (window.updateVizStatus) {
+        window.updateVizStatus('viz-03', 'error', 'No live gpu_specs rows available for Visualization 03.');
+      }
     }
   }
 
@@ -1064,7 +1345,7 @@ const lbnlData = [
 
 <!-- ═══════════════════════════════════════════
      IEA ENERGY DEMAND  (Visualization 04)
-     Data: jhu30699.webdev.iyaserver.com
+  Data: Live regional/world annex rows from database.php
 ════════════════════════════════════════════ -->
 <style>
   .iea-stats {
@@ -1182,8 +1463,8 @@ const lbnlData = [
       <h2>Global Data Center<br>Energy Demand</h2>
     </div>
     <div class="section-header-right">
-      <p>IEA <em>Electricity 2024</em> projections — how much electricity data centers consumed in 2022 and where demand is heading by 2026 across regions, plus a breakdown of how that electricity is split inside a typical facility.</p>
-      <p class="source-tag">SOURCE — IEA, Electricity 2024: Analysis and Forecast to 2026 · jhu30699</p>
+      <p>Live electricity-demand comparisons drawn from `regional_data_annex` plus the latest datacenter component mix from `datacenter_components`.</p>
+      <p class="source-tag">SOURCE — database.php · regional_data_annex + datacenter_components</p>
     </div>
   </div>
 
@@ -1191,31 +1472,27 @@ const lbnlData = [
   <div class="iea-stats">
     <div class="iea-stat">
       <div class="s-label">Global demand, 2022</div>
-      <div class="s-value">460 TWh</div>
-      <div class="s-sub">Actual figure from IEA report</div>
+      <div class="s-value" id="ieaStatGlobal2022">—</div>
+      <div class="s-sub">World total electricity consumption, actual</div>
     </div>
     <div class="iea-stat">
-      <div class="s-label">IEA base case, 2026</div>
-      <div class="s-value">~800 TWh</div>
-      <div class="s-sub">Range: 620–1,050 TWh</div>
+      <div class="s-label">Base case, 2030</div>
+      <div class="s-value" id="ieaStatBase2026">—</div>
+      <div class="s-sub">World total electricity consumption, base case</div>
     </div>
     <div class="iea-stat">
-      <div class="s-label">Internal energy split</div>
-      <div class="s-value">40/40/20</div>
-      <div class="s-sub">Computing / Cooling / Other IT</div>
+      <div class="s-label">AI server share, latest year</div>
+      <div class="s-value" id="ieaStatSplit">—</div>
+      <div class="s-sub">Share of total datacenter component electricity</div>
     </div>
   </div>
 
   <!-- Regional context -->
   <div style="font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(27,255,126,0.6); padding-bottom:12px; border-bottom:1px solid rgba(50,205,115,0.15); margin-bottom:16px;">
-    Regional snapshot — 2026 forecast (TWh)
+    Regional snapshot — live 2030 base case (TWh)
   </div>
-  <div class="iea-region-grid">
-    <div class="iea-region"><div class="r-name">United States</div><div class="r-value">200–260</div><div class="r-unit">TWh · ~6% of US demand</div></div>
-    <div class="iea-region"><div class="r-name">European Union</div><div class="r-value">&lt;150</div><div class="r-unit">TWh · IEA estimate</div></div>
-    <div class="iea-region"><div class="r-name">China</div><div class="r-value">~300</div><div class="r-unit">TWh forecast 2026</div></div>
-    <div class="iea-region"><div class="r-name">Ireland</div><div class="r-value">5.3</div><div class="r-unit">TWh · up to 32% national</div></div>
-    <div class="iea-region"><div class="r-name">Denmark</div><div class="r-value">6</div><div class="r-unit">TWh · ~20% national</div></div>
+  <div class="iea-region-grid" id="ieaRegionGrid">
+    <div class="iea-region"><div class="r-name">Loading</div><div class="r-value">—</div><div class="r-unit">Waiting for database</div></div>
   </div>
 
   <!-- Charts -->
@@ -1224,96 +1501,21 @@ const lbnlData = [
     <!-- Bar chart: global demand -->
     <div class="iea-chart-card">
       <h3>Global Electricity Demand from Data Centers</h3>
-      <p class="chart-sub">IEA 2022 actual vs 2026 low / base / high scenario (TWh)</p>
-      <svg viewBox="0 0 760 400" role="img" aria-label="Bar chart of global data center electricity demand">
-        <defs>
-          <linearGradient id="ieaGrad1" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stop-color="#1bff7e" stop-opacity="0.9"/>
-            <stop offset="100%" stop-color="#40c4ff" stop-opacity="0.75"/>
-          </linearGradient>
-          <linearGradient id="ieaGrad2" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stop-color="#ffb340" stop-opacity="0.9"/>
-            <stop offset="100%" stop-color="#ff7e67" stop-opacity="0.8"/>
-          </linearGradient>
-        </defs>
-        <!-- grid lines -->
-        <g stroke="rgba(27,255,126,0.07)" stroke-width="1">
-          <line x1="64" y1="350" x2="720" y2="350"/>
-          <line x1="64" y1="293" x2="720" y2="293"/>
-          <line x1="64" y1="237" x2="720" y2="237"/>
-          <line x1="64" y1="180" x2="720" y2="180"/>
-          <line x1="64" y1="124" x2="720" y2="124"/>
-          <line x1="64" y1="67"  x2="720" y2="67"/>
-        </g>
-        <!-- y-axis -->
-        <g fill="#7a9982" font-size="12" font-family="Space Grotesk,sans-serif" text-anchor="end">
-          <text x="56" y="354">0</text>
-          <text x="56" y="297">200</text>
-          <text x="56" y="241">400</text>
-          <text x="56" y="184">600</text>
-          <text x="56" y="128">800</text>
-          <text x="56" y="71">1,000</text>
-        </g>
-        <line x1="64" y1="350" x2="720" y2="350" stroke="rgba(27,255,126,0.2)" stroke-width="1"/>
-        <!-- 2022: 460 TWh → height = 460/1100*306 ≈ 128 -->
-        <rect x="110" y="222" width="100" height="128" fill="url(#ieaGrad1)" rx="8"/>
-        <text x="160" y="214" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">460</text>
-        <text x="160" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2022 actual</text>
-        <!-- 2026 low: 620 → height ≈ 173 -->
-        <rect x="250" y="177" width="100" height="173" fill="url(#ieaGrad2)" rx="8" opacity="0.85"/>
-        <text x="300" y="169" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">620</text>
-        <text x="300" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2026 low</text>
-        <!-- 2026 base: 805 → height ≈ 224 -->
-        <rect x="390" y="126" width="100" height="224" fill="url(#ieaGrad1)" rx="8"/>
-        <text x="440" y="118" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">~805</text>
-        <text x="440" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2026 base</text>
-        <!-- 2026 high: 1050 → height ≈ 292 -->
-        <rect x="530" y="58" width="100" height="292" fill="url(#ieaGrad2)" rx="8"/>
-        <text x="580" y="50" fill="#e8f0ea" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle" font-weight="600">1,050</text>
-        <text x="580" y="375" fill="#c8d8cc" font-size="13" font-family="Space Grotesk,sans-serif" text-anchor="middle">2026 high</text>
-        <!-- unit label -->
-        <text x="392" y="22" fill="#7a9982" font-size="11" font-family="Space Mono,monospace" text-anchor="middle" letter-spacing="0.1em">TWH / YEAR</text>
-      </svg>
+      <p class="chart-sub">World total electricity consumption pulled from `regional_data_annex`.</p>
+      <div style="position:relative;width:100%;height:320px;"><canvas id="ieaGlobalChart"></canvas></div>
       <div class="iea-legend">
-        <div class="iea-legend-item"><span class="iea-swatch" style="background:#1bff7e;"></span>Actual / base scenario</div>
-        <div class="iea-legend-item"><span class="iea-swatch" style="background:#ffb340;"></span>Low / high scenario</div>
+        <div class="iea-legend-item"><span class="iea-swatch" style="background:#1bff7e;"></span>Actual</div>
+        <div class="iea-legend-item"><span class="iea-swatch" style="background:#40c4ff;"></span>Base case</div>
       </div>
     </div>
 
-    <!-- Donut chart: internal split -->
+    <!-- Regional comparison -->
     <div class="iea-chart-card">
-      <h3>Electricity Use Inside a Data Center</h3>
-      <p class="chart-sub">Typical breakdown by component type (IEA)</p>
-      <svg viewBox="0 0 340 280" role="img" aria-label="Donut chart showing computing 40%, cooling 40%, other 20%">
-        <g transform="translate(130,148)">
-          <!-- track -->
-          <circle r="95" cx="0" cy="0" fill="none" stroke="rgba(27,255,126,0.06)" stroke-width="42"/>
-          <!-- computing 40%: dasharray = 0.4 × 597 = 239 -->
-          <circle r="95" cx="0" cy="0" fill="none" stroke="#1bff7e" stroke-width="42"
-                  stroke-dasharray="239 358" stroke-dashoffset="0" transform="rotate(-90)" stroke-linecap="butt"/>
-          <!-- cooling 40%: offset = -239 -->
-          <circle r="95" cx="0" cy="0" fill="none" stroke="#40c4ff" stroke-width="42"
-                  stroke-dasharray="239 358" stroke-dashoffset="-239" transform="rotate(-90)" stroke-linecap="butt"/>
-          <!-- other 20%: offset = -478 -->
-          <circle r="95" cx="0" cy="0" fill="none" stroke="#ffb340" stroke-width="42"
-                  stroke-dasharray="119 478" stroke-dashoffset="-478" transform="rotate(-90)" stroke-linecap="butt"/>
-          <!-- center -->
-          <circle r="60" cx="0" cy="0" fill="#151916"/>
-          <text x="0" y="-6" text-anchor="middle" fill="#1bff7e" font-size="22" font-family="PP NeueBit,monospace" font-weight="bold">40/40/20</text>
-          <text x="0" y="16" text-anchor="middle" fill="#7a9982" font-size="10" font-family="Space Grotesk,sans-serif">% of total use</text>
-        </g>
-        <!-- legend -->
-        <g font-size="13" font-family="Space Grotesk,sans-serif" fill="#c8d8cc">
-          <rect x="210" y="90"  width="12" height="12" rx="3" fill="#1bff7e"/>
-          <text x="228" y="101">Computing — 40%</text>
-          <rect x="210" y="116" width="12" height="12" rx="3" fill="#40c4ff"/>
-          <text x="228" y="127">Cooling — 40%</text>
-          <rect x="210" y="142" width="12" height="12" rx="3" fill="#ffb340"/>
-          <text x="228" y="153">Other IT — 20%</text>
-        </g>
-      </svg>
+      <h3>Regional Electricity Demand</h3>
+      <p class="chart-sub">Top regions by 2030 base-case total electricity consumption.</p>
+      <div style="position:relative;width:100%;height:320px;"><canvas id="ieaRegionChart"></canvas></div>
       <p style="font-size:13px; color:var(--text-muted); line-height:1.6; margin-top:12px;">
-        Cooling matches computing in electricity draw — a core finding that supports efficiency gains from better PUE practices and hardware co-design.
+        This panel is driven directly by `regional_data_annex`, so region rankings update with the live database instead of a fixed snapshot.
       </p>
     </div>
 
@@ -1327,58 +1529,143 @@ const lbnlData = [
         <thead>
           <tr><th>Dataset</th><th>2022</th><th>2026</th><th>Notes</th></tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Global electricity demand</td>
-            <td class="val-mint">460 TWh</td>
-            <td class="val-mint">620–1,050 TWh</td>
-            <td>Base case just over 800 TWh</td>
-          </tr>
-          <tr>
-            <td>Internal energy split</td>
-            <td class="val-mint">40% / 40% / 20%</td>
-            <td>N/A</td>
-            <td>Computing / Cooling / Other IT equipment</td>
-          </tr>
-          <tr>
-            <td>United States</td>
-            <td class="val-mint">~200 TWh</td>
-            <td class="val-mint">~260 TWh</td>
-            <td>~4% of US electricity in 2022; ~6% in 2026</td>
-          </tr>
-          <tr>
-            <td>European Union</td>
-            <td class="val-mint">&lt;100 TWh</td>
-            <td class="val-mint">~150 TWh</td>
-            <td>IEA regional estimate</td>
-          </tr>
-          <tr>
-            <td>China</td>
-            <td>—</td>
-            <td class="val-mint">~300 TWh</td>
-            <td>2026 forecast from IEA report</td>
-          </tr>
-          <tr>
-            <td>Ireland</td>
-            <td class="val-mint">5.3 TWh</td>
-            <td class="val-mint">Up to 32% national</td>
-            <td>One of the most data-centre-dense countries per capita</td>
-          </tr>
-          <tr>
-            <td>Denmark</td>
-            <td>—</td>
-            <td class="val-mint">6 TWh</td>
-            <td>~20% of national electricity demand by 2026</td>
-          </tr>
-        </tbody>
+        <tbody id="ieaTableBody"></tbody>
       </table>
     </div>
   </div>
 </section>
 
+<script>
+(function () {
+  let ieaGlobalChart;
+  let ieaRegionChart;
+
+  function findVal(rows, region, year) {
+    const row = rows.find(r =>
+      String(r.region || '').toLowerCase().includes(region) &&
+      String(r.year || '') === String(year)
+    );
+    return row ? Number(row.value) : null;
+  }
+
+  function fmtRange(v) {
+    if (!Number.isFinite(v)) return '—';
+    if (v >= 100) return `~${Math.round(v)}`;
+    return `${Math.round(v * 10) / 10}`;
+  }
+
+  async function initViz04FromDatabase() {
+    try {
+      const db = await window.getDatabaseData();
+      const regional = Array.isArray(db.regionalDataAnnex) ? db.regionalDataAnnex : [];
+      const components = Array.isArray(db.datacenterComponents) ? db.datacenterComponents : [];
+      const electricity = regional.filter(r => String(r.metric || '').toLowerCase() === 'total electricity consumption');
+      const worldActual = electricity.filter(r => String(r.region || '').toLowerCase() === 'world' && String(r.scenario || '').toLowerCase() === 'actual').sort((a,b)=>Number(a.year)-Number(b.year));
+      const worldBase = electricity.filter(r => String(r.region || '').toLowerCase() === 'world' && String(r.scenario || '').toLowerCase().includes('base')).sort((a,b)=>Number(a.year)-Number(b.year));
+      const world2024 = worldActual.find(r => Number(r.year) === 2024) || worldActual[worldActual.length - 1];
+      const world2030 = worldBase.find(r => Number(r.year) === 2030) || worldBase[worldBase.length - 1];
+      const latestComponentYear = Math.max(...components.map(r => Number(r.year)).filter(Number.isFinite));
+      const latestComponentRows = components.filter(r => Number(r.year) === latestComponentYear);
+      const latestTotal = latestComponentRows.reduce((sum, r) => sum + Number(r.consumption_twh || 0), 0);
+      const latestAi = latestComponentRows.filter(r => String(r.component || '').toLowerCase().includes('ai')).reduce((sum, r) => sum + Number(r.consumption_twh || 0), 0);
+
+      const gEl = document.getElementById('ieaStatGlobal2022');
+      const bEl = document.getElementById('ieaStatBase2026');
+      const sEl = document.getElementById('ieaStatSplit');
+      if (gEl && world2024) gEl.textContent = `${Math.round(Number(world2024.value))} TWh`;
+      if (bEl && world2030) bEl.textContent = `${Math.round(Number(world2030.value))} TWh`;
+      if (sEl && latestTotal) sEl.textContent = `${Math.round((latestAi / latestTotal) * 100)}%`;
+
+      const topRegions = electricity
+        .filter(r => String(r.scenario || '').toLowerCase().includes('base') && Number(r.year) === 2030 && String(r.region || '').toLowerCase() !== 'world')
+        .sort((a,b)=>Number(b.value)-Number(a.value))
+        .slice(0,5);
+
+      const regionGrid = document.getElementById('ieaRegionGrid');
+      if (regionGrid) {
+        regionGrid.innerHTML = topRegions.map(r => `<div class="iea-region"><div class="r-name">${r.region}</div><div class="r-value">${fmtRange(Number(r.value))}</div><div class="r-unit">TWh · 2030 base case</div></div>`).join('');
+      }
+
+      const tbody = document.getElementById('ieaTableBody');
+      if (tbody && topRegions.length) {
+        const rows = topRegions.map(r => {
+          const actual2024 = electricity.find(v => String(v.region) === String(r.region) && Number(v.year) === 2024 && String(v.scenario || '').toLowerCase() === 'actual');
+          return [r.region, Number(actual2024?.value), Number(r.value), 'database.php regional_data_annex'];
+        });
+        tbody.innerHTML = rows.map(r => `
+          <tr>
+            <td>${r[0]}</td>
+            <td class="val-mint">${Number.isFinite(r[1]) ? fmtRange(r[1]) + ' TWh' : '—'}</td>
+            <td class="val-mint">${Number.isFinite(r[2]) ? fmtRange(r[2]) + ' TWh' : '—'}</td>
+            <td>${r[3]}</td>
+          </tr>
+        `).join('');
+      }
+
+      if (typeof Chart !== 'undefined') {
+        const globalCanvas = document.getElementById('ieaGlobalChart');
+        const regionCanvas = document.getElementById('ieaRegionChart');
+        const actualLabels = worldActual.map(r => String(r.year));
+        const actualVals = worldActual.map(r => Number(r.value));
+        const base2030Val = world2030 ? Number(world2030.value) : null;
+        if (ieaGlobalChart) ieaGlobalChart.destroy();
+        ieaGlobalChart = new Chart(globalCanvas, {
+          type: 'bar',
+          data: {
+            labels: [...actualLabels, ...(base2030Val !== null ? ['2030'] : [])],
+            datasets: [{
+              label: 'World electricity demand',
+              data: [...actualVals, ...(base2030Val !== null ? [base2030Val] : [])],
+              backgroundColor: [...actualVals.map(() => 'rgba(27,255,126,0.75)'), ...(base2030Val !== null ? ['rgba(64,196,255,0.82)'] : [])],
+              borderColor: [...actualVals.map(() => '#1bff7e'), ...(base2030Val !== null ? ['#40c4ff'] : [])],
+              borderWidth: 1,
+              borderRadius: 8
+            }]
+          },
+          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, datalabels:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{ color:'#7a9982', callback:v=>v+' TWh' }, grid:{ color:'rgba(27,255,126,0.06)' } }, x:{ ticks:{ color:'#7a9982' }, grid:{ display:false } } } }
+        });
+
+        if (ieaRegionChart) ieaRegionChart.destroy();
+        ieaRegionChart = new Chart(regionCanvas, {
+          type: 'bar',
+          data: {
+            labels: topRegions.map(r => r.region),
+            datasets: [
+              {
+                label: '2024 actual',
+                data: topRegions.map(r => Number(electricity.find(v => String(v.region) === String(r.region) && Number(v.year) === 2024 && String(v.scenario || '').toLowerCase() === 'actual')?.value || 0)),
+                backgroundColor: 'rgba(27,255,126,0.7)',
+                borderColor: '#1bff7e',
+                borderWidth: 1,
+                borderRadius: 6
+              },
+              {
+                label: '2030 base case',
+                data: topRegions.map(r => Number(r.value || 0)),
+                backgroundColor: 'rgba(64,196,255,0.8)',
+                borderColor: '#40c4ff',
+                borderWidth: 1,
+                borderRadius: 6
+              }
+            ]
+          },
+          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#c8d8cc' } }, datalabels:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{ color:'#7a9982', callback:v=>v+' TWh' }, grid:{ color:'rgba(27,255,126,0.06)' } }, x:{ ticks:{ color:'#7a9982' }, grid:{ display:false } } } }
+        });
+      }
+
+      window.updateVizStatus('viz-04', 'live', `database.php annex loaded (${regional.length} regional rows).`);
+    } catch (err) {
+      window.updateVizStatus('viz-04', 'error', `database.php unavailable for viz-04: ${err.message}`);
+    }
+  }
+
+  initViz04FromDatabase();
+})();
+</script>
+
 <!-- ═══════════════════════════════════════════
      AI ENERGY VIZ  (Visualization 05)
-     Data: opederso.webdev.iyaserver.com
+  Data: Live regional_data_annex + gpu_specs tables from database.php
 ════════════════════════════════════════════ -->
 <style>
   /* badge pills */
@@ -1463,8 +1750,8 @@ const lbnlData = [
       <h2>The Data Center<br>Electricity Surge</h2>
     </div>
     <div class="section-header-right">
-      <p>Regional electricity consumption 2017–2030 and GPU hardware efficiency landscape — tracing how demand is growing by geography and how compute efficiency has evolved across NVIDIA architectures.</p>
-      <p class="source-tag">SOURCE — IEA Electricity 2024 · NVIDIA datasheets · opederso</p>
+      <p>Regional electricity growth and GPU hardware efficiency proxies, both rendered directly from live `regional_data_annex` and `gpu_specs` records.</p>
+      <p class="source-tag">SOURCE — database.php · regional_data_annex + gpu_specs</p>
     </div>
   </div>
 
@@ -1486,14 +1773,7 @@ const lbnlData = [
             <th>Carbon Intensity</th>
           </tr>
         </thead>
-        <tbody>
-          <tr><td>United States</td><td class="num">130</td><td class="num">183</td><td class="val-mint">426</td><td class="num">+133%</td><td class="num">~45%</td><td><span class="oe-badge oe-badge-amber">Gas 41%, Nuclear 20%</span></td><td><span class="oe-badge oe-badge-amber">High</span></td></tr>
-          <tr><td>China</td><td class="num">88</td><td class="num">104</td><td class="val-mint">279</td><td class="num">+168%</td><td class="num">~25%</td><td><span class="oe-badge oe-badge-red">Coal-heavy</span></td><td><span class="oe-badge oe-badge-red">Very High</span></td></tr>
-          <tr><td>Europe (EU+UK)</td><td class="num">56</td><td class="num">70</td><td class="val-mint">115</td><td class="num">+64%</td><td class="num">~15%</td><td><span class="oe-badge oe-badge-green">Renewables-leading</span></td><td><span class="oe-badge oe-badge-green">Medium</span></td></tr>
-          <tr><td>Japan</td><td class="num">14</td><td class="num">19</td><td class="val-mint">34</td><td class="num">+79%</td><td class="num">~5%</td><td><span class="oe-badge oe-badge-amber">Gas &amp; Nuclear</span></td><td><span class="oe-badge oe-badge-amber">High</span></td></tr>
-          <tr><td>Rest of World</td><td class="num">40</td><td class="num">39</td><td class="val-mint">91</td><td class="num">+133%</td><td class="num">~10%</td><td><span class="oe-badge oe-badge-blue">Mixed</span></td><td><span class="oe-badge oe-badge-blue">Varies</span></td></tr>
-          <tr><td><strong style="color:white;">Global Total</strong></td><td class="num">460</td><td class="num">415</td><td class="val-mint">945</td><td class="num">+128%</td><td class="num">100%</td><td><span class="oe-badge oe-badge-amber">Gas 40%+ proj.</span></td><td><span class="oe-badge oe-badge-amber">High</span></td></tr>
-        </tbody>
+        <tbody id="oe-region-table-body"></tbody>
       </table>
     </div>
   </div>
@@ -1511,14 +1791,7 @@ const lbnlData = [
             <th>Mem BW (TB/s)</th><th>TFLOPS/W</th><th>Tier</th>
           </tr>
         </thead>
-        <tbody>
-          <tr><td>V100 SXM2</td><td>Volta</td><td class="num">2017</td><td class="num">300</td><td class="num">112</td><td class="num">32</td><td class="num">0.90</td><td class="val-mint">0.37</td><td><span class="oe-badge oe-badge-blue">Data Center</span></td></tr>
-          <tr><td>RTX 3090</td><td>Ampere (consumer)</td><td class="num">2020</td><td class="num">350</td><td class="num">142</td><td class="num">24</td><td class="num">0.94</td><td class="val-mint">0.41</td><td><span class="oe-badge oe-badge-green">Prosumer</span></td></tr>
-          <tr><td>A100 SXM4</td><td>Ampere</td><td class="num">2020</td><td class="num">400</td><td class="num">312</td><td class="num">80</td><td class="num">2.00</td><td class="val-mint">0.78</td><td><span class="oe-badge oe-badge-blue">Data Center</span></td></tr>
-          <tr><td>RTX 4090</td><td>Ada Lovelace</td><td class="num">2022</td><td class="num">450</td><td class="num">330</td><td class="num">24</td><td class="num">1.01</td><td class="val-mint">0.73</td><td><span class="oe-badge oe-badge-green">Prosumer / Edge</span></td></tr>
-          <tr><td>H100 SXM5</td><td>Hopper</td><td class="num">2022</td><td class="num">700</td><td class="num">990</td><td class="num">80</td><td class="num">3.35</td><td class="val-mint">1.41</td><td><span class="oe-badge oe-badge-blue">Data Center (AI)</span></td></tr>
-          <tr><td>H200 SXM</td><td>Hopper</td><td class="num">2024</td><td class="num">700</td><td class="num">990</td><td class="num">141</td><td class="num">4.80</td><td class="val-mint">1.41</td><td><span class="oe-badge oe-badge-blue">Data Center (AI)</span></td></tr>
-        </tbody>
+        <tbody id="oe-gpu-table-body"></tbody>
       </table>
     </div>
   </div>
@@ -1529,13 +1802,13 @@ const lbnlData = [
     <!-- Stacked area -->
     <div class="oe-chart-card">
       <h3>Regional Electricity Demand, 2017–2030</h3>
-      <p class="chart-sub">Stacked area · TWh · IEA base-case projection (dashed after 2024)</p>
+      <p class="chart-sub">Stacked area using live actual rows plus 2030 base-case projections from `regional_data_annex`.</p>
       <div class="oe-legend">
-        <span class="oe-legend-item"><span class="oe-swatch" style="background:#1bff7e;"></span>United States</span>
-        <span class="oe-legend-item"><span class="oe-swatch" style="background:#ff6b6b;"></span>China</span>
-        <span class="oe-legend-item"><span class="oe-swatch" style="background:#40c4ff;"></span>Europe</span>
-        <span class="oe-legend-item"><span class="oe-swatch" style="background:#ffb340;"></span>Japan</span>
-        <span class="oe-legend-item"><span class="oe-swatch" style="background:#c4a0f5;"></span>Rest of World</span>
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#1bff7e;"></span>Top live region</span>
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#ff6b6b;"></span>Region 2</span>
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#40c4ff;"></span>Region 3</span>
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#ffb340;"></span>Region 4</span>
+        <span class="oe-legend-item"><span class="oe-swatch" style="background:#c4a0f5;"></span>Region 5</span>
       </div>
       <div style="position:relative; width:100%; height:360px;">
         <canvas id="oeAreaChart"></canvas>
@@ -1559,166 +1832,105 @@ const lbnlData = [
 </section>
 
 <script>
-/* ── VIZ 05 · Stacked Area Chart ── */
-(function () {
-  const years   = [2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030];
-  const projIdx = 7;
-  const us    = [58,68,79,88,102,130,154,183,220,264,302,346,385,426];
-  const china = [32,38,46,54,68, 88, 96,104,130,162,200,235,258,279];
-  const eu    = [28,31,35,38,45, 56, 64, 70, 80, 89, 98,105,111,115];
-  const japan = [ 7, 8, 9,10,12, 14, 16, 19, 22, 25, 28, 31, 33, 34];
-  const row   = [15,17,19,22,28, 40, 38, 39, 47, 56, 66, 76, 84, 91];
+async function hydrateViz05FromDatabase() {
+  try {
+    const db = await window.getDatabaseData();
+    const regional = Array.isArray(db.regionalDataAnnex) ? db.regionalDataAnnex : [];
+    const gpu = Array.isArray(db.gpuSpecs) ? db.gpuSpecs : [];
+    const totalElectricity = regional.filter(r => String(r.metric || '').toLowerCase() === 'total electricity consumption');
+    const world2024 = totalElectricity.find(r => String(r.region || '').toLowerCase() === 'world' && Number(r.year) === 2024 && String(r.scenario || '').toLowerCase() === 'actual');
 
-  function ds(data, color, label) {
-    return {
-      label, data,
-      backgroundColor: color,
-      borderColor: color,
-      borderWidth: 1.5,
-      fill: true,
-      tension: 0.35,
-      pointRadius: data.map((_,i) => i === projIdx ? 3 : 0),
-      pointBackgroundColor: color,
-      segment: { borderDash: ctx => ctx.p0DataIndex >= projIdx ? [5,3] : [] }
-    };
+    const regionBody = document.getElementById('oe-region-table-body');
+    if (regionBody && totalElectricity.length) {
+      const regions = totalElectricity
+        .filter(r => Number(r.year) === 2030 && String(r.scenario || '').toLowerCase().includes('base') && String(r.region || '').toLowerCase() !== 'world')
+        .sort((a,b)=>Number(b.value)-Number(a.value))
+        .slice(0,5)
+        .map(r => r.region);
+      const rows = regions.map(name => {
+        const v2022 = totalElectricity.find(r => String(r.region||'') === name && String(r.year)==='2022' && String(r.scenario || '').toLowerCase()==='actual');
+        const v2024 = totalElectricity.find(r => String(r.region||'') === name && String(r.year)==='2024' && String(r.scenario || '').toLowerCase()==='actual');
+        const v2030 = totalElectricity.find(r => String(r.region||'') === name && String(r.year)==='2030' && String(r.scenario || '').toLowerCase().includes('base'));
+        const a = Number(v2024?.value), b = Number(v2030?.value);
+        const growth = Number.isFinite(a) && Number.isFinite(b) && a > 0 ? `${Math.round(((b-a)/a)*100)}%` : '—';
+        const share = Number(world2024?.value) > 0 && Number.isFinite(a) ? `${Math.round((a / Number(world2024.value)) * 100)}%` : '—';
+        return { name, y22: v2022?.value, y24: v2024?.value, y30: v2030?.value, growth, share };
+      });
+      regionBody.innerHTML = rows.map(r => `
+        <tr><td>${r.name}</td><td class="num">${r.y22 ?? '—'}</td><td class="num">${r.y24 ?? '—'}</td><td class="val-mint">${r.y30 ?? '—'}</td><td class="num">${r.growth}</td><td class="num">${r.share}</td><td><span class="oe-badge oe-badge-blue">regional_data_annex</span></td><td><span class="oe-badge oe-badge-blue">live</span></td></tr>
+      `).join('');
+
+      const years = [2022, 2024, 2030];
+      const areaRegions = rows.map(r => r.name);
+
+      const areaCanvas = document.getElementById('oeAreaChart');
+      const oldArea = Chart.getChart(areaCanvas);
+      if (oldArea) oldArea.destroy();
+      new Chart(areaCanvas, {
+        type: 'line',
+        data: {
+          labels: years,
+          datasets: areaRegions.map((name, idx) => {
+            const palette = ['rgba(27,255,126,0.75)','rgba(64,196,255,0.75)','rgba(255,107,107,0.78)','rgba(255,179,64,0.75)','rgba(196,160,245,0.70)'];
+            const stroke = ['rgba(27,255,126,0.95)','rgba(64,196,255,0.95)','rgba(255,107,107,0.95)','rgba(255,179,64,0.95)','rgba(196,160,245,0.95)'];
+            return {
+              label: name,
+              data: years.map(y => Number(totalElectricity.find(r => String(r.region||'') === name && Number(r.year)===y && (y === 2030 ? String(r.scenario || '').toLowerCase().includes('base') : String(r.scenario || '').toLowerCase()==='actual'))?.value || 0)),
+              backgroundColor: palette[idx % palette.length],
+              borderColor: stroke[idx % stroke.length],
+              fill: true,
+              tension: 0.35,
+              borderWidth: 1.5
+            };
+          })
+        },
+        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#c8d8cc' } }, datalabels:{display:false} }, interaction:{ mode:'index', intersect:false }, scales:{ y:{ stacked:true, beginAtZero:true, ticks:{ color:'#7a9982', callback:v=>v+' TWh' }, grid:{ color:'rgba(27,255,126,0.06)' } }, x:{ ticks:{ color:'#7a9982' }, grid:{ display:false } } } }
+      });
+    }
+
+    const gpuBody = document.getElementById('oe-gpu-table-body');
+    if (gpuBody && gpu.length) {
+      const top = [...gpu]
+        .filter(r => Number.isFinite(Number(r.gpuClock)) && Number.isFinite(Number(r.memSize)))
+        .sort((a,b)=>(Number(b.gpuClock)||0)-(Number(a.gpuClock)||0))
+        .slice(0,6);
+      gpuBody.innerHTML = top.map(r => {
+        const tdp = Math.max(75, Math.round(Number(r.memBusWidth||0) * 1.1));
+        const fp16 = Math.round(Number(r.unifiedShader||0) / 16);
+        const bw = ((Number(r.memBusWidth||0) * Number(r.memClock||0)) / 1000000).toFixed(2);
+        const tfw = (fp16 / Math.max(1, tdp)).toFixed(2);
+        return `<tr><td>${r.productName||''}</td><td>${r.gpuChip||''}</td><td class="num">${r.releaseYear||''}</td><td class="num">${tdp}</td><td class="num">${fp16}</td><td class="num">${r.memSize||''}</td><td class="num">${bw}</td><td class="val-mint">${tfw}</td><td><span class="oe-badge ${String(r.manufacturer||'').toLowerCase().includes('nvidia') ? 'oe-badge-blue' : 'oe-badge-green'}">${r.manufacturer||'GPU'}</span></td></tr>`;
+      }).join('');
+
+      const bubbleCanvas = document.getElementById('oeBubbleChart');
+      const oldBubble = Chart.getChart(bubbleCanvas);
+      if (oldBubble) oldBubble.destroy();
+      const points = top.map(r => ({
+        label: `${r.productName} (${r.releaseYear})`,
+        x: Math.max(75, Math.round(Number(r.memBusWidth||0) * 1.1)),
+        y: (Math.round(Number(r.unifiedShader||0) / 16) / Math.max(75, Math.round(Number(r.memBusWidth||0) * 1.1))),
+        r: Math.max(6, Math.sqrt((Number(r.memBusWidth||0) * Number(r.memClock||0)) / 10000)),
+        color: String(r.manufacturer||'').toLowerCase().includes('nvidia') ? '#40c4ff' : '#1bff7e'
+      }));
+      new Chart(bubbleCanvas, {
+        type: 'bubble',
+        data: { datasets: points.map(p => ({ label:p.label, data:[{x:p.x,y:p.y,r:p.r}], backgroundColor:p.color+'aa', borderColor:p.color, borderWidth:1.5 })) },
+        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, datalabels:{display:false} }, scales:{ x:{ title:{ display:true, text:'Estimated power proxy (W)', color:'#7a9982' }, ticks:{ color:'#7a9982' }, grid:{ color:'rgba(27,255,126,0.06)' } }, y:{ title:{ display:true, text:'Estimated TFLOPS/W proxy', color:'#7a9982' }, ticks:{ color:'#7a9982' }, grid:{ color:'rgba(27,255,126,0.06)' } } } }
+      });
+    }
+
+    window.updateVizStatus('viz-05', 'live', `database.php connected (${regional.length} regional + ${gpu.length} gpu rows).`);
+  } catch (err) {
+    window.updateVizStatus('viz-05', 'error', `database.php unavailable for viz-05: ${err.message}`);
   }
+}
 
-  new Chart(document.getElementById('oeAreaChart'), {
-    type: 'line',
-    data: {
-      labels: years,
-      datasets: [
-        ds(row,   'rgba(196,160,245,0.70)', 'Rest of World'),
-        ds(japan, 'rgba(255,179,64,0.75)',  'Japan'),
-        ds(eu,    'rgba(64,196,255,0.75)',  'Europe'),
-        ds(china, 'rgba(255,107,107,0.78)', 'China'),
-        ds(us,    'rgba(27,255,126,0.75)',  'United States'),
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        datalabels: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(12,16,13,0.97)',
-          titleColor: '#fff', bodyColor: '#c8d8cc',
-          borderColor: 'rgba(27,255,126,0.2)', borderWidth: 1, padding: 12,
-          callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw} TWh` }
-        }
-      },
-      scales: {
-        x: { grid: { color: 'rgba(27,255,126,0.06)' }, ticks: { color: '#7a9982', font: { size: 11, family: 'Space Grotesk,sans-serif' }, maxRotation: 0 } },
-        y: { stacked: true, min: 0, max: 1050,
-             grid: { color: 'rgba(27,255,126,0.06)' },
-             ticks: { color: '#7a9982', font: { size: 11, family: 'Space Grotesk,sans-serif' }, callback: v => v + ' TWh' } }
-      }
-    },
-    plugins: [{
-      id: 'oeProjLine',
-      afterDraw(chart) {
-        if (chart.canvas.id !== 'oeAreaChart') return;
-        const { ctx, scales: { x, y } } = chart;
-        const xPos = x.getPixelForValue(projIdx);
-        ctx.save();
-        ctx.strokeStyle = 'rgba(27,255,126,0.25)';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4,4]);
-        ctx.beginPath(); ctx.moveTo(xPos, y.top); ctx.lineTo(xPos, y.bottom); ctx.stroke();
-        ctx.fillStyle = '#7a9982';
-        ctx.font = '10px Space Grotesk,sans-serif';
-        ctx.fillText('← Historical   Projected →', xPos - 94, y.top + 14);
-        ctx.restore();
-      }
-    }]
-  });
-})();
-
-/* ── VIZ 05 · GPU Bubble Chart ── */
-(function () {
-  const dcColor  = '#40c4ff';
-  const conColor = '#1bff7e';
-
-  const gpus = [
-    { label:'V100 SXM2 (2017)', x:300, y:0.37, bw:0.90, color: dcColor  },
-    { label:'RTX 3090 (2020)',  x:350, y:0.41, bw:0.94, color: conColor },
-    { label:'A100 SXM4 (2020)', x:400, y:0.78, bw:2.00, color: dcColor  },
-    { label:'RTX 4090 (2022)', x:450, y:0.73, bw:1.01, color: conColor },
-    { label:'H100 SXM5 (2022)', x:700, y:1.41, bw:3.35, color: dcColor  },
-    { label:'H200 SXM (2024)',  x:700, y:1.41, bw:4.80, color: dcColor  },
-  ];
-
-  const bwR = bw => Math.sqrt(bw) * 8;
-
-  new Chart(document.getElementById('oeBubbleChart'), {
-    type: 'bubble',
-    data: {
-      datasets: gpus.map(g => ({
-        label: g.label,
-        data: [{ x: g.x, y: g.y, r: bwR(g.bw) }],
-        backgroundColor: g.color + 'aa',
-        borderColor: g.color,
-        borderWidth: 1.5
-      }))
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        datalabels: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(12,16,13,0.97)',
-          titleColor: '#fff', bodyColor: '#c8d8cc',
-          borderColor: 'rgba(27,255,126,0.2)', borderWidth: 1, padding: 12,
-          callbacks: {
-            title: items => items[0].dataset.label,
-            label: ctx => {
-              const g = gpus[ctx.datasetIndex];
-              return [`TDP: ${g.x}W`, `TFLOPS/W: ${g.y}`, `Mem BW: ${g.bw} TB/s`];
-            }
-          }
-        }
-      },
-      scales: {
-        x: { min:200, max:820,
-             title: { display:true, text:'TDP (watts)', color:'#7a9982', font:{size:11} },
-             grid: { color:'rgba(27,255,126,0.06)' },
-             ticks: { color:'#7a9982', font:{size:11}, callback: v => v+'W' } },
-        y: { min:0.1, max:1.7,
-             title: { display:true, text:'FP16 TFLOPS per watt', color:'#7a9982', font:{size:11} },
-             grid: { color:'rgba(27,255,126,0.06)' },
-             ticks: { color:'#7a9982', font:{size:11}, callback: v => v.toFixed(2) } }
-      },
-      layout: { padding: 20 }
-    },
-    plugins: [{
-      id: 'oeGpuLabels',
-      afterDatasetsDraw(chart) {
-        if (chart.canvas.id !== 'oeBubbleChart') return;
-        const { ctx } = chart;
-        chart.data.datasets.forEach((ds, i) => {
-          const meta = chart.getDatasetMeta(i);
-          const pt   = meta.data[0];
-          const g    = gpus[i];
-          const r    = bwR(g.bw);
-          const offY = (g.label.includes('H100') || g.label.includes('H200')) ? -r-7 : (g.label.includes('V100') ? r+13 : -r-7);
-          ctx.save();
-          ctx.font = '500 10px Space Grotesk,sans-serif';
-          ctx.fillStyle = g.color;
-          ctx.textAlign = 'center';
-          ctx.fillText(g.label, pt.x, pt.y + offY);
-          ctx.restore();
-        });
-      }
-    }]
-  });
-})();
+hydrateViz05FromDatabase();
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════════
      VISUALIZATION 06 — Regional Concentration & Growth Trends
-     Source: raniakha.webdev.iyaserver.com/acad274/13blab.html
+  Source: Live regional_data_annex records from database.php
      Scoped prefix: rk-
 ═══════════════════════════════════════════════════════════════ -->
 <style>
@@ -1839,13 +2051,13 @@ const lbnlData = [
   <div class="viz-header">
     <span class="section-label">Visualization 06</span>
     <h2>Regional Concentration &amp; Growth Trends</h2>
-    <p class="viz-desc">Three interactive views — a regional constellation, a growth ladder with forecast band, and a proportional ribbon — that together map where AI data center electricity use sits today and where it is heading by 2030.</p>
+    <p class="viz-desc">Three live views built from `regional_data_annex` — a regional constellation, a growth ladder, and a proportional ribbon showing where electricity demand is concentrated today and how it shifts by 2030 base case.</p>
   </div>
 
   <!-- Data table -->
   <div class="viz-card" style="margin-bottom:32px">
     <h3>Underlying Data Grid</h3>
-    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Source figures from the IEA <em>Energy and AI</em> materials and the 2024 LBNL <em>United States Data Center Energy Usage Report</em>.</p>
+    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Source figures come directly from live `regional_data_annex` records in `database.php`.</p>
     <div class="rk-table-wrap">
       <table class="rk-data-table" aria-label="Data table for Visualization 06">
         <thead>
@@ -1864,7 +2076,7 @@ const lbnlData = [
     <span class="section-label" style="display:inline-block;margin-bottom:12px">Visualization 1</span>
 
     <h3 style="margin-bottom:6px">Regional Share Constellation</h3>
-    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Circle area scaled to TWh. Hover or click each region for details. The center circle represents the full 415 TWh global total.</p>
+    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Circle area scales to live 2024 electricity demand by region. Hover or click each region for details.</p>
     <div class="rk-figure-card">
       <div class="rk-frame-top">
         <div class="rk-frame-dots"><span></span><span></span><span></span></div>
@@ -1874,48 +2086,48 @@ const lbnlData = [
         <svg class="rk-chart" id="rk-shareChart" viewBox="0 0 1100 650" role="img" aria-label="Regional share constellation chart"></svg>
       </div>
     </div>
-    <p class="rk-hint" style="margin-bottom:28px">Global data center electricity is concentrated — the U.S. holds ~45% of the 2024 total, followed by China (25%) and Europe (15%).</p>
+    <p class="rk-hint" id="rk-share-hint" style="margin-bottom:28px">Loading live regional share context…</p>
 
-    <h3 style="margin-bottom:6px">Growth Ladder + U.S. Forecast Band</h3>
-    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Bars show actual and IEA base-case values. The gradient ribbon represents the LBNL U.S. 2028 uncertainty range — click it for details.</p>
+    <h3 style="margin-bottom:6px">Growth Ladder</h3>
+    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Bars compare 2024 actual values with 2030 base-case values for the world and the largest regions in the database.</p>
     <div class="rk-figure-card">
       <div class="rk-frame-top">
         <div class="rk-frame-dots"><span></span><span></span><span></span></div>
-        <div class="rk-frame-label">Interactive SVG · hover bars, click forecast band</div>
+        <div class="rk-frame-label">Interactive SVG · hover bars for live values</div>
       </div>
       <div class="rk-chart-shell">
         <svg class="rk-chart" id="rk-growthChart" viewBox="0 0 1100 700" role="img" aria-label="Growth ladder chart"></svg>
       </div>
     </div>
-    <p class="rk-hint">The IEA base case has global demand more than doubling by 2030. The U.S. 2028 band (325–580 TWh) underscores forecast uncertainty.</p>
+    <p class="rk-hint" id="rk-growth-hint">Loading live growth comparison…</p>
   </div>
 
   <!-- Chart 3: Share Ribbon -->
   <div class="viz-card">
     <h3>Share Ribbon</h3>
-    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">The same regional share data in proportional form. Hover each segment for the exact share and implied TWh.</p>
+    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">The same live regional totals in a proportional 2030 base-case ribbon.</p>
     <div class="rk-figure-card">
       <div class="rk-frame-top">
         <div class="rk-frame-dots"><span></span><span></span><span></span></div>
         <div class="rk-frame-label">Interactive SVG · hover segments</div>
       </div>
       <div class="rk-chart-shell">
-        <svg class="rk-chart" id="rk-ribbonChart" viewBox="0 0 1100 360" role="img" aria-label="Share ribbon chart"></svg>
+        <svg class="rk-chart" id="rk-ribbonChart" viewBox="0 0 1100 420" role="img" aria-label="Share ribbon chart"></svg>
       </div>
     </div>
 
     <div class="rk-callouts" style="margin-top:24px">
       <div class="rk-callout">
         <h3>Concentration</h3>
-        <p>A few regions carry the bulk of global data center electricity use, so grid choices in those regions shape the whole global story.</p>
+        <p id="rk-callout-concentration">Loading live concentration summary…</p>
       </div>
       <div class="rk-callout">
         <h3>Acceleration</h3>
-        <p>Moving from 415 TWh in 2024 to 945 TWh in the IEA base case for 2030 shows how quickly this load can expand in just six years.</p>
+        <p id="rk-callout-acceleration">Loading live growth summary…</p>
       </div>
       <div class="rk-callout">
         <h3>Range</h3>
-        <p>The U.S. 2028 band of 325–580 TWh is a reminder that forecasting infrastructure demand is a range problem, not a single-number problem.</p>
+        <p id="rk-callout-range">Loading live regional comparison…</p>
       </div>
     </div>
   </div>
@@ -1923,35 +2135,24 @@ const lbnlData = [
 
 <script>
 (function(){
-  const rkTableData = [
-    {group:'Global electricity use',  label:'Global data center electricity consumption', region:'World',         year:'2024', value:415,    units:'TWh', type:'Current',            source:'IEA'},
-    {group:'Global electricity use',  label:'Global data center electricity consumption', region:'World',         year:'2030', value:945,    units:'TWh', type:'Projection',         source:'IEA Base Case'},
-    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'United States',year:'2024', value:45,     units:'%',   type:'Share',              source:'IEA'},
-    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'China',        year:'2024', value:25,     units:'%',   type:'Share',              source:'IEA'},
-    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'Europe',       year:'2024', value:15,     units:'%',   type:'Share',              source:'IEA'},
-    {group:'Regional shares',         label:'Share of global 2024 data center electricity',region:'Rest of world',year:'2024', value:15,     units:'%',   type:'Share',              source:'IEA'},
-    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'United States',year:'2024', value:186.75, units:'TWh', type:'Derived',            source:'IEA'},
-    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'China',        year:'2024', value:103.75, units:'TWh', type:'Derived',            source:'IEA'},
-    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'Europe',       year:'2024', value:62.25,  units:'TWh', type:'Derived',            source:'IEA'},
-    {group:'Regional electricity use',label:'Implied from share × 415 TWh',                region:'Rest of world',year:'2024', value:62.25,  units:'TWh', type:'Derived',            source:'IEA'},
-    {group:'U.S. electricity use',    label:'U.S. data center electricity consumption',    region:'United States',year:'2023', value:176,    units:'TWh', type:'Current',            source:'LBNL'},
-    {group:'U.S. electricity use',    label:'Share of total U.S. electricity consumption', region:'United States',year:'2023', value:4.4,    units:'%',   type:'Current',            source:'LBNL'},
-    {group:'U.S. projection range',   label:'Low scenario U.S. data center electricity',   region:'United States',year:'2028', value:325,    units:'TWh', type:'Projection',         source:'LBNL'},
-    {group:'U.S. projection range',   label:'High scenario U.S. data center electricity',  region:'United States',year:'2028', value:580,    units:'TWh', type:'Projection',         source:'LBNL'},
-    {group:'U.S. projection range',   label:'Low scenario share of U.S. electricity',      region:'United States',year:'2028', value:6.7,    units:'%',   type:'Projection',         source:'LBNL'},
-    {group:'U.S. projection range',   label:'High scenario share of U.S. electricity',     region:'United States',year:'2028', value:12.0,   units:'%',   type:'Projection',         source:'LBNL'}
-  ];
+  let rkTableData = [];
+  let rkSummary = { world2024: 0, world2030: 0, regions2024: [], regions2030: [] };
 
-  const tbody = document.getElementById('rk-data-body');
-  for (const row of rkTableData) {
-    const tr = document.createElement('tr');
-    const fmt = Number.isInteger(row.value) ? row.value : row.value.toFixed(2).replace(/\.00$/,'');
-    let bc = 'rk-badge-der';
-    if (row.type === 'Current') bc = 'rk-badge-now';
-    else if (row.type === 'Projection') bc = 'rk-badge-proj';
-    else if (row.type === 'Share') bc = 'rk-badge-share';
-    tr.innerHTML = `<td>${row.group}</td><td>${row.label}</td><td>${row.region}</td><td>${row.year}</td><td>${fmt}</td><td>${row.units}</td><td><span class="rk-badge ${bc}">${row.type}</span></td><td>${row.source}</td>`;
-    tbody.appendChild(tr);
+  function rkRenderTable() {
+    const tbody = document.getElementById('rk-data-body');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    for (const row of rkTableData) {
+      const tr = document.createElement('tr');
+      const fmt = Number.isInteger(row.value) ? row.value : Number(row.value).toFixed(2).replace(/\.00$/,'');
+      let bc = 'rk-badge-der';
+      if (row.type === 'Current') bc = 'rk-badge-now';
+      else if (row.type === 'Projection') bc = 'rk-badge-proj';
+      else if (row.type === 'Share') bc = 'rk-badge-share';
+      tr.innerHTML = `<td>${row.group}</td><td>${row.label}</td><td>${row.region}</td><td>${row.year}</td><td>${fmt}</td><td>${row.units}</td><td><span class="rk-badge ${bc}">${row.type}</span></td><td>${row.source}</td>`;
+      tbody.appendChild(tr);
+    }
   }
 
   const rkTooltip = document.getElementById('rk-tooltip');
@@ -1981,18 +2182,15 @@ const lbnlData = [
   /* ── Chart 1: Regional Share Constellation ── */
   function rkShareChart() {
     const svg = document.getElementById('rk-shareChart');
+    svg.innerHTML = '';
     const W=1100, H=650;
     rkMake('rect',{x:0,y:0,width:W,height:H,fill:'#0d1510'},svg);
     rkMake('text',{x:70,y:44,class:'rk-chart-title'},svg).textContent='Regional Share of Global Data Center Electricity Use';
-    rkMake('text',{x:70,y:66,class:'rk-chart-sub'},svg).textContent='Circle area scaled to TWh — center circle = 415 TWh global total (2024)';
+    rkMake('text',{x:70,y:66,class:'rk-chart-sub'},svg).textContent='Circle area scaled to live 2024 TWh; center circle = world total';
 
-    const global = {twh:415, x:305, y:330};
-    const regions = [
-      {name:'United States', share:45, twh:186.75, color:'#1bff7e', x:675, y:165},
-      {name:'China',         share:25, twh:103.75, color:'#40c4ff', x:860, y:285},
-      {name:'Europe',        share:15, twh:62.25,  color:'#ffb340', x:780, y:470},
-      {name:'Rest of world', share:15, twh:62.25,  color:'#ff8b8b', x:585, y:505}
-    ];
+    const globalTwh = rkSummary.world2024 || 1;
+    const regions = rkSummary.regions2024.slice(0, 4).map((r, i) => ({ ...r, color: ['#1bff7e','#40c4ff','#ffb340','#ff8b8b'][i], x: [675,860,780,585][i], y: [165,285,470,505][i] }));
+    const global = {twh:globalTwh, x:305, y:330};
     const scale = v => Math.sqrt(v) * 8.3;
     const gR = scale(global.twh);
 
@@ -2013,7 +2211,7 @@ const lbnlData = [
       rkMake('text',{x:d.x,y:d.y+6,'text-anchor':'middle',class:'rk-chart-title',style:'font-size:20px'},g).textContent=d.share+'%';
       rkMake('text',{x:d.x,y:d.y+r+24,'text-anchor':'middle',class:'rk-series-label'},g).textContent=d.name;
       rkMake('text',{x:d.x,y:d.y+r+44,'text-anchor':'middle',class:'rk-dim-note'},g).textContent=rkFmt(d.twh)+' TWh';
-      const html = `<div class="rk-tt-title">${d.name}</div><div class="rk-tt-body"><strong>${d.share}%</strong> of global data center electricity use in 2024.<br><strong>${rkFmt(d.twh)} TWh</strong> implied from the 415 TWh global total.</div>`;
+      const html = `<div class="rk-tt-title">${d.name}</div><div class="rk-tt-body"><strong>${d.share}%</strong> of global 2024 data center electricity use.<br><strong>${rkFmt(d.twh)} TWh</strong> from regional_data_annex.</div>`;
       g.addEventListener('mousemove', e => { if (!rkPinned||rkPinned===g) rkShow(html,e.clientX,e.clientY); });
       g.addEventListener('mouseenter', e => { if (!rkPinned) rkShow(html,e.clientX,e.clientY); });
       g.addEventListener('mouseleave', rkHide);
@@ -2033,6 +2231,7 @@ const lbnlData = [
   /* ── Chart 2: Growth Ladder ── */
   function rkGrowthChart() {
     const svg = document.getElementById('rk-growthChart');
+    svg.innerHTML = '';
     const W=1100,H=700,m={l:95,r:90,t:90,b:95},pw=W-m.l-m.r,ph=H-m.t-m.b;
     rkMake('rect',{x:0,y:0,width:W,height:H,fill:'#0d1510'},svg);
     const maxVal=1000;
@@ -2043,15 +2242,16 @@ const lbnlData = [
       rkMake('text',{x:m.l-12,y:yy+4,'text-anchor':'end',class:'rk-axis-tick'},svg).textContent=val;
     });
     rkMake('text',{x:m.l,y:44,class:'rk-chart-title'},svg).textContent='Current Demand and Forecast Growth';
-    rkMake('text',{x:m.l,y:66,class:'rk-chart-sub'},svg).textContent='Bars show actual / base-case values · ribbon shows the LBNL U.S. 2028 uncertainty band';
+    rkMake('text',{x:m.l,y:66,class:'rk-chart-sub'},svg).textContent='Bars show live 2024 actual vs 2030 base-case values from regional_data_annex';
     rkMake('text',{x:28,y:m.t+ph/2,transform:`rotate(-90 28 ${m.t+ph/2})`,'text-anchor':'middle',class:'rk-axis-label'},svg).textContent='Electricity Use (TWh)';
 
+    const topGrowthRegions = rkSummary.regions2030.slice(0, 3);
     const bars=[
-      {label:'Global 2024', value:415, color:'#1bff7e', note:'Current global electricity use'},
-      {label:'Global 2030', value:945, color:'#40c4ff', note:'IEA base-case projection'},
-      {label:'U.S. 2023',   value:176, color:'#ffb340', note:'Current U.S. electricity use'}
+      {label:'World 2024', value:rkSummary.world2024, color:'#1bff7e', note:'Current world electricity use'},
+      {label:'World 2030', value:rkSummary.world2030, color:'#40c4ff', note:'Projected world electricity use'},
+      ...topGrowthRegions.map((r, i) => ({ label:r.name, value:r.twh, color:['#ffb340','#ff8b8b','#c4a0f5'][i], note:`2030 base-case regional electricity use` }))
     ];
-    const xs=[210,455,700];
+    const xs=[120,300,520,700,880];
     bars.forEach((d,i)=>{
       const x=xs[i], w=120, top=yPos(d.value), h=m.t+ph-top;
       const g=rkMake('g',{style:'cursor:pointer'},svg);
@@ -2067,73 +2267,131 @@ const lbnlData = [
       g.addEventListener('click', e=>{rkPinned=rkPinned===g?null:g; rkPinned?rkShow(html,e.clientX,e.clientY):rkHide();});
     });
 
-    const bandX=860,bandW=110,low=325,high=580;
-    const bandTop=yPos(high),bandBottom=yPos(low),bandH=bandBottom-bandTop;
-    rkMake('line',{x1:bandX+bandW/2,y1:yPos(176),x2:bandX+bandW/2,y2:bandBottom+8,stroke:'rgba(255,255,255,.18)','stroke-dasharray':'6 6','stroke-width':2},svg);
-    const defs=rkMake('defs',{},svg);
-    const lg=rkMake('linearGradient',{id:'rk-forecastGlow',x1:'0%',y1:'0%',x2:'0%',y2:'100%'},defs);
-    rkMake('stop',{offset:'0%','stop-color':'#40c4ff'},lg);
-    rkMake('stop',{offset:'100%','stop-color':'#1bff7e'},lg);
-    const bandG=rkMake('g',{style:'cursor:pointer'},svg);
-    rkMake('rect',{x:bandX,y:bandTop,width:bandW,height:bandH,rx:26,fill:'url(#rk-forecastGlow)',opacity:.9,stroke:'rgba(255,255,255,.25)','stroke-width':2,
-      style:'animation:rk-bandPulse 2.8s ease-in-out infinite'},bandG);
-    rkMake('text',{x:bandX+bandW/2,y:bandBottom+24,'text-anchor':'middle',class:'rk-series-label'},svg).textContent='325 TWh';
-    rkMake('text',{x:bandX+bandW/2,y:bandTop-14,'text-anchor':'middle',class:'rk-series-label'},svg).textContent='580 TWh';
-    rkMake('text',{x:bandX+bandW/2,y:m.t+ph+28,'text-anchor':'middle',class:'rk-axis-label'},svg).textContent='U.S. 2028 range';
-    rkMake('text',{x:bandX+bandW/2,y:bandTop+bandH/2+6,'text-anchor':'middle',class:'rk-chart-title',style:'font-size:16px'},svg).textContent='Forecast';
-    const bandHtml=`<div class="rk-tt-title">U.S. 2028 range</div><div class="rk-tt-body"><strong>325 to 580 TWh</strong><br>Equals <strong>6.7% to 12.0%</strong> of projected total U.S. electricity consumption (LBNL).</div>`;
-    bandG.addEventListener('mousemove', e=>{if(!rkPinned||rkPinned===bandG) rkShow(bandHtml,e.clientX,e.clientY);});
-    bandG.addEventListener('mouseenter', e=>{if(!rkPinned) rkShow(bandHtml,e.clientX,e.clientY);});
-    bandG.addEventListener('mouseleave', rkHide);
-    bandG.addEventListener('click', e=>{rkPinned=rkPinned===bandG?null:bandG; rkPinned?rkShow(bandHtml,e.clientX,e.clientY):rkHide();});
-
     rkMake('rect',{x:782,y:102,width:248,height:88,rx:18,fill:'rgba(255,255,255,.04)',stroke:'rgba(255,255,255,.09)'},svg);
     rkMake('text',{x:804,y:130,class:'rk-legend-text',style:'font-size:14px;font-weight:700'},svg).textContent='Growth multipliers';
-    rkMake('text',{x:804,y:154,class:'rk-legend-text'},svg).textContent='Global: 945 / 415 = 2.28×';
-    rkMake('text',{x:804,y:176,class:'rk-legend-text'},svg).textContent='U.S. low: 325 / 176 = 1.85×';
+    rkMake('text',{x:804,y:154,class:'rk-legend-text'},svg).textContent=`World: ${(rkSummary.world2030/Math.max(1, rkSummary.world2024)).toFixed(2)}×`;
+    if (topGrowthRegions[0]) {
+      const current = rkSummary.regions2024.find(r => r.name === topGrowthRegions[0].name)?.twh || 0;
+      rkMake('text',{x:804,y:176,class:'rk-legend-text'},svg).textContent=`${topGrowthRegions[0].name}: ${(topGrowthRegions[0].twh/Math.max(1, current)).toFixed(2)}×`;
+    }
   }
 
   /* ── Chart 3: Share Ribbon ── */
   function rkRibbonChart() {
     const svg = document.getElementById('rk-ribbonChart');
-    const W=1100,H=360,m={l:70,r:70,t:82,b:76},pw=W-m.l-m.r;
+    svg.innerHTML = '';
+    const W=1100,H=360,m={l:28,r:28,t:84,b:96},pw=W-m.l-m.r;
     rkMake('rect',{x:0,y:0,width:W,height:H,fill:'#0d1510'},svg);
     rkMake('text',{x:m.l,y:44,class:'rk-chart-title'},svg).textContent='Regional Share Ribbon';
-    rkMake('text',{x:m.l,y:66,class:'rk-chart-sub'},svg).textContent='2024 shares of the 415 TWh global total';
+    rkMake('text',{x:m.l,y:66,class:'rk-chart-sub'},svg).textContent='2030 base-case regional shares of the world total';
 
-    const ribbonData=[
-      {name:'United States', share:45, twh:186.75, color:'#1bff7e'},
-      {name:'China',         share:25, twh:103.75, color:'#40c4ff'},
-      {name:'Europe',        share:15, twh:62.25,  color:'#ffb340'},
-      {name:'Rest of world', share:15, twh:62.25,  color:'#ff8b8b'}
-    ];
-    const y=150, h=64;
+    const globalTwh = rkSummary.world2030 || 1;
+    const rawRegions = rkSummary.regions2030.slice(0, 5).map((r, i) => ({
+      ...r,
+      widthRatio: Math.max(0, r.twh / globalTwh),
+      color: ['#1bff7e','#40c4ff','#ffb340','#ff8b8b','#c4a0f5'][i]
+    }));
+    const usedRatio = rawRegions.reduce((sum, r) => sum + r.widthRatio, 0);
+    const ribbonData = usedRatio < 0.999 ? [...rawRegions, {
+      name: 'Other regions',
+      twh: Math.max(0, globalTwh - rawRegions.reduce((sum, r) => sum + r.twh, 0)),
+      share: Math.max(0, Math.round((1 - usedRatio) * 100)),
+      widthRatio: Math.max(0, 1 - usedRatio),
+      color: 'rgba(255,255,255,0.14)'
+    }] : rawRegions;
+    const normalizedTotal = ribbonData.reduce((sum, r) => sum + r.widthRatio, 0) || 1;
+    const y=132, h=68;
     let curX=m.l;
     ribbonData.forEach((d,i)=>{
-      const w=pw*(d.share/100);
+      const remainingWidth = m.l + pw - curX;
+      const exactWidth = pw * (d.widthRatio / normalizedTotal);
+      const w = i === ribbonData.length - 1 ? remainingWidth : Math.max(0, exactWidth);
       const g=rkMake('g',{style:'cursor:pointer'},svg);
-      rkMake('rect',{x:curX,y,width:w,height:h,rx:20,fill:d.color,opacity:.88,stroke:'rgba(255,255,255,.2)','stroke-width':1.5,
+      rkMake('rect',{x:curX,y,width:Math.max(0, w),height:h,rx:18,fill:d.color,opacity:.88,stroke:'rgba(255,255,255,.2)','stroke-width':1.5,
         style:`transform-origin:${curX+w/2}px ${y+h/2}px;animation:rk-slideIn .7s cubic-bezier(.2,.9,.2,1) ${i*110}ms both`},g);
-      if(w>120){
-        rkMake('text',{x:curX+w/2,y:y+27,'text-anchor':'middle',class:'rk-series-label',style:'font-size:14px'},g).textContent=d.name;
-        rkMake('text',{x:curX+w/2,y:y+47,'text-anchor':'middle',class:'rk-dim-note'},g).textContent=`${d.share}% · ${rkFmt(d.twh)} TWh`;
-      } else {
-        rkMake('text',{x:curX+w/2,y:y-12,'text-anchor':'middle',class:'rk-series-label'},g).textContent=d.name;
-        rkMake('text',{x:curX+w/2,y:y+h+20,'text-anchor':'middle',class:'rk-dim-note'},g).textContent=`${d.share}%`;
+      if(w>190){
+        rkMake('text',{x:curX+w/2,y:y+28,'text-anchor':'middle',class:'rk-series-label',style:'font-size:14px'},g).textContent=d.name;
+        rkMake('text',{x:curX+w/2,y:y+50,'text-anchor':'middle',class:'rk-dim-note'},g).textContent=`${d.share}% · ${rkFmt(d.twh)} TWh`;
+      } else if (w > 120) {
+        rkMake('text',{x:curX+w/2,y:y+30,'text-anchor':'middle',class:'rk-series-label',style:'font-size:12px'},g).textContent=d.name.length > 15 ? `${d.name.slice(0, 15)}…` : d.name;
+        rkMake('text',{x:curX+w/2,y:y+50,'text-anchor':'middle',class:'rk-dim-note',style:'font-size:11px'},g).textContent=`${d.share}%`;
       }
-      const html=`<div class="rk-tt-title">${d.name}</div><div class="rk-tt-body"><strong>${d.share}%</strong> of the 2024 global total.<br><strong>${rkFmt(d.twh)} TWh</strong> implied from 415 TWh.</div>`;
+      const html=`<div class="rk-tt-title">${d.name}</div><div class="rk-tt-body"><strong>${d.share}%</strong> of the 2030 base-case world total.<br><strong>${rkFmt(d.twh)} TWh</strong> from regional_data_annex.</div>`;
       g.addEventListener('mousemove', e=>{if(!rkPinned||rkPinned===g) rkShow(html,e.clientX,e.clientY);});
       g.addEventListener('mouseenter', e=>{if(!rkPinned) rkShow(html,e.clientX,e.clientY);});
       g.addEventListener('mouseleave', rkHide);
       g.addEventListener('click', e=>{rkPinned=rkPinned===g?null:g; rkPinned?rkShow(html,e.clientX,e.clientY):rkHide();});
       curX+=w;
     });
-    rkMake('text',{x:m.l,y:290,class:'rk-legend-text',style:'font-size:13px'},svg).textContent='A proportional view makes the 45% U.S. share immediately legible alongside other regions.';
+
+    const legendTop = 238;
+    const legendCols = 3;
+    const legendCellW = pw / legendCols;
+    ribbonData.forEach((d, i) => {
+      const col = i % legendCols;
+      const row = Math.floor(i / legendCols);
+      const lx = m.l + col * legendCellW;
+      const ly = legendTop + row * 34;
+      rkMake('rect',{x:lx,y:ly,width:12,height:12,rx:3,fill:d.color,stroke:'rgba(255,255,255,.16)','stroke-width':1},svg);
+      rkMake('text',{x:lx+20,y:ly+10,class:'rk-legend-text',style:'font-size:12px'},svg).textContent=`${d.name} · ${d.share}%`;
+    });
+
+    rkMake('text',{x:m.l,y:334,class:'rk-legend-text',style:'font-size:13px'},svg).textContent='Exact live widths keep the full ribbon inside the frame; hover segments for detailed values.';
   }
 
-  rkShareChart();
-  rkGrowthChart();
-  rkRibbonChart();
+  async function initViz06FromDatabase() {
+    try {
+      const db = await window.getDatabaseData();
+      const regional = Array.isArray(db.regionalDataAnnex) ? db.regionalDataAnnex : [];
+      const electricity = regional.filter(r => String(r.metric || '').toLowerCase() === 'total electricity consumption');
+      const world2024 = Number(electricity.find(r => String(r.region || '').toLowerCase() === 'world' && Number(r.year) === 2024 && String(r.scenario || '').toLowerCase() === 'actual')?.value || 0);
+      const world2030 = Number(electricity.find(r => String(r.region || '').toLowerCase() === 'world' && Number(r.year) === 2030 && String(r.scenario || '').toLowerCase().includes('base'))?.value || 0);
+      const regions2024 = electricity
+        .filter(r => Number(r.year) === 2024 && String(r.scenario || '').toLowerCase() === 'actual' && String(r.region || '').toLowerCase() !== 'world')
+        .sort((a,b)=>Number(b.value)-Number(a.value))
+        .slice(0,5)
+        .map(r => ({ name: String(r.region), twh: Number(r.value), share: world2024 ? Math.round((Number(r.value) / world2024) * 100) : 0 }));
+      const regions2030 = electricity
+        .filter(r => Number(r.year) === 2030 && String(r.scenario || '').toLowerCase().includes('base') && String(r.region || '').toLowerCase() !== 'world')
+        .sort((a,b)=>Number(b.value)-Number(a.value))
+        .slice(0,5)
+        .map(r => ({ name: String(r.region), twh: Number(r.value), share: world2030 ? Math.round((Number(r.value) / world2030) * 100) : 0 }));
+
+      rkSummary = { world2024, world2030, regions2024, regions2030 };
+
+      rkTableData = [
+        { group:'Global electricity use', label:'World total electricity consumption', region:'World', year:'2024', value:world2024, units:'TWh', type:'Current', source:'database.php' },
+        { group:'Global electricity use', label:'World total electricity consumption', region:'World', year:'2030', value:world2030, units:'TWh', type:'Projection', source:'database.php' },
+        ...regions2024.map(r => ({ group:'Regional share', label:'Share of world total electricity consumption', region:r.name, year:'2024', value:r.share, units:'%', type:'Share', source:'database.php' })),
+        ...regions2024.map(r => ({ group:'Regional electricity use', label:'Actual regional electricity consumption', region:r.name, year:'2024', value:r.twh, units:'TWh', type:'Current', source:'database.php' })),
+        ...regions2030.map(r => ({ group:'Regional electricity use', label:'Base-case regional electricity consumption', region:r.name, year:'2030', value:r.twh, units:'TWh', type:'Projection', source:'database.php' }))
+      ].filter(r => Number.isFinite(r.value));
+
+      rkRenderTable();
+      rkShareChart();
+      rkGrowthChart();
+      rkRibbonChart();
+      const shareHint = document.getElementById('rk-share-hint');
+      const growthHint = document.getElementById('rk-growth-hint');
+      const concentration = document.getElementById('rk-callout-concentration');
+      const acceleration = document.getElementById('rk-callout-acceleration');
+      const range = document.getElementById('rk-callout-range');
+      if (regions2024[0] && shareHint) shareHint.textContent = `${regions2024[0].name} holds the largest share in the live 2024 regional dataset at ${regions2024[0].share}% of the world total.`;
+      if (growthHint) growthHint.textContent = `World electricity demand rises from ${rkFmt(world2024)} TWh in 2024 to ${rkFmt(world2030)} TWh in the 2030 base case.`;
+      if (concentration && regions2024[0]) concentration.textContent = `${regions2024[0].name}, ${regions2024[1]?.name || 'the next region'}, and ${regions2024[2]?.name || 'other large markets'} account for most live 2024 demand in the annex dataset.`;
+      if (acceleration) acceleration.textContent = `The world total grows by ${Math.round(((world2030 - world2024) / Math.max(1, world2024)) * 100)}% between the live 2024 actual and 2030 base-case records.`;
+      if (range && regions2030[0]) range.textContent = `${regions2030[0].name} remains the largest projected regional load in 2030 at ${rkFmt(regions2030[0].twh)} TWh.`;
+      window.updateVizStatus('viz-06', 'live', `database.php regional_data_annex loaded (${rkTableData.length} rows).`);
+    } catch (err) {
+      rkRenderTable();
+      rkShareChart();
+      rkGrowthChart();
+      rkRibbonChart();
+      window.updateVizStatus('viz-06', 'error', `database.php unavailable for viz-06: ${err.message}`);
+    }
+  }
+
+  initViz06FromDatabase();
 
   window.addEventListener('scroll', ()=>{ if(!rkPinned) rkTooltip.classList.remove('rk-show'); });
   document.addEventListener('click', e=>{
