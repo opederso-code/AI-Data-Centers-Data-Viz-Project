@@ -75,7 +75,11 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 28px var(--col-pad);
-  position: relative;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(to bottom, var(--bg) 85%, rgba(17, 21, 18, 0.8));
+  z-index: 999;
+  backdrop-filter: blur(8px);
 }
 .nav-logo {
   display: flex;

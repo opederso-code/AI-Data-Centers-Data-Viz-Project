@@ -49,10 +49,11 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 28px var(--pad-h);
-  position: relative;
-  background: transparent;
-  border-bottom: none;
-  backdrop-filter: none;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(to bottom, var(--bg) 85%, rgba(17, 21, 18, 0.8));
+  z-index: 999;
+  backdrop-filter: blur(8px);
 }
 .nav-logo {
   display: flex;
@@ -1280,9 +1281,10 @@ input[type=range].scenario-slider::-webkit-slider-thumb {
   border: none;
   transition: background 0.2s, color 0.2s;
 }
-.ng-btn:disabled { opacity: 0.3; cursor: default; }
+.ng-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .ng-btn-ghost { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
 .ng-btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.12); color: #fff; }
+.ng-btn-ghost:disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); }
 .ng-btn-primary { background: var(--mint); color: #0a1a0f; font-weight: 700; }
 .ng-btn-primary:hover { background: #3effa0; }
 .ng-progress {
