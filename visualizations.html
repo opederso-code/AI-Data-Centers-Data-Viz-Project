@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Energy Index — Data Visualization Lab</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="visualizations.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 </head>
@@ -13,12 +13,15 @@
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="nav-logo">The Energy Index</a>
-  <div style="display:flex;align-items:center;gap:28px;">
-    <span class="nav-label">Data Visualization Lab · Milestone 2</span>
-    <a href="purpose.html" class="nav-label nav-label-link">Purpose</a>
-    <a href="assumptions.html" class="nav-label nav-label-link">Assumptions</a>
-    <a href="resources.html" class="nav-label nav-label-link">Resources</a>
+  <a href="index.html" class="nav-logo">
+    <img src="energyindexlogo.png" alt="" />
+    <span class="nav-logo-text">The Energy Index</span>
+  </a>
+  <div class="nav-links">
+    <a href="purpose.html">Purpose &amp; Conclusions</a>
+    <a href="assumptions.html">Assumptions</a>
+    <a href="resources.html">Resources</a>
+    <a href="index.html" class="nav-cta">Go Back Home</a>
   </div>
 </nav>
 
@@ -699,14 +702,14 @@ async function renderViz1Scatter(){
   // Axis labels
   g.append('text').attr('x', iw/2).attr('y', ih+48)
     .attr('text-anchor','middle').attr('fill','#7a9982')
-    .attr('font-size','12px').attr('font-family','Space Grotesk,sans-serif')
+    .attr('font-size','12px').attr('font-family','Inter,sans-serif')
     .attr('letter-spacing','0.06em')
     .text('Cluster power capacity (MW)');
 
   g.append('text').attr('transform','rotate(-90)')
     .attr('x', -ih/2).attr('y', -52)
     .attr('text-anchor','middle').attr('fill','#7a9982')
-    .attr('font-size','12px').attr('font-family','Space Grotesk,sans-serif')
+    .attr('font-size','12px').attr('font-family','Inter,sans-serif')
     .attr('letter-spacing','0.06em')
     .text('AI chips per MW');
 
@@ -745,7 +748,7 @@ async function renderViz1Scatter(){
     .attr('y', d => yScale(d.accuracy) - 10)
     .attr('fill', d => d.color)
     .attr('font-size', '11px')
-    .attr('font-family', 'Space Grotesk,sans-serif')
+    .attr('font-family', 'Inter,sans-serif')
     .attr('font-weight', '500')
     .text(d => d.name.length > 24 ? d.name.slice(0, 24) + '…' : d.name)
     .attr('opacity',0)
@@ -907,7 +910,7 @@ function renderViz02AreaChart(){
   // Axis label
   g.append('text').attr('x',iw/2).attr('y',ih+48)
     .attr('text-anchor','middle').attr('fill','#7a9982')
-    .attr('font-size','12px').attr('font-family','Space Grotesk,sans-serif')
+    .attr('font-size','12px').attr('font-family','Inter,sans-serif')
     .attr('letter-spacing','0.06em')
     .text('Year');
 
@@ -932,8 +935,7 @@ initViz02Live();
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
-
-<section style="padding: var(--pad-v) var(--pad-h); border-top: 1px solid var(--border);">
+<section id="viz-03" style="padding: var(--pad-v) var(--pad-h); border-top: 1px solid var(--border);">
   <div class="section-header">
     <div class="section-header-left">
       <div class="section-label">Visualization 03</div>
@@ -1171,7 +1173,7 @@ initViz02Live();
             color: '#e8f0ea',
             formatter: (v,ctx) => ctx.dataset.data.length <= 6 ? ctx.raw.productName : '',
             anchor: 'end', align: 'top', offset: 4,
-            font: { size: 10, family: 'Space Grotesk, sans-serif' }
+            font: { size: 10, family: 'Inter, sans-serif' }
           },
           tooltip: {
             backgroundColor: TOOLTIP_BG, titleColor: '#fff', bodyColor: '#c8d8cc',
@@ -1349,7 +1351,7 @@ initViz02Live();
       <h3>Regional Electricity Demand</h3>
       <p class="chart-sub">Top regions by 2030 base-case total electricity consumption.</p>
       <div style="position:relative;width:100%;height:320px;"><canvas id="ieaRegionChart"></canvas></div>
-      <p style="font-size:13px; color:var(--text-muted); line-height:1.6; margin-top:12px;">
+      <p style="font-size:16px; color:var(--text-muted); line-height:1.6; margin-top:12px;">
         This panel is driven directly by `regional_data_annex`, so region rankings update with the live database instead of a fixed snapshot.
       </p>
     </div>
@@ -1508,7 +1510,7 @@ initViz02Live();
   Data: Live regional_data_annex + gpu_specs tables from database.php
 ════════════════════════════════════════════ -->
 
-<section style="padding: var(--pad-v) var(--pad-h); border-top: 1px solid var(--border);">
+<section id="viz-05" style="padding: var(--pad-v) var(--pad-h); border-top: 1px solid var(--border);">
   <div class="section-header">
     <div class="section-header-left">
       <div class="section-label">Visualization 05</div>
@@ -1706,17 +1708,18 @@ hydrateViz05FromDatabase();
 
 <div id="rk-tooltip"><div class="rk-tt-title"></div><div class="rk-tt-body"></div></div>
 
-<section class="viz-section">
+<section class="viz-section" id="viz-06">
   <div class="viz-header">
     <span class="section-label">Visualization 06</span>
     <h2>Regional Concentration &amp; Growth Trends</h2>
     <p class="viz-desc">Three interactive charts showing where global electricity demand is concentrated and how it shifts by 2030. Start with the <strong style="color:#e8f0ea;">constellation</strong> (circle size = 2024 demand), then follow growth in the <strong style="color:#e8f0ea;">growth ladder</strong>, and see proportional share change in the <strong style="color:#e8f0ea;">ribbon chart</strong>. Hover or click any region to highlight it across all three views.</p>
+    <p class="source-tag">SOURCE — database.php · regional_data_annex</p>
   </div>
 
   <!-- Data table -->
   <div class="viz-card" style="margin-bottom:32px">
     <h3>Underlying Data Grid</h3>
-    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Source figures come directly from live `regional_data_annex` records in `database.php`.</p>
+    <p style="color:var(--text-muted);font-size:16px;margin:6px 0 14px">Source figures come directly from live `regional_data_annex` records in `database.php`.</p>
     <div class="rk-table-wrap">
       <table class="rk-data-table" aria-label="Data table for Visualization 06">
         <thead>
@@ -1735,7 +1738,7 @@ hydrateViz05FromDatabase();
     <span class="section-label" style="display:inline-block;margin-bottom:12px">Visualization 1</span>
 
     <h3 style="margin-bottom:6px">Regional Share Constellation</h3>
-    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Circle area scales to live 2024 electricity demand by region. Hover or click each region for details.</p>
+    <p style="color:var(--text-muted);font-size:16px;margin:6px 0 14px">Circle area scales to live 2024 electricity demand by region. Hover or click each region for details.</p>
     <div class="rk-figure-card">
       <div class="rk-frame-top">
         <div class="rk-frame-dots"><span></span><span></span><span></span></div>
@@ -1748,7 +1751,7 @@ hydrateViz05FromDatabase();
     <p class="rk-hint" id="rk-share-hint" style="margin-bottom:28px">Loading live regional share context…</p>
 
     <h3 style="margin-bottom:6px">Growth Ladder</h3>
-    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">Bars compare 2024 actual values with 2030 base-case values for the world and the largest regions in the database.</p>
+    <p style="color:var(--text-muted);font-size:16px;margin:6px 0 14px">Bars compare 2024 actual values with 2030 base-case values for the world and the largest regions in the database.</p>
     <div class="rk-figure-card">
       <div class="rk-frame-top">
         <div class="rk-frame-dots"><span></span><span></span><span></span></div>
@@ -1764,7 +1767,7 @@ hydrateViz05FromDatabase();
   <!-- Chart 3: Share Ribbon -->
   <div class="viz-card">
     <h3>Share Ribbon</h3>
-    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 14px">The same live regional totals in a proportional 2030 base-case ribbon.</p>
+    <p style="color:var(--text-muted);font-size:16px;margin:6px 0 14px">The same live regional totals in a proportional 2030 base-case ribbon.</p>
     <div class="rk-figure-card">
       <div class="rk-frame-top">
         <div class="rk-frame-dots"><span></span><span></span><span></span></div>
@@ -2205,33 +2208,23 @@ hydrateViz05FromDatabase();
 (function() {
   const steps = [
     {
-      title: 'Welcome to The Energy Index',
-      body: 'This page has 6 live data visualizations + an interactive scenario builder. Follow this guide to understand what each one shows and what conclusions to draw.',
-      target: '.hero'
-    },
-    {
-      title: 'Step 1 — GPU Architecture Trade-off',
-      body: 'Scroll to Viz 01. This scatter plot compares NVIDIA GPU generations on compute efficiency vs. power draw. Hover any point to see specs. Notice: each generation roughly doubles efficiency per watt.',
+      title: 'Step 1 — GPU Hardware Trends',
+      body: '<strong>Hover</strong> any bubble in Viz 01 to see GPU model, TDP, and TFLOPS/W. <strong>Use the dropdown filters</strong> in Viz 03 (Manufacturer, Year, Sort) to compare specs across NVIDIA / AMD / Intel.<br><br><em>→ Conclusion: each generation is ~2× more efficient per watt — but workloads scale faster than hardware.</em>',
       target: '#viz-01'
     },
     {
-      title: 'Step 2 — U.S. Electricity Over Time',
-      body: 'Scroll to Viz 02. The area chart shows how U.S. data center electricity consumption has grown. Watch the left-to-right reveal on load. The slope is accelerating.',
+      title: 'Step 2 — Electricity Demand',
+      body: '<strong>Watch</strong> Viz 02\'s left-to-right reveal animation — that\'s actual U.S. consumption 2000–2023. <strong>Hover</strong> any bar in Viz 04 for exact TWh values. <strong>Click</strong> any region in Viz 06\'s constellation to highlight it across all three views (constellation, ladder, ribbon).<br><br><em>→ Conclusion: the slope is accelerating. IEA projects ~945 TWh globally by 2030.</em>',
       target: '#viz-02'
     },
     {
-      title: 'Step 3 — IEA Demand Snapshot',
-      body: 'Viz 04 shows IEA projections through 2030. The gap between actual and projected demand shows how quickly AI infrastructure is scaling beyond earlier estimates.',
-      target: '#viz-04'
-    },
-    {
-      title: 'Step 4 — Try the Scenario Explorer',
-      body: 'Scroll down to "Build Your Scenario." Drag the sliders to change PUE, grid carbon, and workload size. Click between GPU generations. Watch the bars update — this is the core finding of the project.',
+      title: 'Step 3 — Try the Scenario Explorer',
+      body: '<strong>Drag</strong> the PUE slider (1.10 → 2.40), Carbon slider (30 → 750 gCO₂/kWh), and Workload slider. <strong>Click</strong> between V100 / A100 / H100 to switch GPU generations. <strong>Watch</strong> the energy + emissions bars update in real time.<br><br><em>→ Try this: H100 + low PUE + Norway grid vs. V100 + high PUE + coal grid. The gap is 10×.</em>',
       target: '.scenario-section'
     },
     {
-      title: 'Key Conclusion',
-      body: 'The best-to-worst spread is 10× or more. No single lever closes the gap alone — you need low PUE + clean grid + modern GPUs together. That\'s the argument this site makes.',
+      title: 'Step 4 — Key Conclusion',
+      body: 'No single lever closes the gap. <strong>Modern GPU + low PUE + clean grid</strong> together produce the lowest scenario; <strong>older GPU + high PUE + dirty grid</strong> produce the worst.<br><br><em>→ That\'s the argument this site makes: hardware, facility, and location must all improve together.</em>',
       target: '.scenario-section'
     }
   ];
@@ -2299,8 +2292,10 @@ hydrateViz05FromDatabase();
   }
 
   let scrollTicking = false;
+  let suppressScrollSync = false;
   window.addEventListener('scroll', function() {
     if (guide.classList.contains('ng-hidden')) return;
+    if (suppressScrollSync) return;
     if (scrollTicking) return;
     scrollTicking = true;
     requestAnimationFrame(function() {
@@ -2310,7 +2305,7 @@ hydrateViz05FromDatabase();
         // Update display without triggering scroll-into-view (user is scrolling)
         const s = steps[current];
         titleEl.textContent = s.title;
-        bodyEl.textContent = s.body;
+        bodyEl.innerHTML = s.body;
         stepNumEl.textContent = current + 1;
         progressEl.style.width = ((current + 1) / steps.length * 100) + '%';
         prevBtn.disabled = current === 0;
@@ -2334,7 +2329,7 @@ hydrateViz05FromDatabase();
   function applyStep(idx) {
     const s = steps[idx];
     titleEl.textContent = s.title;
-    bodyEl.textContent = s.body;
+    bodyEl.innerHTML = s.body;
     stepNumEl.textContent = idx + 1;
     progressEl.style.width = ((idx + 1) / steps.length * 100) + '%';
     prevBtn.disabled = idx === 0;
@@ -2344,8 +2339,10 @@ hydrateViz05FromDatabase();
     if (s.target) {
       const el = document.querySelector(s.target);
       if (el) {
+        suppressScrollSync = true;
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         setTimeout(() => { el.classList.add('ng-highlight'); highlightEl = el; }, 500);
+        setTimeout(() => { suppressScrollSync = false; }, 900);
       }
     }
   }
@@ -2378,8 +2375,8 @@ hydrateViz05FromDatabase();
     }
   });
 
-  // Auto-show after 2.5s on first load
-  setTimeout(showGuide, 2500);
+  // Auto-show immediately on first load
+  showGuide();
 })();
 </script>
 </body>

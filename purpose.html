@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Our Purpose — The Energy Index</title>
+  <title>Purpose & Conclusions — The Energy Index</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="stylesheet" href="index.css" />
   
@@ -17,7 +17,7 @@
     <span class="nav-logo-text">The Energy Index</span>
   </a>
   <div class="nav-links">
-    <a href="purpose.html">Purpose</a>
+    <a href="purpose.html">Purpose &amp; Conclusions</a>
     <a href="assumptions.html">Assumptions</a>
     <a href="resources.html">Resources</a>
     <a href="visualizations.html" class="nav-cta">Explore the Data →</a>
@@ -26,12 +26,53 @@
 
 <!-- PURPOSE -->
 <section class="purpose-section">
-  <h2>Our Purpose</h2>
+  <h2>Purpose &amp; Conclusions</h2>
   <p>
     AI infrastructure is <strong>growing faster</strong> than our ability to measure its impact. This project <strong>connects the dots</strong> between hardware efficiency, energy mix, and carbon output to surface where the real leverage is.
   </p>
   <p style="font-size:16px; color:rgba(255,255,255,0.6); max-width:640px;">
-    <strong style="color:#e5e5e5;">Key conclusion:</strong> Facility efficiency (PUE) <span class="cite" data-cite-title="LBNL 2024 U.S. Data Center Energy Usage Report" data-cite-body="Covers PUE ranges from 1.1 (hyperscale best practice) to 2.4 (legacy enterprise), a 2× energy waste gap for identical workloads." data-cite-url="https://eta-publications.lbl.gov/sites/default/files/2024-12/lbnl-2024-united-states-data-center-energy-usage-report_1.pdf" data-cite-link="lbl.gov →">1</span>, grid carbon intensity <span class="cite" data-cite-title="IEA Energy & AI Dataset" data-cite-body="IEA regional data showing up to 8× carbon variance for the same AI workload depending on grid location." data-cite-url="https://www.iea.org/data-and-statistics/data-product/energy-and-ai" data-cite-link="iea.org →">2</span>, and GPU generation <span class="cite" data-cite-title="Kappa-Energy Index — MDPI Sensors 2025" data-cite-body="Measures energy efficiency across GPU generations. Gen-over-gen improvement ~2.5× while workloads grew 10×." data-cite-url="https://www.mdpi.com/1424-8220/25/3/846" data-cite-link="mdpi.com →">3</span> each contribute independently to total energy footprint. Optimizing all three together produces dramatically better outcomes than any single lever alone — hardware improvements alone won't close the gap while AI workloads keep growing at 10× the pace of efficiency gains.
+    We make <strong style="color:#e5e5e5;">three core assertions</strong> about how AI data center energy and carbon scale. Each is supported by the live data on this site, and each represents an independent lever — together they multiply.
+  </p>
+</section>
+
+<!-- THREE CORE CONCLUSIONS -->
+<section class="conclusions-section">
+  <div class="conclusions-grid">
+
+    <article class="conclusion-card">
+      <div class="conclusion-num">01</div>
+      <div class="conclusion-stat">~2.5×<span class="conclusion-stat-unit">per generation</span></div>
+      <h3 class="conclusion-title">Hardware alone won't close the gap</h3>
+      <p class="conclusion-body">
+        GPU efficiency improves roughly <strong>2.5× per generation</strong> (V100 → H100 is ~3.8× more TFLOPS per watt), but AI workloads have grown ~10× over the same window. Hardware gains are real, but they lag the demand curve. <span class="cite" data-cite-title="Kappa-Energy Index — MDPI Sensors 2025" data-cite-body="Measures energy efficiency across GPU generations. Gen-over-gen improvement ~2.5× while workloads grew 10×." data-cite-url="https://www.mdpi.com/1424-8220/25/3/846" data-cite-link="mdpi.com →">1</span>
+      </p>
+      <div class="conclusion-source">SOURCE — MDPI Sensors 25(3):846 · Viz 01, 03, 05</div>
+    </article>
+
+    <article class="conclusion-card">
+      <div class="conclusion-num">02</div>
+      <div class="conclusion-stat">2×<span class="conclusion-stat-unit">PUE 1.1 ↔ 2.4</span></div>
+      <h3 class="conclusion-title">Facility efficiency is a 2× lever</h3>
+      <p class="conclusion-body">
+        Identical workloads consume roughly <strong>2× more grid energy</strong> in legacy enterprise facilities (PUE ~2.4) than in best-in-class hyperscale (PUE ~1.1). Cooling and power delivery are where that gap lives — invisible to the workload but doubling the bill. <span class="cite" data-cite-title="LBNL 2024 U.S. Data Center Energy Usage Report" data-cite-body="Covers PUE ranges from 1.1 (hyperscale best practice) to 2.4 (legacy enterprise), a 2× energy waste gap for identical workloads." data-cite-url="https://eta-publications.lbl.gov/sites/default/files/2024-12/lbnl-2024-united-states-data-center-energy-usage-report_1.pdf" data-cite-link="lbl.gov →">2</span>
+      </p>
+      <div class="conclusion-source">SOURCE — LBNL 2024 · Viz 02, Scenario Explorer</div>
+    </article>
+
+    <article class="conclusion-card">
+      <div class="conclusion-num">03</div>
+      <div class="conclusion-stat">8×<span class="conclusion-stat-unit">30 ↔ 750 gCO₂/kWh</span></div>
+      <h3 class="conclusion-title">Grid location is an 8× lever</h3>
+      <p class="conclusion-body">
+        The same kWh emits <strong>~30 gCO₂ on Norway's hydro grid</strong> and <strong>~700+ gCO₂ on coal-heavy grids</strong>. Where a data center is built matters more for emissions than how efficient it is internally. Geography is the largest single lever in the model. <span class="cite" data-cite-title="IEA Energy & AI Dataset" data-cite-body="IEA regional data showing up to 8× carbon variance for the same AI workload depending on grid location." data-cite-url="https://www.iea.org/data-and-statistics/data-product/energy-and-ai" data-cite-link="iea.org →">3</span>
+      </p>
+      <div class="conclusion-source">SOURCE — IEA Energy &amp; AI · Viz 04, 06</div>
+    </article>
+
+  </div>
+
+  <p class="conclusions-takeaway">
+    <strong>Together, these three levers multiply.</strong> The best-to-worst spread across the model is <strong style="color:var(--green);">10× or more</strong> — and no single lever closes that gap on its own. Hardware, facility, and location must all improve together.
   </p>
 </section>
 
