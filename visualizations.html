@@ -220,105 +220,6 @@
   </div>
 </section>
 
-
-<!-- ══════════════════════════════════════════════════
-     SCENARIO EXPLORER — Interactive slider section
-══════════════════════════════════════════════════ -->
-<section class="scenario-section">
-  <div class="section-header">
-    <div class="section-header-left">
-      <div class="section-label">Interactive Explorer</div>
-      <h2>Build Your Scenario</h2>
-    </div>
-    <div class="section-header-right">
-      <p>Adjust the three key levers — facility efficiency, GPU generation, and grid carbon intensity — to see how total energy footprint and carbon output change. All calculations use real data ranges from the live database.</p>
-    </div>
-  </div>
-
-  <div class="scenario-grid">
-    <!-- Controls -->
-    <div class="scenario-controls">
-
-      <div class="slider-group">
-        <div class="slider-label">
-          <span>Facility Efficiency (PUE) <span class="cite" data-cite-title="LBNL 2024 U.S. Data Center Energy Usage Report" data-cite-body="PUE range 1.1 (best hyperscale) to 2.4 (legacy enterprise). A PUE of 1.0 would be perfect efficiency — all power going to compute." data-cite-url="https://eta-publications.lbl.gov/sites/default/files/2024-12/lbnl-2024-united-states-data-center-energy-usage-report_1.pdf" data-cite-link="lbl.gov →">1</span></span>
-          <strong id="pue-display">1.5</strong>
-        </div>
-        <input type="range" class="scenario-slider" id="pue-slider" min="110" max="240" value="150" step="1">
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);font-family:'Space Mono',monospace;">
-          <span>1.1 — Best (hyperscale)</span><span>2.4 — Worst (legacy)</span>
-        </div>
-      </div>
-
-      <div class="slider-group">
-        <div class="slider-label">
-          <span>GPU Generation <span class="cite" data-cite-title="Kappa-Energy Index — MDPI Sensors 2025" data-cite-body="Each GPU generation delivers roughly 2.5× more compute efficiency per watt. H100 achieves ~1.41 TFLOPS/W vs V100 at ~0.37." data-cite-url="https://www.mdpi.com/1424-8220/25/3/846" data-cite-link="mdpi.com →">2</span></span>
-          <strong id="gpu-display">A100</strong>
-        </div>
-        <div class="gpu-selector" id="gpu-selector">
-          <button class="gpu-chip-btn" data-gpu="V100" data-eff="0.37">V100</button>
-          <button class="gpu-chip-btn active" data-gpu="A100" data-eff="0.77">A100</button>
-          <button class="gpu-chip-btn" data-gpu="H100" data-eff="1.41">H100</button>
-        </div>
-        <div style="font-size:11px;color:var(--text-faint);font-family:'Space Mono',monospace;margin-top:4px;">Efficiency: <span id="gpu-eff-display">0.77</span> TFLOPS/W</div>
-      </div>
-
-      <div class="slider-group">
-        <div class="slider-label">
-          <span>Grid Carbon Intensity <span class="cite" data-cite-title="IEA Energy & AI Dataset" data-cite-body="Carbon intensity ranges from ~30 gCO₂/kWh (Norway hydro) to ~700+ gCO₂/kWh (coal-heavy grids). Same workload, 8× carbon difference." data-cite-url="https://www.iea.org/data-and-statistics/data-product/energy-and-ai" data-cite-link="iea.org →">3</span></span>
-          <strong id="carbon-display">400 gCO₂/kWh</strong>
-        </div>
-        <input type="range" class="scenario-slider" id="carbon-slider" min="30" max="750" value="400" step="10">
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);font-family:'Space Mono',monospace;">
-          <span>30 — Norway (hydro)</span><span>750 — Coal-heavy grid</span>
-        </div>
-      </div>
-
-      <div class="slider-group">
-        <div class="slider-label">
-          <span>Workload Size (GPU·hours/day)</span>
-          <strong id="workload-display">1,000</strong>
-        </div>
-        <input type="range" class="scenario-slider" id="workload-slider" min="100" max="10000" value="1000" step="100">
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);font-family:'Space Mono',monospace;">
-          <span>100 — Small lab</span><span>10,000 — Large cluster</span>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Output -->
-    <div class="scenario-output">
-      <div class="scenario-result">
-        <div class="r-label">Daily Energy Use</div>
-        <div class="r-value" id="res-energy">—</div>
-        <div class="r-sub">MWh consumed per day (compute + overhead)</div>
-      </div>
-      <div class="scenario-result">
-        <div class="r-label">Daily Carbon Footprint</div>
-        <div class="r-value" id="res-carbon">—</div>
-        <div class="r-sub">kg CO₂ equivalent per day</div>
-      </div>
-
-      <div class="scenario-bar-wrap">
-        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">vs. best-practice baseline</div>
-        <div class="scenario-bar-row">
-          <span style="width:80px">Energy</span>
-          <div class="scenario-bar-track"><div class="scenario-bar-fill" id="bar-energy" style="width:0%;background:var(--mint)"></div></div>
-          <span id="bar-energy-label" style="width:40px;text-align:right">—</span>
-        </div>
-        <div class="scenario-bar-row">
-          <span style="width:80px">Carbon</span>
-          <div class="scenario-bar-track"><div class="scenario-bar-fill" id="bar-carbon" style="width:0%;background:var(--mint)"></div></div>
-          <span id="bar-carbon-label" style="width:40px;text-align:right">—</span>
-        </div>
-      </div>
-
-      <div class="scenario-verdict" id="scenario-verdict"></div>
-    </div>
-  </div>
-</section>
-
 <!-- ══════════════════════════════════════════════════
      NARRATIVE GUIDE — Step-by-step floating panel
 ══════════════════════════════════════════════════ -->
@@ -1670,17 +1571,106 @@ async function hydrateViz05FromDatabase() {
       const bubbleCanvas = document.getElementById('oeBubbleChart');
       const oldBubble = Chart.getChart(bubbleCanvas);
       if (oldBubble) oldBubble.destroy();
-      const points = top.map(r => ({
-        label: `${r.productName} (${r.releaseYear})`,
-        x: Math.max(75, Math.round(Number(r.memBusWidth||0) * 1.1)),
-        y: (Math.round(Number(r.unifiedShader||0) / 16) / Math.max(75, Math.round(Number(r.memBusWidth||0) * 1.1))),
-        r: Math.max(6, Math.sqrt((Number(r.memBusWidth||0) * Number(r.memClock||0)) / 10000)),
-        color: String(r.manufacturer||'').toLowerCase().includes('nvidia') ? '#40c4ff' : '#1bff7e'
-      }));
+
+      // Accurate data center and consumer GPU specs
+      // Source: MDPI Kappa-Energy Index (2025) + NVIDIA spec sheets
+      function bwToR(bw) { return Math.sqrt(bw) * 8; }
+      const DC_COLOR = '#40c4ff';
+      const CON_COLOR = '#1bff7e';
+      const dcGPUs = [
+        { label:'V100 SXM2 (2017)', x:300, y:0.37, r:bwToR(0.90) },
+        { label:'A100 SXM4 (2020)', x:400, y:0.78, r:bwToR(2.00) },
+        { label:'H100 SXM5 (2022)', x:700, y:1.41, r:bwToR(3.35) },
+        { label:'H200 SXM (2024)',  x:700, y:1.41, r:bwToR(4.80) },
+      ];
+      const conGPUs = [
+        { label:'RTX 3090 (2020)', x:350, y:0.41, r:bwToR(0.94) },
+        { label:'RTX 4090 (2022)', x:450, y:0.73, r:bwToR(1.01) },
+      ];
+
+      const labelPlugin = {
+        id: 'gpuLabels',
+        afterDatasetsDraw(chart) {
+          const ctx = chart.ctx;
+          chart.data.datasets.forEach((ds, di) => {
+            const meta = chart.getDatasetMeta(di);
+            if (!meta.visible) return;
+            meta.data.forEach((pt, pi) => {
+              const raw = ds.data[pi];
+              ctx.save();
+              ctx.font = '600 11px "Space Grotesk", sans-serif';
+              ctx.fillStyle = ds.borderColor;
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              ctx.fillText(ds.label, pt.x, pt.y - pt.options.radius - 4);
+              ctx.restore();
+            });
+          });
+        }
+      };
+
       new Chart(bubbleCanvas, {
         type: 'bubble',
-        data: { datasets: points.map(p => ({ label:p.label, data:[{x:p.x,y:p.y,r:p.r}], backgroundColor:p.color+'aa', borderColor:p.color, borderWidth:1.5 })) },
-        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, datalabels:{display:false} }, scales:{ x:{ title:{ display:true, text:'Estimated power proxy (W)', color:'#7a9982' }, ticks:{ color:'#7a9982' }, grid:{ color:'rgba(27,255,126,0.06)' } }, y:{ title:{ display:true, text:'Estimated TFLOPS/W proxy', color:'#7a9982' }, ticks:{ color:'#7a9982' }, grid:{ color:'rgba(27,255,126,0.06)' } } } }
+        plugins: [labelPlugin],
+        data: {
+          datasets: [
+            ...dcGPUs.map(g => ({
+              label: g.label,
+              data: [{ x: g.x, y: g.y, r: g.r }],
+              backgroundColor: DC_COLOR + '44',
+              borderColor: DC_COLOR,
+              borderWidth: 2,
+            })),
+            ...conGPUs.map(g => ({
+              label: g.label,
+              data: [{ x: g.x, y: g.y, r: g.r }],
+              backgroundColor: CON_COLOR + '44',
+              borderColor: CON_COLOR,
+              borderWidth: 2,
+            })),
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            datalabels: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(10,20,13,0.97)',
+              titleColor: '#e5e5e5',
+              bodyColor: '#9ab09f',
+              borderColor: 'rgba(27,255,126,0.2)',
+              borderWidth: 1,
+              padding: 12,
+              callbacks: {
+                title: items => items[0].dataset.label,
+                label: item => {
+                  const raw = item.raw;
+                  return [
+                    `TDP: ${raw.x} W`,
+                    `Efficiency: ${raw.y.toFixed(2)} TFLOPS/W`,
+                    `Bubble size ∝ memory bandwidth`
+                  ];
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              min: 200, max: 820,
+              title: { display: true, text: 'TDP — Power Draw (W)', color: '#7a9982' },
+              ticks: { color: '#7a9982' },
+              grid: { color: 'rgba(27,255,126,0.06)' }
+            },
+            y: {
+              min: 0.1, max: 1.7,
+              title: { display: true, text: 'FP16 TFLOPS / Watt', color: '#7a9982' },
+              ticks: { color: '#7a9982' },
+              grid: { color: 'rgba(27,255,126,0.06)' }
+            }
+          }
+        }
       });
     }
 
@@ -1792,6 +1782,104 @@ hydrateViz05FromDatabase();
         <h3>Range</h3>
         <p id="rk-callout-range">Loading live regional comparison…</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SCENARIO EXPLORER — Interactive slider section
+══════════════════════════════════════════════════ -->
+<section class="scenario-section">
+  <div class="section-header">
+    <div class="section-header-left">
+      <div class="section-label">Interactive Explorer</div>
+      <h2>Build Your Scenario</h2>
+    </div>
+    <div class="section-header-right">
+      <p>Adjust the three key levers — facility efficiency, GPU generation, and grid carbon intensity — to see how total energy footprint and carbon output change. All calculations use real data ranges from the live database.</p>
+    </div>
+  </div>
+
+  <div class="scenario-grid">
+    <!-- Controls -->
+    <div class="scenario-controls">
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>Facility Efficiency (PUE) <span class="cite" data-cite-title="LBNL 2024 U.S. Data Center Energy Usage Report" data-cite-body="PUE range 1.1 (best hyperscale) to 2.4 (legacy enterprise). A PUE of 1.0 would be perfect efficiency — all power going to compute." data-cite-url="https://eta-publications.lbl.gov/sites/default/files/2024-12/lbnl-2024-united-states-data-center-energy-usage-report_1.pdf" data-cite-link="lbl.gov →">1</span></span>
+          <strong id="pue-display">1.5</strong>
+        </div>
+        <input type="range" class="scenario-slider" id="pue-slider" min="110" max="240" value="150" step="1">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);font-family:'Space Mono',monospace;">
+          <span>1.1 — Best (hyperscale)</span><span>2.4 — Worst (legacy)</span>
+        </div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>GPU Generation <span class="cite" data-cite-title="Kappa-Energy Index — MDPI Sensors 2025" data-cite-body="Each GPU generation delivers roughly 2.5× more compute efficiency per watt. H100 achieves ~1.41 TFLOPS/W vs V100 at ~0.37." data-cite-url="https://www.mdpi.com/1424-8220/25/3/846" data-cite-link="mdpi.com →">2</span></span>
+          <strong id="gpu-display">A100</strong>
+        </div>
+        <div class="gpu-selector" id="gpu-selector">
+          <button class="gpu-chip-btn" data-gpu="V100" data-eff="0.37">V100</button>
+          <button class="gpu-chip-btn active" data-gpu="A100" data-eff="0.77">A100</button>
+          <button class="gpu-chip-btn" data-gpu="H100" data-eff="1.41">H100</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-faint);font-family:'Space Mono',monospace;margin-top:4px;">Efficiency: <span id="gpu-eff-display">0.77</span> TFLOPS/W</div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>Grid Carbon Intensity <span class="cite" data-cite-title="IEA Energy & AI Dataset" data-cite-body="Carbon intensity ranges from ~30 gCO₂/kWh (Norway hydro) to ~700+ gCO₂/kWh (coal-heavy grids). Same workload, 8× carbon difference." data-cite-url="https://www.iea.org/data-and-statistics/data-product/energy-and-ai" data-cite-link="iea.org →">3</span></span>
+          <strong id="carbon-display">400 gCO₂/kWh</strong>
+        </div>
+        <input type="range" class="scenario-slider" id="carbon-slider" min="30" max="750" value="400" step="10">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);font-family:'Space Mono',monospace;">
+          <span>30 — Norway (hydro)</span><span>750 — Coal-heavy grid</span>
+        </div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>Workload Size (GPU·hours/day)</span>
+          <strong id="workload-display">1,000</strong>
+        </div>
+        <input type="range" class="scenario-slider" id="workload-slider" min="100" max="10000" value="1000" step="100">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);font-family:'Space Mono',monospace;">
+          <span>100 — Small lab</span><span>10,000 — Large cluster</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Output -->
+    <div class="scenario-output">
+      <div class="scenario-result">
+        <div class="r-label">Daily Energy Use</div>
+        <div class="r-value" id="res-energy">—</div>
+        <div class="r-sub">MWh consumed per day (compute + overhead)</div>
+      </div>
+      <div class="scenario-result">
+        <div class="r-label">Daily Carbon Footprint</div>
+        <div class="r-value" id="res-carbon">—</div>
+        <div class="r-sub">kg CO₂ equivalent per day</div>
+      </div>
+
+      <div class="scenario-bar-wrap">
+        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">vs. best-practice baseline</div>
+        <div class="scenario-bar-row">
+          <span style="width:80px">Energy</span>
+          <div class="scenario-bar-track"><div class="scenario-bar-fill" id="bar-energy" style="width:0%;background:var(--mint)"></div></div>
+          <span id="bar-energy-label" style="width:40px;text-align:right">—</span>
+        </div>
+        <div class="scenario-bar-row">
+          <span style="width:80px">Carbon</span>
+          <div class="scenario-bar-track"><div class="scenario-bar-fill" id="bar-carbon" style="width:0%;background:var(--mint)"></div></div>
+          <span id="bar-carbon-label" style="width:40px;text-align:right">—</span>
+        </div>
+      </div>
+
+      <div class="scenario-verdict" id="scenario-verdict"></div>
     </div>
   </div>
 </section>
