@@ -1,0 +1,23 @@
+{
+  "name": "ai-data-centers-data-viz-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opederso-code/AI-Data-Centers-Data-Viz-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/opederso-code/AI-Data-Centers-Data-Viz-Project/issues"
+  },
+  "homepage": "https://github.com/opederso-code/AI-Data-Centers-Data-Viz-Project#readme",
+  "dependencies": {
+    "mysql2": "^3.22.3"
+  }
+}
