@@ -1709,11 +1709,15 @@ hydrateViz05FromDatabase();
 <div id="rk-tooltip"><div class="rk-tt-title"></div><div class="rk-tt-body"></div></div>
 
 <section class="viz-section" id="viz-06">
-  <div class="viz-header">
-    <span class="section-label">Visualization 06</span>
-    <h2>Regional Concentration &amp; Growth Trends</h2>
-    <p class="viz-desc">Three interactive charts showing where global electricity demand is concentrated and how it shifts by 2030. Start with the <strong style="color:#e8f0ea;">constellation</strong> (circle size = 2024 demand), then follow growth in the <strong style="color:#e8f0ea;">growth ladder</strong>, and see proportional share change in the <strong style="color:#e8f0ea;">ribbon chart</strong>. Hover or click any region to highlight it across all three views.</p>
-    <p class="source-tag">SOURCE — database.php · regional_data_annex</p>
+  <div class="section-header">
+    <div class="section-header-left">
+      <span class="section-label">Visualization 06</span>
+      <h2>Regional Concentration &amp; Growth Trends</h2>
+    </div>
+    <div class="section-header-right">
+      <p>Three interactive charts showing where global electricity demand is concentrated and how it shifts by 2030. Start with the <strong style="color:#e8f0ea;">constellation</strong> (circle size = 2024 demand), then follow growth in the <strong style="color:#e8f0ea;">growth ladder</strong>, and see proportional share change in the <strong style="color:#e8f0ea;">ribbon chart</strong>. Hover or click any region to highlight it across all three views.</p>
+      <p class="source-tag">SOURCE — database.php · regional_data_annex</p>
+    </div>
   </div>
 
   <!-- Data table -->
@@ -1735,7 +1739,6 @@ hydrateViz05FromDatabase();
 
   <!-- Charts 1 & 2: grouped under Visualization 1 -->
   <div class="viz-card" style="margin-bottom:32px">
-    <span class="section-label" style="display:inline-block;margin-bottom:12px">Visualization 1</span>
 
     <h3 style="margin-bottom:6px">Regional Share Constellation</h3>
     <p style="color:var(--text-muted);font-size:16px;margin:6px 0 14px">Circle area scales to live 2024 electricity demand by region. Hover or click each region for details.</p>
@@ -1998,7 +2001,7 @@ hydrateViz05FromDatabase();
       rkMake('text',{x:lx+20,y:ly+10,class:'rk-legend-text',style:'font-size:12px'},svg).textContent=`${d.name} · ${d.share}%`;
     });
 
-    rkMake('text',{x:m.l,y:334,class:'rk-legend-text',style:'font-size:13px'},svg).textContent='Exact live widths keep the full ribbon inside the frame; hover segments for detailed values.';
+    rkMake('text',{x:m.l,y:334,class:'rk-legend-text',style:'font-size:13px'},svg).textContent='Hover segments for detailed values.';
   }
 
   async function initViz06FromDatabase() {
