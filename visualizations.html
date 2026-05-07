@@ -21,7 +21,7 @@
     <a href="purpose.html">Purpose &amp; Conclusions</a>
     <a href="assumptions.html">Assumptions</a>
     <a href="resources.html">Resources</a>
-    <a href="index.html" class="nav-cta">Go Back Home</a>
+    <a href="visualizations.html" class="nav-cta">Explore the Data →</a>
   </div>
 </nav>
 
@@ -1536,8 +1536,6 @@ initViz02Live();
             <th>2030 TWh</th>
             <th>2024–2030 Growth</th>
             <th>Share (2024)</th>
-            <th>Energy Mix</th>
-            <th>Carbon Intensity</th>
           </tr>
         </thead>
         <tbody id="oe-region-table-body"></tbody>
@@ -1624,7 +1622,7 @@ async function hydrateViz05FromDatabase() {
         return { name, y22: v2022?.value, y24: v2024?.value, y30: v2030?.value, growth, share };
       });
       regionBody.innerHTML = rows.map(r => `
-        <tr><td>${r.name}</td><td class="num">${r.y22 ?? '—'}</td><td class="num">${r.y24 ?? '—'}</td><td class="val-mint">${r.y30 ?? '—'}</td><td class="num">${r.growth}</td><td class="num">${r.share}</td><td><span class="oe-badge oe-badge-blue">regional_data_annex</span></td><td><span class="oe-badge oe-badge-blue">live</span></td></tr>
+        <tr><td>${r.name}</td><td class="num">${r.y22 ?? '—'}</td><td class="num">${r.y24 ?? '—'}</td><td class="val-mint">${r.y30 ?? '—'}</td><td class="num">${r.growth}</td><td class="num">${r.share}</td></tr>
       `).join('');
 
       const years = [2022, 2024, 2030];
@@ -1697,7 +1695,7 @@ hydrateViz05FromDatabase();
 
 <div class="insight" style="margin: 0 var(--pad-h) 32px;">
   <div class="insight-label">How to Read This Section</div>
-  <p>This section pairs two views. The <strong style="color:#e8f0ea;">regional electricity table</strong> shows how data center demand compares across regions from 2022 → 2030, including energy mix and carbon intensity. The <strong style="color:#e8f0ea;">GPU efficiency bubble chart</strong> below it plots individual GPU models by estimated power draw (X) vs. compute efficiency (Y) — bigger bubbles indicate wider memory bandwidth. <strong style="color:#e8f0ea;">The core tension:</strong> GPU hardware got ~4× more efficient per watt from V100 to H100, but AI workloads grew 10× in the same window — hardware gains alone cannot offset demand growth.</p>
+  <p>This section pairs two views. The <strong style="color:#e8f0ea;">regional electricity table</strong> shows how data center demand compares across regions from 2022 → 2030. The <strong style="color:#e8f0ea;">GPU efficiency bubble chart</strong> below it plots individual GPU models by estimated power draw (X) vs. compute efficiency (Y) — bigger bubbles indicate wider memory bandwidth. <strong style="color:#e8f0ea;">The core tension:</strong> GPU hardware got ~4× more efficient per watt from V100 to H100, but AI workloads grew 10× in the same window — hardware gains alone cannot offset demand growth.</p>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════

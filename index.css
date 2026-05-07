@@ -468,13 +468,13 @@ nav {
 }
 .assumption-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
 }
 .assumption-card {
   background: rgba(21,25,22,0.4);
   border: 1px solid var(--green-border2);
-  padding: 28px 24px;
+  padding: 48px 36px;
   display: flex;
   flex-direction: column;
   gap: 4px;
